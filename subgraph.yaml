@@ -1,0 +1,68 @@
+specVersion: 0.0.2
+description: Startrail Ethereum Subgraph
+repository: https://github.com/startbahn/startrail-subgraph
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: LicensedUserEvent
+    network: rinkeby
+    source:
+      address: '0xD086dd32CC6a52D56EeEf8D3Cd58A06c8e02c7a5'
+      abi: LicensedUserEvent
+      startBlock: 6917816 # contract creation block
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - LicensedUserWallet
+      abis:
+        - name: LicensedUserEvent
+          file: ./abis/LicensedUserEvent.json
+      eventHandlers:
+        - event: CreateLicensedUserWallet(indexed address,address[],uint256,string,string,string)
+          handler: handleCreateLicensedUserWallet
+      file: ./src/luw-mapping.ts
+
+  - kind: ethereum/contract
+    name: StartrailRegistry
+    network: rinkeby
+    source:
+      address: '0xd609B4021C553c60a430D9a180eD9F046f7c01E0'
+      abi: StartrailRegistry
+      startBlock: 6917818  # contract creation block
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - SRR
+      abis:
+        - name: StartrailRegistry
+          file: ./abis/StartrailRegistry.json
+      file: ./src/srr-mapping.ts
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+
+  - kind: ethereum/contract
+    name: RootLogic
+    network: rinkeby
+    source:
+      address: '0x107645b03b8a0935126DeB7673d32f446a4E60B5'
+      abi: RootLogic
+      startBlock: 6917820 # contract creation block
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - SRR
+      abis:
+        - name: RootLogic
+          file: ./abis/RootLogic.json
+      file: ./src/srr-mapping.ts
+      eventHandlers:
+        - event: CreateSRR(indexed uint256,(bool,address,address),bytes32)
+          handler: handleCreateSRR

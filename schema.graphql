@@ -1,0 +1,32 @@
+enum UserType {
+  admin
+  artist
+  handler
+}
+
+type LicensedUserWallet @entity {
+  id: ID!                     # contractAddress.toHexString()
+  contractAddress: Bytes!
+  requiredConfirmation: Int!
+  englishName: String!
+  originalName: String!
+  userType: UserType!
+  owners: [Bytes!]!
+}
+
+#
+# Startrail Registry Record (SRR) - ERC721 Token
+#
+# NOTE: a number of fields are nullable because the SRR is initially created
+#       from the Transfer event which has only tokenId and ownerAddress
+#
+type SRR @entity {
+  id: ID!                     # tokenId.toHexString()
+  tokenId: BigInt            # ERC721 token id
+  isPrimaryIssuer: Boolean
+  artistAddress: Bytes
+  issuer: LicensedUserWallet
+  ownerAddress: Bytes!
+  metadataDigest: Bytes      # sha256 hash of metadata JSON file
+}
+
