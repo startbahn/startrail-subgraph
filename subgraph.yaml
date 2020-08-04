@@ -70,3 +70,26 @@ dataSources:
           handler: handleSRRProvenance
         - event: SRRCommitment(address,bytes32,uint256)
           handler: handleSRRCommitment
+
+  - kind: ethereum/contract
+    name: BulkIssue
+    network: rinkeby
+    source:
+      address: '0x932A14afd15CC7A0959Bb73FE4C19aBE29e50bA0'
+      abi: BulkIssue
+      startBlock: 6917819 # contract creation block
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - SRR
+      abis:
+        - name: BulkIssue
+          file: ./abis/BulkIssue.json
+      file: ./src/bulk-mapping.ts
+      eventHandlers:
+        - event: BatchPrepared(indexed bytes32)
+          handler: handleBatchPrepared
+        - event: CreateSRRWithProof(indexed bytes32,bytes32)
+          handler: handleCreateSRRWithProof

@@ -7,7 +7,7 @@ import {
 } from '../generated/RootLogic/RootLogic'
 import { LicensedUserWallet, SRR, SRRProvenance } from '../generated/schema'
 import { Transfer as TransferEvent } from '../generated/StartrailRegistry/StartrailRegistry'
-import { byteArrayFromHex, concat } from './utils'
+import { byteArrayFromHex } from './utils'
 
 export function handleTransfer(event: TransferEvent): void {
   let srrId = event.params.tokenId.toString()
@@ -89,5 +89,19 @@ export function handleSRRCommitment(event: SRRCommitmentEvent): void {
   srr.updatedAt = event.block.timestamp.toI32()
   
   srr.save()
+}
+
+// TODO:
+
+export function handleUpdateSRR(): void {
+  throw new Error('not yet implemented')
+}
+
+export function handleTokenURIIntegrityDigestUpdate(): void {
+  throw new Error('not yet implemented')
+}
+
+export function handleSRRCommitmentCancelled(): void {
+  throw new Error('not yet implemented')
 }
 

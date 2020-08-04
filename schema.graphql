@@ -30,7 +30,7 @@ type LicensedUserWallet @entity {
 #       from the Transfer event which has only tokenId and ownerAddress
 #
 type SRR @entity {
-  id: ID!                     # tokenId.toHexString()
+  id: ID!                     # tokenId.toString()
   tokenId: BigInt             # ERC721 token id
   
   isPrimaryIssuer: Boolean
@@ -57,9 +57,19 @@ type SRRProvenance @entity {
   metadataDigest: String!     # event Provenance.metadataDigest
   metadataURI: String!        # event Provenance.metadataURI
 
-  # block.timestamp when entity created
-  # NOTE: this isredundant because we have timestamp above but it's included 
+  # NOTE: this is redundant because we have timestamp above but it's included 
   #       for consistency as all entities have createdAt
-  createdAt: Int!             
+  createdAt: Int!             # block.timestamp when entity created
 }
 
+type BulkIssue @entity {
+  id: ID!                     # merkleRoot.toHexString()
+  merkleRoot: Bytes!          # batch merkle root
+  srrs: [Bytes!]             # Hashes of SRRs processed
+
+  createdAt: Int!             # block.timestamp when entity created
+  updatedAt: Int!             # block.timestamp when entity last updated
+
+  # TO add when contracts updated:
+  # issuer: Bytes!              # batch issuer address
+}
