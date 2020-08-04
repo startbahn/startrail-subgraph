@@ -1,4 +1,4 @@
-import { ByteArray } from '@graphprotocol/graph-ts'
+import { ByteArray, ethereum } from '@graphprotocol/graph-ts'
 
 // Helper for concatenating two byte arrays
 // from the ens-subgraph:
@@ -24,3 +24,8 @@ export function byteArrayFromHex(s: string): ByteArray {
   }
   return out as ByteArray;
 }
+
+export function eventUTCMillis(event: ethereum.Event): i32 {
+  return event.block.timestamp.toI32() * 1000
+}
+

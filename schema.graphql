@@ -31,7 +31,7 @@ type LicensedUserWallet @entity {
 #
 type SRR @entity {
   id: ID!                     # tokenId.toString()
-  tokenId: BigInt             # ERC721 token id
+  tokenId: String             # ERC721 token id
   
   isPrimaryIssuer: Boolean
   artistAddress: Bytes
@@ -42,6 +42,7 @@ type SRR @entity {
   transferCommitment: Bytes   # keccak256 hash transfer commitment
   
   provenance: [SRRProvenance!]! @derivedFrom(field: "srr")
+  metadataHistory: [SRRMetadataHistory!]! @derivedFrom(field: "srr")
 
   createdAt: Int!             # block.timestamp when entity created
   updatedAt: Int!             # block.timestamp when entity last updated
@@ -59,6 +60,13 @@ type SRRProvenance @entity {
 
   # NOTE: this is redundant because we have timestamp above but it's included 
   #       for consistency as all entities have createdAt
+  createdAt: Int!             # block.timestamp when entity created
+}
+
+type SRRMetadataHistory @entity {
+  id: ID!                     # keccak256(tokenId,metadataDigest)
+  srr: SRR!                   # SRR for event Provenance.tokenId
+  metadataDigest: String!     # event Provenance.metadataDigest
   createdAt: Int!             # block.timestamp when entity created
 }
 

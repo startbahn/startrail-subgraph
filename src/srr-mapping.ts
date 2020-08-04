@@ -8,26 +8,34 @@ import {
   UpdateSRR as UpdateSRREvent,
   UpdateTokenURIIntegrityDigest as UpdateTokenURIIntegrityDigestEvent,
 } from '../generated/RootLogic/RootLogic'
-import { LicensedUserWallet, SRR, SRRProvenance } from '../generated/schema'
+import {
+  LicensedUserWallet,
+  SRR,
+  SRRMetadataHistory,
+  SRRProvenance,
+} from '../generated/schema'
 import { Transfer as TransferEvent } from '../generated/StartrailRegistry/StartrailRegistry'
-import { byteArrayFromHex } from './utils'
+import { byteArrayFromHex, eventUTCMillis } from './utils'
 
 export function handleTransfer(event: TransferEvent): void {
   let srrId = event.params.tokenId.toString()
   let srr = SRR.load(srrId)
   if (srr == null) {
     srr = new SRR(srrId)
-    srr.tokenId = event.params.tokenId
-    srr.createdAt = event.block.timestamp.toI32()
+    srr.tokenId = srrId
+    srr.createdAt = eventUTCMillis(event)
   } else if (srr.transferCommitment != null) {
     srr.transferCommitment = null
   }
   srr.ownerAddress = event.params.to
-  srr.updatedAt = event.block.timestamp.toI32()
+  srr.updatedAt = eventUTCMillis(event)
   srr.save()
 }
 
 export function handleCreateSRR(event: CreateSRREvent): void {
+  //
+  // Save SRR
+  //
   let srrId = event.params.tokenId.toString()
   let srr = SRR.load(srrId)
 
@@ -41,9 +49,12 @@ export function handleCreateSRR(event: CreateSRREvent): void {
     srr.issuer = luw.id
   }
 
-  srr.updatedAt = event.block.timestamp.toI32()
+  let blockTime = eventUTCMillis(event)
+  srr.updatedAt = blockTime
   
   srr.save()
+
+  saveSRRMetadataHistory(srr as SRR, blockTime)
 }
 
 export function handleSRRProvenance(event: SRRProvenanceEvent): void {
@@ -71,7 +82,7 @@ export function handleSRRProvenance(event: SRRProvenanceEvent): void {
   provenance.metadataURI = event.params.historyMetadataURI
   
   provenance.timestamp = event.params.timestamp.toI32()
-  provenance.createdAt = event.block.timestamp.toI32()
+  provenance.createdAt = eventUTCMillis(event)
   
   provenance.save()
 }
@@ -87,7 +98,7 @@ export function handleSRRCommitment(event: SRRCommitmentEvent): void {
   log.info('SRRCommitment commitment = {}', [event.params.commitment.toHexString()])
 
   srr.transferCommitment = event.params.commitment
-  srr.updatedAt = event.block.timestamp.toI32()
+  srr.updatedAt = eventUTCMillis(event)
   
   srr.save()
 }
@@ -101,7 +112,7 @@ export function handleSRRCommitmentCancelled(event: SRRCommitmentCancelledEvent)
   }
 
   srr.transferCommitment = null
-  srr.updatedAt = event.block.timestamp.toI32()
+  srr.updatedAt = eventUTCMillis(event)
   
   srr.save()
 }
@@ -116,7 +127,7 @@ export function handleUpdateSRR(event: UpdateSRREvent): void {
 
   srr.artistAddress = event.params.registryRecord.artistAddress
   srr.isPrimaryIssuer = event.params.registryRecord.isPrimaryIssuer
-  srr.updatedAt = event.block.timestamp.toI32()
+  srr.updatedAt = eventUTCMillis(event)
   
   srr.save()
 }
@@ -129,8 +140,23 @@ export function handleUpdateTokenURIIntegrityDigest(event: UpdateTokenURIIntegri
     return
   }
 
+  let blockTime = eventUTCMillis(event)
+  
+  srr.updatedAt = blockTime
   srr.metadataDigest = event.params.tokenURIIntegrityDigest
-
   srr.save()
+
+  saveSRRMetadataHistory(srr as SRR, blockTime)
+}
+
+function saveSRRMetadataHistory(srr: SRR, blockTime: i32): void {
+  let metadataHistoryId = crypto.keccak256(
+    byteArrayFromHex(srr.id + srr.metadataDigest.toString())
+  ).toHexString()
+  let srrMetadataHistory = new SRRMetadataHistory(metadataHistoryId)
+  srrMetadataHistory.srr = srr.id
+  srrMetadataHistory.createdAt = blockTime 
+  srrMetadataHistory.metadataDigest = srr.metadataDigest.toString()
+  srrMetadataHistory.save()
 }
 
