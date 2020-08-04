@@ -7,11 +7,20 @@ enum UserType {
 type LicensedUserWallet @entity {
   id: ID!                     # contractAddress.toHexString()
   contractAddress: Bytes!
+
   requiredConfirmation: Int!
   englishName: String!
   originalName: String!
   userType: UserType!
   owners: [Bytes!]!
+
+  issuedSRRs: [SRR!]! @derivedFrom(field: "issuer")
+
+  # How to map this:
+  # ownedSRRs: [SRR!]! @derivedFrom(field: "ownerAddress")
+
+  createdAt: Int!             # block.timestamp when entity created
+  updatedAt: Int!             # block.timestamp when entity last updated
 }
 
 #
@@ -22,11 +31,35 @@ type LicensedUserWallet @entity {
 #
 type SRR @entity {
   id: ID!                     # tokenId.toHexString()
-  tokenId: BigInt            # ERC721 token id
+  tokenId: BigInt             # ERC721 token id
+  
   isPrimaryIssuer: Boolean
   artistAddress: Bytes
   issuer: LicensedUserWallet
   ownerAddress: Bytes!
-  metadataDigest: Bytes      # sha256 hash of metadata JSON file
+  metadataDigest: Bytes       # sha256 hash of metadata JSON file
+  
+  transferCommitment: Bytes   # keccak256 hash transfer commitment
+  
+  provenance: [SRRProvenance!]! @derivedFrom(field: "srr")
+
+  createdAt: Int!             # block.timestamp when entity created
+  updatedAt: Int!             # block.timestamp when entity last updated
+}
+
+type SRRProvenance @entity {
+  id: ID!                     # keccak256(tokenId,timestamp)
+  timestamp: Int!             # event Provenance.timestamp (block.timestamp)
+
+  srr: SRR!                   # SRR for event Provenance.tokenId
+  from: Bytes!                # event Provenance.from - ownership transferred from
+  to: Bytes!                  # event Provenance.to - ownership transferred to
+  metadataDigest: String!     # event Provenance.metadataDigest
+  metadataURI: String!        # event Provenance.metadataURI
+
+  # block.timestamp when entity created
+  # NOTE: this isredundant because we have timestamp above but it's included 
+  #       for consistency as all entities have createdAt
+  createdAt: Int!             
 }
 

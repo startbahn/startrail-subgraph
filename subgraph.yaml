@@ -66,3 +66,7 @@ dataSources:
       eventHandlers:
         - event: CreateSRR(indexed uint256,(bool,address,address),bytes32)
           handler: handleCreateSRR
+        - event: Provenance(indexed uint256,indexed address,indexed address,uint256,string,string)
+          handler: handleSRRProvenance
+        - event: SRRCommitment(address,bytes32,uint256)
+          handler: handleSRRCommitment
