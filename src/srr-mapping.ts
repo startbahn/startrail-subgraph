@@ -4,6 +4,9 @@ import {
   CreateSRR as CreateSRREvent,
   Provenance as SRRProvenanceEvent,
   SRRCommitment as SRRCommitmentEvent,
+  SRRCommitmentCancelled as SRRCommitmentCancelledEvent,
+  UpdateSRR as UpdateSRREvent,
+  UpdateTokenURIIntegrityDigest as UpdateTokenURIIntegrityDigestEvent,
 } from '../generated/RootLogic/RootLogic'
 import { LicensedUserWallet, SRR, SRRProvenance } from '../generated/schema'
 import { Transfer as TransferEvent } from '../generated/StartrailRegistry/StartrailRegistry'
@@ -74,8 +77,6 @@ export function handleSRRProvenance(event: SRRProvenanceEvent): void {
 }
 
 export function handleSRRCommitment(event: SRRCommitmentEvent): void {
-  log.info('SRRCommitment handler called!', [])
-
   let srrId = event.params.tokenId.toString()
   let srr = SRR.load(srrId)
   if (srr == null) {
@@ -91,17 +92,45 @@ export function handleSRRCommitment(event: SRRCommitmentEvent): void {
   srr.save()
 }
 
-// TODO:
+export function handleSRRCommitmentCancelled(event: SRRCommitmentCancelledEvent): void {
+  let srrId = event.params.tokenId.toString()
+  let srr = SRR.load(srrId)
+  if (srr == null) {
+    log.error('received event for unknown SRR: {}', [event.params.tokenId.toString()])
+    return
+  }
 
-export function handleUpdateSRR(): void {
-  throw new Error('not yet implemented')
+  srr.transferCommitment = null
+  srr.updatedAt = event.block.timestamp.toI32()
+  
+  srr.save()
 }
 
-export function handleTokenURIIntegrityDigestUpdate(): void {
-  throw new Error('not yet implemented')
+export function handleUpdateSRR(event: UpdateSRREvent): void {
+  let srrId = event.params.tokenId.toString()
+  let srr = SRR.load(srrId)
+  if (srr == null) {
+    log.error('received event for unknown SRR: {}', [event.params.tokenId.toString()])
+    return
+  }
+
+  srr.artistAddress = event.params.registryRecord.artistAddress
+  srr.isPrimaryIssuer = event.params.registryRecord.isPrimaryIssuer
+  srr.updatedAt = event.block.timestamp.toI32()
+  
+  srr.save()
 }
 
-export function handleSRRCommitmentCancelled(): void {
-  throw new Error('not yet implemented')
+export function handleUpdateTokenURIIntegrityDigest(event: UpdateTokenURIIntegrityDigestEvent): void {
+  let srrId = event.params.tokenId.toString()
+  let srr = SRR.load(srrId)
+  if (srr == null) {
+    log.error('received event for unknown SRR: {}', [event.params.tokenId.toString()])
+    return
+  }
+
+  srr.metadataDigest = event.params.tokenURIIntegrityDigest
+
+  srr.save()
 }
 
