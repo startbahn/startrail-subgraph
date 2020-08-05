@@ -19,8 +19,8 @@ type LicensedUserWallet @entity {
   # How to map this:
   # ownedSRRs: [SRR!]! @derivedFrom(field: "ownerAddress")
 
-  createdAt: Int!             # block.timestamp when entity created
-  updatedAt: Int!             # block.timestamp when entity last updated
+  createdAt: BigInt!          # block.timestamp when entity created
+  updatedAt: BigInt!          # block.timestamp when entity last updated
 }
 
 #
@@ -44,39 +44,39 @@ type SRR @entity {
   provenance: [SRRProvenance!]! @derivedFrom(field: "srr")
   metadataHistory: [SRRMetadataHistory!]! @derivedFrom(field: "srr")
 
-  createdAt: Int!             # block.timestamp when entity created
-  updatedAt: Int!             # block.timestamp when entity last updated
+  createdAt: BigInt!          # block.timestamp when entity created
+  updatedAt: BigInt!          # block.timestamp when entity last updated
 }
 
 type SRRProvenance @entity {
   id: ID!                     # keccak256(tokenId,timestamp)
-  timestamp: Int!             # event Provenance.timestamp (block.timestamp)
+  timestamp: BigInt!          # event Provenance.timestamp (block.timestamp)
 
   srr: SRR!                   # SRR for event Provenance.tokenId
   from: Bytes!                # event Provenance.from - ownership transferred from
   to: Bytes!                  # event Provenance.to - ownership transferred to
-  metadataDigest: String!     # event Provenance.metadataDigest
+  metadataDigest: Bytes!      # event Provenance.metadataDigest
   metadataURI: String!        # event Provenance.metadataURI
 
   # NOTE: this is redundant because we have timestamp above but it's included 
   #       for consistency as all entities have createdAt
-  createdAt: Int!             # block.timestamp when entity created
+  createdAt: BigInt!          # block.timestamp when entity created
 }
 
 type SRRMetadataHistory @entity {
   id: ID!                     # keccak256(tokenId,metadataDigest)
   srr: SRR!                   # SRR for event Provenance.tokenId
-  metadataDigest: String!     # event Provenance.metadataDigest
-  createdAt: Int!             # block.timestamp when entity created
+  metadataDigest: Bytes!      # event Provenance.metadataDigest
+  createdAt: BigInt!          # block.timestamp when entity created
 }
 
 type BulkIssue @entity {
   id: ID!                     # merkleRoot.toHexString()
   merkleRoot: Bytes!          # batch merkle root
-  srrs: [Bytes!]             # Hashes of SRRs processed
+  srrs: [Bytes!]              # Hashes of SRRs processed
 
-  createdAt: Int!             # block.timestamp when entity created
-  updatedAt: Int!             # block.timestamp when entity last updated
+  createdAt: BigInt!          # block.timestamp when entity created
+  updatedAt: BigInt!          # block.timestamp when entity last updated
 
   # TO add when contracts updated:
   # issuer: Bytes!              # batch issuer address

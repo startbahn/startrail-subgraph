@@ -1,4 +1,10 @@
-import { crypto, log } from '@graphprotocol/graph-ts'
+import {
+  ByteArray,
+  Bytes,
+  crypto,
+  ethereum,
+  log,
+} from '@graphprotocol/graph-ts'
 
 import {
   CreateSRR as CreateSRREvent,
@@ -15,20 +21,23 @@ import {
   SRRProvenance,
 } from '../generated/schema'
 import { Transfer as TransferEvent } from '../generated/StartrailRegistry/StartrailRegistry'
-import { byteArrayFromHex, eventUTCMillis } from './utils'
+import { eventUTCMillis } from './utils'
 
 export function handleTransfer(event: TransferEvent): void {
+  let timestampMillis = eventUTCMillis(event)
   let srrId = event.params.tokenId.toString()
+  
   let srr = SRR.load(srrId)
   if (srr == null) {
     srr = new SRR(srrId)
     srr.tokenId = srrId
-    srr.createdAt = eventUTCMillis(event)
+    srr.createdAt = timestampMillis
   } else if (srr.transferCommitment != null) {
     srr.transferCommitment = null
   }
+
   srr.ownerAddress = event.params.to
-  srr.updatedAt = eventUTCMillis(event)
+  srr.updatedAt = timestampMillis
   srr.save()
 }
 
@@ -54,7 +63,7 @@ export function handleCreateSRR(event: CreateSRREvent): void {
   
   srr.save()
 
-  saveSRRMetadataHistory(srr as SRR, blockTime)
+  saveSRRMetadataHistory(srr as SRR, event)
 }
 
 export function handleSRRProvenance(event: SRRProvenanceEvent): void {
@@ -66,8 +75,8 @@ export function handleSRRProvenance(event: SRRProvenanceEvent): void {
   }
 
   let provenanceId = crypto.keccak256(
-    byteArrayFromHex(
-      event.params.tokenId.toString() + 
+    ByteArray.fromUTF8(
+      event.params.tokenId.toString() +
       event.params.timestamp.toString()
     )
   ).toHexString()
@@ -78,10 +87,10 @@ export function handleSRRProvenance(event: SRRProvenanceEvent): void {
   provenance.from = event.params.from
   provenance.to = event.params.to
   
-  provenance.metadataDigest = event.params.historyMetadataDigest
+  provenance.metadataDigest = Bytes.fromHexString(event.params.historyMetadataDigest) as Bytes
   provenance.metadataURI = event.params.historyMetadataURI
   
-  provenance.timestamp = event.params.timestamp.toI32()
+  provenance.timestamp = event.params.timestamp
   provenance.createdAt = eventUTCMillis(event)
   
   provenance.save()
@@ -140,23 +149,26 @@ export function handleUpdateTokenURIIntegrityDigest(event: UpdateTokenURIIntegri
     return
   }
 
-  let blockTime = eventUTCMillis(event)
-  
-  srr.updatedAt = blockTime
+  srr.updatedAt = eventUTCMillis(event)
   srr.metadataDigest = event.params.tokenURIIntegrityDigest
   srr.save()
 
-  saveSRRMetadataHistory(srr as SRR, blockTime)
+  saveSRRMetadataHistory(srr as SRR, event)
 }
 
-function saveSRRMetadataHistory(srr: SRR, blockTime: i32): void {
+function saveSRRMetadataHistory(srr: SRR, event: ethereum.Event): void {
   let metadataHistoryId = crypto.keccak256(
-    byteArrayFromHex(srr.id + srr.metadataDigest.toString())
+    ByteArray.fromUTF8(
+      event.transaction.hash.toHexString() +
+      event.logIndex.toHexString() +
+      srr.metadataDigest.toHexString()
+    )
   ).toHexString()
-  let srrMetadataHistory = new SRRMetadataHistory(metadataHistoryId)
+
+  let srrMetadataHistory = new SRRMetadataHistory(metadataHistoryId) // metadataHistoryId)
   srrMetadataHistory.srr = srr.id
-  srrMetadataHistory.createdAt = blockTime 
-  srrMetadataHistory.metadataDigest = srr.metadataDigest.toString()
+  srrMetadataHistory.createdAt = eventUTCMillis(event)
+  srrMetadataHistory.metadataDigest = Bytes.fromHexString(srr.metadataDigest.toHexString()) as Bytes
   srrMetadataHistory.save()
 }
 

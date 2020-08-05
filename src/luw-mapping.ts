@@ -15,7 +15,7 @@ export function handleCreateLicensedUserWallet(event: CreateLUWEvent): void {
   luw.userType = event.params.userType
   luw.owners = event.params.owners as Array<Bytes>
 
-  luw.createdAt = luw.updatedAt = event.block.timestamp.toI32()
+  luw.createdAt = luw.updatedAt = event.block.timestamp
   
   luw.save()
 }

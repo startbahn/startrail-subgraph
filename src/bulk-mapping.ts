@@ -5,6 +5,7 @@ import {
   CreateSRRWithProof as CreateSRRWithProofEvent,
 } from '../generated/BulkIssue/BulkIssue'
 import { BulkIssue } from '../generated/schema'
+import { eventUTCMillis } from './utils'
 
 export function handleBatchPrepared(event: BatchPreparedEvent): void {
   let merkleRoot = event.params.merkleRoot.toHexString()
@@ -16,7 +17,7 @@ export function handleBatchPrepared(event: BatchPreparedEvent): void {
 
   batch = new BulkIssue(merkleRoot)
   batch.merkleRoot = event.params.merkleRoot
-  batch.createdAt = batch.updatedAt = event.block.timestamp.toI32()
+  batch.createdAt = batch.updatedAt = eventUTCMillis(event)
   batch.save()
 }
 
@@ -31,7 +32,7 @@ export function handleCreateSRRWithProof(event: CreateSRRWithProofEvent): void {
   }
 
   batch.srrs.push(event.params.srrHash)  
-  batch.updatedAt = event.block.timestamp.toI32()
+  batch.updatedAt = eventUTCMillis(event)
   
   batch.save()
 }
