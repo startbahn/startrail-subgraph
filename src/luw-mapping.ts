@@ -3,6 +3,7 @@ import { Bytes } from '@graphprotocol/graph-ts'
 
 import { CreateLicensedUserWallet as CreateLUWEvent } from '../generated/LicensedUserEvent/LicensedUserEvent'
 import { LicensedUserWallet } from '../generated/schema'
+import { eventUTCMillis } from './utils'
 
 export function handleCreateLicensedUserWallet(event: CreateLUWEvent): void {
   let luwId = event.params.contractAddress.toHexString()
@@ -15,7 +16,7 @@ export function handleCreateLicensedUserWallet(event: CreateLUWEvent): void {
   luw.userType = event.params.userType
   luw.owners = event.params.owners as Array<Bytes>
 
-  luw.createdAt = luw.updatedAt = event.block.timestamp
+  luw.createdAt = luw.updatedAt = eventUTCMillis(event)
   
   luw.save()
 }

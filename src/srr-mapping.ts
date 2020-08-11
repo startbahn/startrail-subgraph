@@ -74,6 +74,12 @@ export function handleSRRProvenance(event: SRRProvenanceEvent): void {
     return
   }
 
+  // Update existing SRR
+  srr.ownerAddress = event.params.to 
+  srr.updatedAt = eventUTCMillis(event)
+  srr.save()
+
+  // Create new Provenance
   let provenanceId = crypto.keccak256(
     ByteArray.fromUTF8(
       event.params.tokenId.toString() +
@@ -94,6 +100,8 @@ export function handleSRRProvenance(event: SRRProvenanceEvent): void {
   provenance.createdAt = eventUTCMillis(event)
   
   provenance.save()
+
+
 }
 
 export function handleSRRCommitment(event: SRRCommitmentEvent): void {
