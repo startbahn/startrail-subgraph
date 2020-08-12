@@ -33,6 +33,7 @@ export function handleTransfer(event: TransferEvent): void {
     srr = new SRR(srrId)
     srr.tokenId = srrId
     srr.createdAt = timestampMillis
+    srr.txHash = event.transaction.hash
   } else if (srr.transferCommitment != null) {
     srr.transferCommitment = null
   }
