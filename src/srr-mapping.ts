@@ -19,6 +19,7 @@ import {
   SRR,
   SRRMetadataHistory,
   SRRProvenance,
+  SRRTransferCommit,
 } from '../generated/schema'
 import { Transfer as TransferEvent } from '../generated/StartrailRegistry/StartrailRegistry'
 import { eventUTCMillis } from './utils'
@@ -39,6 +40,13 @@ export function handleTransfer(event: TransferEvent): void {
   srr.ownerAddress = event.params.to
   srr.updatedAt = timestampMillis
   srr.save()
+
+  let srrCommit = SRRTransferCommit.load(srrId)
+  if (srrCommit != null) {
+    srrCommit.commitment = null
+    srrCommit.updatedAt = timestampMillis
+    srrCommit.save()
+  }
 }
 
 export function handleCreateSRR(event: CreateSRREvent): void {
@@ -70,7 +78,7 @@ export function handleSRRProvenance(event: SRRProvenanceEvent): void {
   let srrId = event.params.tokenId.toString()
   let srr = SRR.load(srrId)
   if (srr == null) {
-    log.error('received event for unknown SRR: {}', [event.params.tokenId.toString()])
+    log.error('received event for unknown SRR: {}', [srrId])
     return
   }
 
@@ -100,45 +108,65 @@ export function handleSRRProvenance(event: SRRProvenanceEvent): void {
   provenance.createdAt = eventUTCMillis(event)
   
   provenance.save()
-
-
 }
 
 export function handleSRRCommitment(event: SRRCommitmentEvent): void {
   let srrId = event.params.tokenId.toString()
   let srr = SRR.load(srrId)
   if (srr == null) {
-    log.error('received event for unknown SRR: {}', [event.params.tokenId.toString()])
+    log.error('received event for unknown SRR: {}', [srrId])
     return
   }
 
   log.info('SRRCommitment commitment = {}', [event.params.commitment.toHexString()])
 
+  let blockTime = eventUTCMillis(event)
+
   srr.transferCommitment = event.params.commitment
-  srr.updatedAt = eventUTCMillis(event)
-  
+  srr.updatedAt = blockTime
   srr.save()
+
+  let srrCommit = SRRTransferCommit.load(srrId)
+  if (srrCommit == null) {
+    srrCommit = new SRRTransferCommit(srrId)
+    srrCommit.createdAt = blockTime
+  }
+
+  srrCommit.commitment = srr.transferCommitment
+  srrCommit.updatedAt = blockTime
+  srrCommit.save()
 }
 
 export function handleSRRCommitmentCancelled(event: SRRCommitmentCancelledEvent): void {
   let srrId = event.params.tokenId.toString()
   let srr = SRR.load(srrId)
   if (srr == null) {
-    log.error('received event for unknown SRR: {}', [event.params.tokenId.toString()])
+    log.error('received event for unknown SRR: {}', [srrId])
     return
   }
 
+  let blockTime = eventUTCMillis(event)
+
   srr.transferCommitment = null
-  srr.updatedAt = eventUTCMillis(event)
-  
+  srr.updatedAt = blockTime
   srr.save()
+
+  let srrCommit = SRRTransferCommit.load(srrId)
+  if (srrCommit == null) {
+    log.error(`received event but don't have corresponding SRRTransferCommit: {}`, [srrId])
+    return
+  }
+
+  srrCommit.commitment = null
+  srrCommit.updatedAt = blockTime
+  srrCommit.save()
 }
 
 export function handleUpdateSRR(event: UpdateSRREvent): void {
   let srrId = event.params.tokenId.toString()
   let srr = SRR.load(srrId)
   if (srr == null) {
-    log.error('received event for unknown SRR: {}', [event.params.tokenId.toString()])
+    log.error('received event for unknown SRR: {}', [srrId])
     return
   }
 
@@ -153,7 +181,7 @@ export function handleUpdateTokenURIIntegrityDigest(event: UpdateTokenURIIntegri
   let srrId = event.params.tokenId.toString()
   let srr = SRR.load(srrId)
   if (srr == null) {
-    log.error('received event for unknown SRR: {}', [event.params.tokenId.toString()])
+    log.error('received event for unknown SRR: {}', [srrId])
     return
   }
 

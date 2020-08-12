@@ -70,6 +70,13 @@ type SRRMetadataHistory @entity {
   createdAt: BigInt!          # block.timestamp when entity created
 }
 
+type SRRTransferCommit @entity {
+  id: ID!                     # tokenId.toString()
+  commitment: Bytes           # event Provenance.from - ownership transferred from
+  createdAt: BigInt!          # block.timestamp when entity created
+  updatedAt: BigInt!          # block.timestamp when entity last updated
+}
+
 type BulkIssue @entity {
   id: ID!                     # merkleRoot.toHexString()
   merkleRoot: Bytes!          # batch merkle root
