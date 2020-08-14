@@ -16,6 +16,7 @@ export function handleBatchPrepared(event: BatchPreparedEvent): void {
   }
 
   batch = new BulkIssue(merkleRoot)
+  batch.srrs = []
   batch.merkleRoot = event.params.merkleRoot
   batch.createdAt = batch.updatedAt = eventUTCMillis(event)
   batch.save()
@@ -23,6 +24,7 @@ export function handleBatchPrepared(event: BatchPreparedEvent): void {
 
 export function handleCreateSRRWithProof(event: CreateSRRWithProofEvent): void {
   let merkleRoot = event.params.merkleRoot.toHexString()
+  log.info('handleCreateSRRWithProof: merkleRoot {}', [merkleRoot])
   let batch = BulkIssue.load(merkleRoot)
   if (batch == null) {
     log.error('received a CreateSRRWithProof event for an unknown batch. MerkleRoot: {}', 
@@ -31,8 +33,13 @@ export function handleCreateSRRWithProof(event: CreateSRRWithProofEvent): void {
     return
   }
 
-  batch.srrs.push(event.params.srrHash)  
+  log.info('adding srrHash {}', [event.params.srrHash.toHex()])
+  // this 3 step assign, push, reassign is necessary here:
+  // (see https://thegraph.com/docs/assemblyscript-api#api-reference):
+  let srrs = batch.srrs
+  srrs.push(event.params.srrHash)  
+  batch.srrs = srrs
+
   batch.updatedAt = eventUTCMillis(event)
-  
   batch.save()
 }

@@ -31647,12 +31647,12 @@
         }
       },
       "links": {},
-      "address": "0x2eCc7881679B609d66d8F4851B894ae5fa0bf505",
-      "transactionHash": "0x39692f41c9515fd27664915b4e2a1fd92d510d23b31dc3ce8b7f5461b45acd9e"
+      "address": "0xB154453349E0ecA3Ee374d03A3C7555c64c1C3cB",
+      "transactionHash": "0xf2d93f7ba1032d33ab2ba6dac96ee37affcd9d358d3ae16e905c4a6b84ad3dfa"
     }
   },
   "schemaVersion": "3.0.23",
-  "updatedAt": "2020-07-28T09:26:58.701Z",
+  "updatedAt": "2020-08-03T06:30:32.696Z",
   "networkType": "ethereum",
   "devdoc": {
     "methods": {

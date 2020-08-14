@@ -45,6 +45,7 @@ export function handleTransfer(event: TransferEvent): void {
   let srrCommit = SRRTransferCommit.load(srrId)
   if (srrCommit != null) {
     srrCommit.commitment = null
+    srrCommit.lastAction = 'transfer'
     srrCommit.updatedAt = timestampMillis
     srrCommit.save()
   }
@@ -134,6 +135,7 @@ export function handleSRRCommitment(event: SRRCommitmentEvent): void {
   }
 
   srrCommit.commitment = srr.transferCommitment
+  srrCommit.lastAction = 'approve'
   srrCommit.updatedAt = blockTime
   srrCommit.save()
 }
@@ -158,6 +160,7 @@ export function handleSRRCommitmentCancelled(event: SRRCommitmentCancelledEvent)
     return
   }
 
+  srrCommit.lastAction = 'cancel'
   srrCommit.commitment = null
   srrCommit.updatedAt = blockTime
   srrCommit.save()
