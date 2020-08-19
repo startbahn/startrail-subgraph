@@ -190,7 +190,7 @@ export function handleUpdateSRRMetadataDigest(event: UpdateSRRMetadataDigestEven
   }
 
   srr.updatedAt = eventUTCMillis(event)
-  srr.metadataDigest = event.params.tokenURIIntegrityDigest
+  srr.metadataDigest = event.params.metadataDigest
   srr.save()
 
   saveSRRMetadataHistory(srr as SRR, event)
