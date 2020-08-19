@@ -6,7 +6,7 @@
     "create-local": "graph create --node http://127.0.0.1:8020 startbahn/startrail-rinkeby-develop",
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "npm run codegen && graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail-rinkeby-develop",
+    "deploy": "npm run codegen && graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail-rinkeby-develop --access-token $TOKEN",
     "deploy-local": "graph deploy --ipfs http://localhost:5001 --node http://127.0.0.1:8020 startbahn/startrail-rinkeby-develop"
   },
   "devDependencies": {
