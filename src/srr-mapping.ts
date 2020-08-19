@@ -12,7 +12,7 @@ import {
   SRRCommitment as SRRCommitmentEvent,
   SRRCommitmentCancelled as SRRCommitmentCancelledEvent,
   UpdateSRR as UpdateSRREvent,
-  UpdateTokenURIIntegrityDigest as UpdateTokenURIIntegrityDigestEvent,
+  UpdateSRRMetadataDigest as UpdateSRRMetadataDigestEvent,
 } from '../generated/RootLogic/RootLogic'
 import {
   LicensedUserWallet,
@@ -181,7 +181,7 @@ export function handleUpdateSRR(event: UpdateSRREvent): void {
   srr.save()
 }
 
-export function handleUpdateTokenURIIntegrityDigest(event: UpdateTokenURIIntegrityDigestEvent): void {
+export function handleUpdateSRRMetadataDigest(event: UpdateSRRMetadataDigestEvent): void {
   let srrId = event.params.tokenId.toString()
   let srr = SRR.load(srrId)
   if (srr == null) {
