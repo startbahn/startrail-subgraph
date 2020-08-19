@@ -74,8 +74,8 @@ dataSources:
           handler: handleSRRCommitment
         - event: SRRCommitmentCancelled(uint256)
           handler: handleSRRCommitmentCancelled
-        - event: UpdateTokenURIIntegrityDigest(indexed uint256,bytes32)
-          handler: handleUpdateTokenURIIntegrityDigest
+        - event: UpdateSRRMetadataDigest(indexed uint256,bytes32)
+          handler: handleUpdateSRRMetadataDigest
 
   - kind: ethereum/contract
     name: BulkIssue
