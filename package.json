@@ -2,12 +2,12 @@
   "name": "startrail-subgraph",
   "version": "0.1.0",
   "scripts": {
-    "create": "graph create startbahn/startrail-subgraph --node https://api.thegraph.com/deploy/",
-    "create-local": "graph create startbahn/startrail-subgraph --node http://127.0.0.1:8020",
+    "create": "graph create --node https://api.thegraph.com/deploy/ startbahn/startrail-rinkeby",
+    "create-local": "graph create --node http://127.0.0.1:8020 startbahn/startrail-rinkeby",
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy startbahn/startrail-subgraph --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/",
-    "deploy-local": "graph deploy startbahn/startrail-subgraph --ipfs http://localhost:5001 --node http://127.0.0.1:8020"
+    "deploy": "npm run codegen && graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail-rinkeby",
+    "deploy-local": "graph deploy --ipfs http://localhost:5001 --node http://127.0.0.1:8020 startbahn/startrail-rinkeby"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "^0.18.0",
