@@ -8,9 +8,9 @@ dataSources:
     name: LicensedUserEvent
     network: rinkeby
     source:
-      address: '0xBF0F80084697758EF7ACE0Fb084b3c5dEc74c535'
+      address: '0x2A07fBCD64BE0e2329890C21c6F34e81889a5912'
       abi: LicensedUserEvent
-      startBlock: 6951000 # contract creation block
+      startBlock: 10720704  # contract creation block
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -29,9 +29,9 @@ dataSources:
     name: StartrailRegistry
     network: rinkeby
     source:
-      address: '0xF95C310F451eEF86552646a78D4a4e270c0d403F'
+      address: '0xd5D31A30Dd78b4A8a4effb8c9aE410C8e86C1812'
       abi: StartrailRegistry
-      startBlock: 6951000  # contract creation block
+      startBlock: 10720664  # contract creation block
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -50,9 +50,9 @@ dataSources:
     name: RootLogic
     network: rinkeby
     source:
-      address: '0x263d7e7804DC6C8C3226E6AB028Bb0872695Ecdd'
+      address: '0x7f556e211a3E4b57d005D3aa49a31306FA8Bb34d'
       abi: RootLogic
-      startBlock: 6951000 # contract creation block
+      startBlock: 10720801 # contract creation block
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -81,9 +81,9 @@ dataSources:
     name: BulkIssue
     network: rinkeby
     source:
-      address: '0x20515A6FdEd2B733Cf45D6c07114C5b4A8724Bf2'
+      address: '0x1cE784a1c9C244397Ab812633Ca4122eE8aFD49B'
       abi: BulkIssue
-      startBlock: 6951000 # contract creation block
+      startBlock: 10720832 # contract creation block
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
