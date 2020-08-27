@@ -6,26 +6,23 @@ executors:
       - image: circleci/node:12.18.2
 
 commands:
-  restore_node_dependencies:
-    steps:
-      - restore_cache:
-          name: Restore node dependencies cache
-          keys:
-            - v1-node-dependencies-{{ checksum "package-lock.json" }}
-            - v1-node-dependencies
   install_node_dependencies:
     steps:
       - run:
           name: Install node dependencies
           command: npm ci
-  save_node_dependencies:
+  install_graph_cli:
     steps:
-      - save_cache:
-          name: Save node dependencies cache
-          key: v1-node-dependencies-{{ checksum "package-lock.json" }}
-          paths:
-            - app/node_modules
-
+      - run:
+          name: Install graph cli
+          command: sudo npm i -g --loglevel=silent --unsafe-perm=true --allow-root @graphprotocol/graph-cli
+  build_sub_graph:
+    steps:
+      - run:
+          name: Build sub-graph source and generate code
+          command: |
+            npm run codegen
+            npm run build
   deploy_develop:
     steps:
       - run:
@@ -41,34 +38,39 @@ commands:
     steps:
       - run:
           name: deploy mainnet master subgraph into public node
-          command: |
-            npm run deploy-master
+          command: npm run deploy-master
 
 jobs:
   build:
     executor: default
     steps:
       - checkout
-      - restore_node_dependencies
       - install_node_dependencies
-      - save_node_dependencies
+      - install_graph_cli
+      - build_sub_graph
   rinkeby-develop:
     executor: default
     steps:
       - checkout
-      - restore_node_dependencies
+      - install_node_dependencies
+      - install_graph_cli
+      - build_sub_graph
       - deploy_develop
   rinkeby-release:
     executor: default
     steps:
       - checkout
-      - restore_node_dependencies
+      - install_node_dependencies
+      - install_graph_cli
+      - build_sub_graph
       - deploy_release
   mainnet-master:
     executor: default
     steps:
       - checkout
-      - restore_node_dependencies
+      - install_node_dependencies
+      - install_graph_cli
+      - build_sub_graph
       - deploy_master
 
 workflows:
