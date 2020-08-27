@@ -56,14 +56,14 @@ jobs:
     executor: default
     steps:
       - checkout
-      - restore_node_dependencies
+      - install_node_dependencies
       - install_graph_cli
       - deploy_release
   mainnet-master:
     executor: default
     steps:
       - checkout
-      - restore_node_dependencies
+      - install_node_dependencies
       - install_graph_cli
       - deploy_master
 
