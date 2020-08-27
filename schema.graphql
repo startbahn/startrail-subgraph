@@ -1,7 +1,7 @@
 enum UserType {
   admin
-  artist
   handler
+  artist
 }
 
 type LicensedUserWallet @entity {
@@ -11,7 +11,7 @@ type LicensedUserWallet @entity {
   requiredConfirmation: Int!
   englishName: String!
   originalName: String!
-  userType: UserType!
+  userType: String!
   owners: [Bytes!]!
 
   issuedSRRs: [SRR!]! @derivedFrom(field: "issuer")
