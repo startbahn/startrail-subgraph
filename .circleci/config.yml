@@ -19,8 +19,10 @@ commands:
   build_sub_graph:
     steps:
       - run:
-          name: build sub-graph source code
-          command: npm run build
+          name: Build sub-graph source and generate code
+          command: |
+            npm run codegen
+            npm run build
   deploy_develop:
     steps:
       - run:
