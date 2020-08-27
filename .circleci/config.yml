@@ -17,14 +17,14 @@ commands:
     steps:
       - run:
           name: Install node dependencies
-          command: npm ci
+          command: (npm install -g @graphprotocol/graph-cli && npm ci)
   save_node_dependencies:
     steps:
       - save_cache:
           name: Save node dependencies cache
           key: v1-node-dependencies-{{ checksum "package-lock.json" }}
           paths:
-            - app/node_modules
+            - node_modules
 
   deploy_develop:
     steps:
