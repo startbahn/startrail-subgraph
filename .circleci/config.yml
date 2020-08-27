@@ -17,7 +17,7 @@ commands:
     steps:
       - run:
           name: Install node dependencies
-          command: (cd app && npm ci)
+          command: npm ci
   save_node_dependencies:
     steps:
       - save_cache:
@@ -30,14 +30,13 @@ commands:
     steps:
       - run:
           name: deploy rinkeby develop subgraph into public node
-          command: |
-            npm run deploy-rinkeby-develop
+          command: npm run deploy-rinkeby-develop
   deploy_rinkeby_release:
     steps:
       - run:
           name: deploy rinkeby release subgraph into public node
-          command: |
-            npm run deploy-rinkeby-release
+          command: npm run deploy-rinkeby-release
+          
   deploy_mainnet_master:
     steps:
       - run:
