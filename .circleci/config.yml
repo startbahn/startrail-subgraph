@@ -17,9 +17,12 @@ commands:
     steps:
       - run:
           name: Install node dependencies
-          command: |
-           sudo npm i -g --loglevel=silent --unsafe-perm=true --allow-root @graphprotocol/graph-cli
-           npm ci
+          command: npm ci
+  install_graph_cli:
+    steps:
+      - run:
+          name: Install graph cli
+          command: sudo npm i -g --loglevel=silent --unsafe-perm=true --allow-root @graphprotocol/graph-cli
   save_node_dependencies:
     steps:
       - save_cache:
@@ -43,8 +46,7 @@ commands:
     steps:
       - run:
           name: deploy mainnet master subgraph into public node
-          command: |
-            npm run deploy-master
+          command: npm run deploy-master
 
 jobs:
   build:
@@ -59,18 +61,21 @@ jobs:
     steps:
       - checkout
       - restore_node_dependencies
+      - install_graph_cli
       - deploy_develop
   rinkeby-release:
     executor: default
     steps:
       - checkout
       - restore_node_dependencies
+      - install_graph_cli
       - deploy_release
   mainnet-master:
     executor: default
     steps:
       - checkout
       - restore_node_dependencies
+      - install_graph_cli
       - deploy_master
 
 workflows:
