@@ -6,13 +6,6 @@ executors:
       - image: circleci/node:12.18.2
 
 commands:
-  restore_node_dependencies:
-    steps:
-      - restore_cache:
-          name: Restore node dependencies cache
-          keys:
-            - v1-node-dependencies-{{ checksum "package-lock.json" }}
-            - v1-node-dependencies
   install_node_dependencies:
     steps:
       - run:
@@ -23,14 +16,11 @@ commands:
       - run:
           name: Install graph cli
           command: sudo npm i -g --loglevel=silent --unsafe-perm=true --allow-root @graphprotocol/graph-cli
-  save_node_dependencies:
+  build_sub_graph:
     steps:
-      - save_cache:
-          name: Save node dependencies cache
-          key: v1-node-dependencies-{{ checksum "package-lock.json" }}
-          paths:
-            - node_modules
-
+      - run:
+          name: build sub-graph source code
+          command: npm run build
   deploy_develop:
     steps:
       - run:
@@ -53,14 +43,13 @@ jobs:
     executor: default
     steps:
       - checkout
-      - restore_node_dependencies
       - install_node_dependencies
-      - save_node_dependencies
+      - build_sub_graph
   rinkeby-develop:
     executor: default
     steps:
       - checkout
-      - restore_node_dependencies
+      - install_node_dependencies
       - install_graph_cli
       - deploy_develop
   rinkeby-release:
