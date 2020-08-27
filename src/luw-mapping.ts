@@ -5,6 +5,16 @@ import { CreateLicensedUserWallet as CreateLUWEvent } from '../generated/License
 import { LicensedUserWallet } from '../generated/schema'
 import { eventUTCMillis } from './utils'
 
+export function userType(n: i32): string {
+  switch (n) {
+    case 0: return 'admin';
+    case 1: return 'handler';
+    case 2: return 'artist';
+    default: 
+      log.error(`unhandled userType: {}`, [n.toString()])
+      return '';
+  }
+}
 export function handleCreateLicensedUserWallet(event: CreateLUWEvent): void {
   let luwId = event.params.contractAddress.toHexString()
   
@@ -14,19 +24,7 @@ export function handleCreateLicensedUserWallet(event: CreateLUWEvent): void {
   luw.englishName = event.params.englishName
   luw.originalName = event.params.originalName
   luw.owners = event.params.owners as Array<Bytes>
-
-  let userType = event.params.userType
-  switch(userType) {
-    case 0:
-      luw.userType = 'admin'
-    case 1:
-      luw.userType = 'handler'
-    case 2:
-      luw.userType = 'artist'
-    default:
-      log.error(`unhandled userType: {}`, [userType.toString()])
-  }
-
+  luw.userType = userType(event.params.userType)
   luw.createdAt = luw.updatedAt = eventUTCMillis(event)
  
   luw.save()
