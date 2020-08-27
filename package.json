@@ -7,9 +7,9 @@
     "codegen": "graph codegen",
     "build": "graph build",
     "deploy-local": "graph deploy --ipfs http://localhost:5001 --node http://127.0.0.1:8020 startbahn/startrail-rinkeby-develop",
-    "deploy-rinkeby-develop": "npm run codegen && graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail-rinkeby-develop --access-token $TOKEN",
-    "deploy-rinkeby-release": "npm run codegen && graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail-rinkeby-release --access-token $TOKEN",
-    "deploy-mainnet-master": "npm run codegen && graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail-mainnet-master --access-token $TOKEN"
+    "deploy-develop": "npm run codegen && graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail-rinkeby-develop --access-token $TOKEN",
+    "deploy-release": "npm run codegen && graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail-rinkeby-release --access-token $TOKEN",
+    "deploy-master": "npm run codegen && graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail --access-token $TOKEN"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "^0.18.0",

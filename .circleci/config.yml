@@ -26,23 +26,23 @@ commands:
           paths:
             - app/node_modules
 
-  deploy_rinkeby_develop:
+  deploy_develop:
     steps:
       - run:
           name: deploy rinkeby develop subgraph into public node
-          command: npm run deploy-rinkeby-develop
-  deploy_rinkeby_release:
+          command: npm run deploy-develop
+  deploy_release:
     steps:
       - run:
           name: deploy rinkeby release subgraph into public node
-          command: npm run deploy-rinkeby-release
-          
-  deploy_mainnet_master:
+          command: npm run deploy-release
+
+  deploy_master:
     steps:
       - run:
           name: deploy mainnet master subgraph into public node
           command: |
-            npm run deploy-mainnet-master
+            npm run deploy-master
 
 jobs:
   build:
@@ -57,19 +57,19 @@ jobs:
     steps:
       - checkout
       - restore_node_dependencies
-      - deploy_rinkeby_develop
+      - deploy_develop
   rinkeby-release:
     executor: default
     steps:
       - checkout
       - restore_node_dependencies
-      - deploy_rinkeby_release
+      - deploy_release
   mainnet-master:
     executor: default
     steps:
       - checkout
       - restore_node_dependencies
-      - deploy_mainnet_master
+      - deploy_master
 
 workflows:
   version: 2
@@ -81,13 +81,13 @@ workflows:
             - build
           filters:
             branches:
-              only: rinkeby-develop
+              only: develop
       - rinkeby-release:
           requires:
             - build
           filters:
             branches:
-              only: rinkeby-release
+              only: release
       - mainnet-master:
           requires:
             - build
