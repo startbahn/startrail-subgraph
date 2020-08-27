@@ -1,0 +1,97 @@
+version: 2.1
+
+executors:
+  default:
+    docker:
+      - image: circleci/node:12.18.2
+
+commands:
+  restore_node_dependencies:
+    steps:
+      - restore_cache:
+          name: Restore node dependencies cache
+          keys:
+            - v1-node-dependencies-{{ checksum "package-lock.json" }}
+            - v1-node-dependencies
+  install_node_dependencies:
+    steps:
+      - run:
+          name: Install node dependencies
+          command: (cd app && npm ci)
+  save_node_dependencies:
+    steps:
+      - save_cache:
+          name: Save node dependencies cache
+          key: v1-node-dependencies-{{ checksum "package-lock.json" }}
+          paths:
+            - app/node_modules
+
+  deploy_rinkeby_develop:
+    steps:
+      - run:
+          name: deploy rinkeby develop subgraph into public node
+          command: |
+            npm run deploy-rinkeby-develop
+  deploy_rinkeby_release:
+    steps:
+      - run:
+          name: deploy rinkeby release subgraph into public node
+          command: |
+            npm run deploy-rinkeby-release
+  deploy_mainnet_master:
+    steps:
+      - run:
+          name: Upgrade Contracts of Master Branch to Rinkeby
+          command: |
+            npm run deploy-mainnet-master
+
+jobs:
+  build:
+    executor: default
+    steps:
+      - checkout
+      - restore_node_dependencies
+      - install_node_dependencies
+      - save_node_dependencies
+  rinkeby-develop:
+    executor: default
+    steps:
+      - checkout
+      - restore_node_dependencies
+      - deploy_rinkeby_develop
+  rinkeby-release:
+    executor: default
+    steps:
+      - checkout
+      - restore_node_dependencies
+      - deploy_rinkeby_release
+  mainnet-master:
+    executor: default
+    steps:
+      - checkout
+      - restore_node_dependencies
+      - deploy_mainnet_master
+
+workflows:
+  version: 2
+  pull-request:
+    jobs:
+      - build
+      - rinkeby-develop:
+          requires:
+            - build
+          filters:
+            branches:
+              only: rinkeby-develop
+      - rinkeby-release:
+          requires:
+            - build
+          filters:
+            branches:
+              only: rinkeby-release
+      - mainnet-master:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
