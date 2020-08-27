@@ -6,7 +6,7 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: LicensedUserEvent
-    network: rinkeby
+    network: mainnet
     source:
       address: '0x2A07fBCD64BE0e2329890C21c6F34e81889a5912'
       abi: LicensedUserEvent
@@ -27,7 +27,7 @@ dataSources:
 
   - kind: ethereum/contract
     name: StartrailRegistry
-    network: rinkeby
+    network: mainnet
     source:
       address: '0xd5D31A30Dd78b4A8a4effb8c9aE410C8e86C1812'
       abi: StartrailRegistry
@@ -48,7 +48,7 @@ dataSources:
 
   - kind: ethereum/contract
     name: RootLogic
-    network: rinkeby
+    network: mainnet
     source:
       address: '0x7f556e211a3E4b57d005D3aa49a31306FA8Bb34d'
       abi: RootLogic
@@ -79,7 +79,7 @@ dataSources:
 
   - kind: ethereum/contract
     name: BulkIssue
-    network: rinkeby
+    network: mainnet
     source:
       address: '0x1cE784a1c9C244397Ab812633Ca4122eE8aFD49B'
       abi: BulkIssue
