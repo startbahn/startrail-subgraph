@@ -21,7 +21,7 @@ commands:
   install_graph_cli:
     steps:
       - run:
-          name: Install node dependencies
+          name: Install graph cli
           command: sudo npm i -g --loglevel=silent --unsafe-perm=true --allow-root @graphprotocol/graph-cli
   save_node_dependencies:
     steps:
