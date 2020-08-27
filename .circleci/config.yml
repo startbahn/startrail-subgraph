@@ -41,7 +41,7 @@ commands:
   deploy_mainnet_master:
     steps:
       - run:
-          name: Upgrade Contracts of Master Branch to Rinkeby
+          name: deploy mainnet master subgraph into public node
           command: |
             npm run deploy-mainnet-master
 
