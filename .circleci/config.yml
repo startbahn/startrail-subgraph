@@ -46,8 +46,7 @@ commands:
     steps:
       - run:
           name: deploy mainnet master subgraph into public node
-          command: |
-            npm run deploy-master
+          command: npm run deploy-master
 
 jobs:
   build:
