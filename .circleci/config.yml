@@ -54,6 +54,7 @@ jobs:
       - checkout
       - install_node_dependencies
       - install_graph_cli
+      - build_sub_graph
       - deploy_develop
   rinkeby-release:
     executor: default
@@ -61,6 +62,7 @@ jobs:
       - checkout
       - install_node_dependencies
       - install_graph_cli
+      - build_sub_graph
       - deploy_release
   mainnet-master:
     executor: default
@@ -68,6 +70,7 @@ jobs:
       - checkout
       - install_node_dependencies
       - install_graph_cli
+      - build_sub_graph
       - deploy_master
 
 workflows:
