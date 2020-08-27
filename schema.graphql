@@ -1,0 +1,98 @@
+enum UserType {
+  admin
+  handler
+  artist
+}
+
+type LicensedUserWallet @entity {
+  id: ID!                     # contractAddress.toHexString()
+  contractAddress: Bytes!
+
+  requiredConfirmation: Int!
+  englishName: String!
+  originalName: String!
+  userType: String!
+  owners: [Bytes!]!
+
+  issuedSRRs: [SRR!]! @derivedFrom(field: "issuer")
+
+  # How to map this:
+  # ownedSRRs: [SRR!]! @derivedFrom(field: "ownerAddress")
+
+  createdAt: BigInt!          # block.timestamp when entity created
+  updatedAt: BigInt!          # block.timestamp when entity last updated
+}
+
+#
+# Startrail Registry Record (SRR) - ERC721 Token
+#
+# NOTE: a number of fields are nullable because the SRR is initially created
+#       from the Transfer event which has only tokenId and ownerAddress
+#
+type SRR @entity {
+  id: ID!                     # tokenId.toString()
+  tokenId: String             # ERC721 token id
+  
+  isPrimaryIssuer: Boolean
+  artistAddress: Bytes
+  issuer: LicensedUserWallet
+  ownerAddress: Bytes!
+  metadataDigest: Bytes       # sha256 hash of metadata JSON file
+  
+  transferCommitment: Bytes   # keccak256 hash transfer commitment
+  
+  provenance: [SRRProvenance!]! @derivedFrom(field: "srr")
+  metadataHistory: [SRRMetadataHistory!]! @derivedFrom(field: "srr")
+
+  txHash: Bytes!              # txHash created at
+  createdAt: BigInt!          # block.timestamp when entity created
+  updatedAt: BigInt!          # block.timestamp when entity last updated
+}
+
+type SRRProvenance @entity {
+  id: ID!                     # keccak256(tokenId,timestamp)
+  timestamp: BigInt!          # event Provenance.timestamp (block.timestamp)
+
+  srr: SRR!                   # SRR for event Provenance.tokenId
+  from: Bytes!                # event Provenance.from - ownership transferred from
+  to: Bytes!                  # event Provenance.to - ownership transferred to
+  metadataDigest: Bytes!      # event Provenance.metadataDigest
+  metadataURI: String!        # event Provenance.metadataURI
+
+  # NOTE: this is redundant because we have timestamp above but it's included 
+  #       for consistency as all entities have createdAt
+  createdAt: BigInt!          # block.timestamp when entity created
+}
+
+type SRRMetadataHistory @entity {
+  id: ID!                     # keccak256(tokenId,metadataDigest)
+  srr: SRR!                   # SRR for event Provenance.tokenId
+  metadataDigest: Bytes!      # event Provenance.metadataDigest
+  createdAt: BigInt!          # block.timestamp when entity created
+}
+
+enum TransferCommitLastAction {
+  approve
+  cancel
+  transfer
+}
+
+type SRRTransferCommit @entity {
+  id: ID!                     # tokenId.toString()
+  commitment: Bytes           # event Provenance.from - ownership transferred from
+  lastAction: TransferCommitLastAction!
+  createdAt: BigInt!          # block.timestamp when entity created
+  updatedAt: BigInt!          # block.timestamp when entity last updated
+}
+
+type BulkIssue @entity {
+  id: ID!                     # merkleRoot.toHexString()
+  merkleRoot: Bytes!          # batch merkle root
+  srrs: [Bytes!]              # Hashes of SRRs processed
+
+  createdAt: BigInt!          # block.timestamp when entity created
+  updatedAt: BigInt!          # block.timestamp when entity last updated
+
+  # TO add when contracts updated:
+  # issuer: Bytes!              # batch issuer address
+}

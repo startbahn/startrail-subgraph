@@ -1,0 +1,98 @@
+version: 2.1
+
+executors:
+  default:
+    docker:
+      - image: circleci/node:12.18.2
+
+commands:
+  install_node_dependencies:
+    steps:
+      - run:
+          name: Install node dependencies
+          command: npm ci
+  install_graph_cli:
+    steps:
+      - run:
+          name: Install graph cli
+          command: sudo npm i -g --loglevel=silent --unsafe-perm=true --allow-root @graphprotocol/graph-cli
+  build_sub_graph:
+    steps:
+      - run:
+          name: Build sub-graph source and generate code
+          command: |
+            npm run codegen
+            npm run build
+  deploy_develop:
+    steps:
+      - run:
+          name: deploy rinkeby develop subgraph into public node
+          command: npm run deploy-develop
+  deploy_release:
+    steps:
+      - run:
+          name: deploy rinkeby release subgraph into public node
+          command: npm run deploy-release
+
+  deploy_master:
+    steps:
+      - run:
+          name: deploy mainnet master subgraph into public node
+          command: npm run deploy-master
+
+jobs:
+  build:
+    executor: default
+    steps:
+      - checkout
+      - install_node_dependencies
+      - install_graph_cli
+      - build_sub_graph
+  rinkeby-develop:
+    executor: default
+    steps:
+      - checkout
+      - install_node_dependencies
+      - install_graph_cli
+      - build_sub_graph
+      - deploy_develop
+  rinkeby-release:
+    executor: default
+    steps:
+      - checkout
+      - install_node_dependencies
+      - install_graph_cli
+      - build_sub_graph
+      - deploy_release
+  mainnet-master:
+    executor: default
+    steps:
+      - checkout
+      - install_node_dependencies
+      - install_graph_cli
+      - build_sub_graph
+      - deploy_master
+
+workflows:
+  version: 2
+  pull-request:
+    jobs:
+      - build
+      - rinkeby-develop:
+          requires:
+            - build
+          filters:
+            branches:
+              only: develop
+      - rinkeby-release:
+          requires:
+            - build
+          filters:
+            branches:
+              only: release
+      - mainnet-master:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master

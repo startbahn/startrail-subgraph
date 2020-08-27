@@ -1,0 +1,101 @@
+specVersion: 0.0.2
+description: Startrail Ethereum Subgraph
+repository: https://github.com/startbahn/startrail-subgraph
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: LicensedUserEvent
+    network: mainnet
+    source:
+      address: '0x2A07fBCD64BE0e2329890C21c6F34e81889a5912'
+      abi: LicensedUserEvent
+      startBlock: 10720704  # contract creation block
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - LicensedUserWallet
+      abis:
+        - name: LicensedUserEvent
+          file: ./abis/LicensedUserEvent.json
+      eventHandlers:
+        - event: CreateLicensedUserWallet(indexed address,address[],uint256,string,string,uint8)
+          handler: handleCreateLicensedUserWallet
+      file: ./src/luw-mapping.ts
+
+  - kind: ethereum/contract
+    name: StartrailRegistry
+    network: mainnet
+    source:
+      address: '0xd5D31A30Dd78b4A8a4effb8c9aE410C8e86C1812'
+      abi: StartrailRegistry
+      startBlock: 10720664  # contract creation block
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - SRR
+      abis:
+        - name: StartrailRegistry
+          file: ./abis/StartrailRegistry.json
+      file: ./src/srr-mapping.ts
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+
+  - kind: ethereum/contract
+    name: RootLogic
+    network: mainnet
+    source:
+      address: '0x7f556e211a3E4b57d005D3aa49a31306FA8Bb34d'
+      abi: RootLogic
+      startBlock: 10720801 # contract creation block
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - SRR
+      abis:
+        - name: RootLogic
+          file: ./abis/RootLogic.json
+      file: ./src/srr-mapping.ts
+      eventHandlers:
+        - event: CreateSRR(indexed uint256,(bool,address,address),bytes32)
+          handler: handleCreateSRR
+        - event: UpdateSRR(indexed uint256,(bool,address,address))
+          handler: handleUpdateSRR
+        - event: Provenance(indexed uint256,indexed address,indexed address,uint256,string,string)
+          handler: handleSRRProvenance
+        - event: SRRCommitment(address,bytes32,uint256)
+          handler: handleSRRCommitment
+        - event: SRRCommitmentCancelled(uint256)
+          handler: handleSRRCommitmentCancelled
+        - event: UpdateSRRMetadataDigest(indexed uint256,bytes32)
+          handler: handleUpdateSRRMetadataDigest
+
+  - kind: ethereum/contract
+    name: BulkIssue
+    network: mainnet
+    source:
+      address: '0x1cE784a1c9C244397Ab812633Ca4122eE8aFD49B'
+      abi: BulkIssue
+      startBlock: 10720832 # contract creation block
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - SRR
+      abis:
+        - name: BulkIssue
+          file: ./abis/BulkIssue.json
+      file: ./src/bulk-mapping.ts
+      eventHandlers:
+        - event: BatchPrepared(indexed bytes32)
+          handler: handleBatchPrepared
+        - event: CreateSRRWithProof(indexed bytes32,bytes32)
+          handler: handleCreateSRRWithProof

@@ -1,0 +1,25 @@
+{
+  "name": "startrail-subgraph",
+  "version": "1.0.0",
+  "scripts": {
+    "create": "graph create --node https://api.thegraph.com/deploy/ startbahn/startrail-rinkeby-develop",
+    "create-local": "graph create --node http://127.0.0.1:8020 startbahn/startrail-rinkeby-develop",
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy-local": "graph deploy --ipfs http://localhost:5001 --node http://127.0.0.1:8020 startbahn/startrail-rinkeby-develop",
+    "deploy-develop": "graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail-rinkeby-develop --access-token $TOKEN",
+    "deploy-release": "graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail-rinkeby-release --access-token $TOKEN",
+    "deploy-master": "graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail --access-token $TOKEN"
+  },
+  "devDependencies": {
+    "@graphprotocol/graph-cli": "^0.18.0",
+    "@graphprotocol/graph-ts": "^0.18.1"
+  },
+  "dependencies": {
+    "babel-polyfill": "^6.26.0",
+    "babel-register": "^6.26.0",
+    "truffle": "^5.0.4",
+    "truffle-contract": "^4.0.5",
+    "truffle-hdwallet-provider": "^1.0.4"
+  }
+}
