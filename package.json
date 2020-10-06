@@ -7,6 +7,8 @@
     "codegen": "graph codegen",
     "build": "graph build",
     "deploy-local": "graph deploy --ipfs http://localhost:5001 --node http://127.0.0.1:8020 startbahn/startrail-rinkeby-develop",
+    "deploy-gke-develop": "graph deploy --ipfs http://subgraph.startbahn.jp/ipfs/ --node http://subgraph.startbahn.jp/admin startbahn/startrail-rinkeby-develop",
+    "deploy-gke-release": "graph deploy --ipfs http://subgraph.startbahn.jp/ipfs/ --node http://subgraph.startbahn.jp/admin startbahn/startrail-rinkeby-release",
     "deploy-develop": "graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail-rinkeby-develop --access-token $TOKEN",
     "deploy-release": "graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail-rinkeby-release --access-token $TOKEN",
     "deploy-master": "graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail --access-token $TOKEN"
