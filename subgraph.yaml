@@ -29,7 +29,7 @@ dataSources:
     name: StartrailRegistry
     network: rinkeby
     source:
-      address: "0xf245C39C50DBac453ab36407f0886ae10409419f"
+      address: "0x8824382015de561Dc42A68968f46A5D12491d481"
       abi: StartrailRegistry
       startBlock: 7370000 # contract creation block
     mapping:
