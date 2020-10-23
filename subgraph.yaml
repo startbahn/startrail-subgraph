@@ -8,7 +8,7 @@ dataSources:
     name: LicensedUserEvent
     network: rinkeby
     source:
-      address: "0x77b66dF6833db5b539Ec8B361a458077585cd436"
+      address: "0xb269CF0f173DD0c0794BE4641ECa54fbdf3c32cc"
       abi: LicensedUserEvent
       startBlock: 6951000 # contract creation block
     mapping:
@@ -29,7 +29,7 @@ dataSources:
     name: StartrailRegistry
     network: rinkeby
     source:
-      address: "0x6Cee395a337958540F98161Ee17e686c2865a3b2"
+      address: "0xf245C39C50DBac453ab36407f0886ae10409419f"
       abi: StartrailRegistry
       startBlock: 7370000 # contract creation block
     mapping:
@@ -62,7 +62,7 @@ dataSources:
     name: RootLogic
     network: rinkeby
     source:
-      address: "0x6Cee395a337958540F98161Ee17e686c2865a3b2"
+      address: "0x8824382015de561Dc42A68968f46A5D12491d481"
       abi: RootLogic
       startBlock: 6951000 # contract creation block
     mapping:
@@ -93,7 +93,7 @@ dataSources:
     name: BulkIssue
     network: rinkeby
     source:
-      address: "0x2448cC7bd6847D305f239d195A0fefE4a593f40D"
+      address: "0x82f794c63c711e842656cfDE3BA45dF67953FD7F"
       abi: BulkIssue
       startBlock: 6951000 # contract creation block
     mapping:
