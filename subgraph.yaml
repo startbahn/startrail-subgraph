@@ -62,7 +62,7 @@ dataSources:
     name: RootLogic
     network: rinkeby
     source:
-      address: "0x2323E1fcCE9a822662C89f90b15Df415f6E7A6A9"
+      address: "0x9Ef1095432A1E236CAdF84248CF6cE271cC5926C"
       abi: RootLogic
       startBlock: 7280000 # contract creation block
     mapping:
