@@ -28,6 +28,9 @@ type LicensedUserWallet @entity {
 #
 # NOTE: a number of fields are nullable because the SRR is initially created
 #       from the Transfer event which has only tokenId and ownerAddress
+#       additionally ownerAddress can be null when created by CreateSRR first
+#       (this is the case when parsing token events fired from the old scheme
+#        see comments on handleCreateSRR for details)
 #
 type SRR @entity {
   id: ID!                     # tokenId.toString()
@@ -36,7 +39,7 @@ type SRR @entity {
   isPrimaryIssuer: Boolean
   artistAddress: Bytes
   issuer: LicensedUserWallet
-  ownerAddress: Bytes!
+  ownerAddress: Bytes
   metadataDigest: Bytes       # sha256 hash of metadata JSON file
   
   transferCommitment: Bytes   # keccak256 hash transfer commitment
