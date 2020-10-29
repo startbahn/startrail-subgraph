@@ -52,15 +52,25 @@ export function handleTransfer(event: TransferEvent): void {
 }
 
 export function handleCreateSRR(event: CreateSRREvent): void {
-  //
-  // Save SRR
-  //
+  let timestampMillis = eventUTCMillis(event)
+  
   let srrId = event.params.tokenId.toString()
   let srr = SRR.load(srrId)
+  
+  // SRR should already exist for most tokens because handleTransfer will fire
+  // first. However some tokens created under the old scheme 
+  // (RootLogic->StartrailRegistry) will be processed by CreateSRR only.
+  // So we handle this here and create the SRR:
+  if (srr == null) {
+    srr = new SRR(srrId)
+    srr.tokenId = srrId
+    srr.createdAt = timestampMillis
+    srr.txHash = event.transaction.hash
+  }
 
   srr.artistAddress = event.params.registryRecord.artistAddress
   srr.isPrimaryIssuer = event.params.registryRecord.isPrimaryIssuer
-  srr.metadataDigest = event.params.metadataDigest
+  srr.metadataDigest = event.params.metadataDigest  
 
   let issuerId = event.params.registryRecord.issuer.toHexString()
   let luw = LicensedUserWallet.load(issuerId)
