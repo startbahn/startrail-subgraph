@@ -53,7 +53,7 @@ commands:
   deploy_gke_master:
     steps:
       - run:
-          name: deploy rinkeby release subgraph into startbahn GKE node
+          name: deploy rinkeby master subgraph into startbahn GKE node
           command: npm run deploy-gke-master
 
 jobs:
@@ -91,7 +91,7 @@ jobs:
       - build_sub_graph
       - deploy_master
       - deploy_gke_master
-      
+
 workflows:
   version: 2
   pull-request:
