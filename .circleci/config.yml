@@ -39,6 +39,22 @@ commands:
       - run:
           name: deploy mainnet master subgraph into public node
           command: npm run deploy-master
+  deploy_gke_develop:
+    steps:
+      - run:
+          name: deploy rinkeby develop subgraph into startbahn GKE node
+          command: npm run deploy-gke-develop
+  deploy_gke_release:
+    steps:
+      - run:
+          name: deploy rinkeby release subgraph into startbahn GKE node
+          command: npm run deploy-gke-release
+
+  deploy_gke_master:
+    steps:
+      - run:
+          name: deploy rinkeby master subgraph into startbahn GKE node
+          command: npm run deploy-gke-master
 
 jobs:
   build:
@@ -56,6 +72,7 @@ jobs:
       - install_graph_cli
       - build_sub_graph
       - deploy_develop
+      - deploy_gke_develop
   rinkeby-release:
     executor: default
     steps:
@@ -64,6 +81,7 @@ jobs:
       - install_graph_cli
       - build_sub_graph
       - deploy_release
+      - deploy_gke_release
   mainnet-master:
     executor: default
     steps:
@@ -72,6 +90,7 @@ jobs:
       - install_graph_cli
       - build_sub_graph
       - deploy_master
+      - deploy_gke_master
 
 workflows:
   version: 2
