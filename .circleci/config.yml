@@ -43,18 +43,24 @@ commands:
     steps:
       - run:
           name: deploy rinkeby develop subgraph into startbahn GKE node
-          command: npm run deploy-gke-develop
+          command: | 
+            npm run create-gke-develop
+            npm run deploy-gke-develop
   deploy_gke_release:
     steps:
       - run:
           name: deploy rinkeby release subgraph into startbahn GKE node
-          command: npm run deploy-gke-release
+          command: | 
+            npm run create-gke-release
+            npm run deploy-gke-release
 
   deploy_gke_master:
     steps:
       - run:
           name: deploy rinkeby master subgraph into startbahn GKE node
-          command: npm run deploy-gke-master
+          command: | 
+            npm run create-gke-master
+            npm run deploy-gke-master
 
 jobs:
   build:
