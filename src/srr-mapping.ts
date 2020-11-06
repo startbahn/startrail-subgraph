@@ -9,10 +9,13 @@ import {
 import {
   CreateSRR as CreateSRREvent,
   Provenance as SRRProvenanceEvent,
+  // Does it work? Should I change the name because there is two event with overloading parameters. 
+  Provenance as SRRProvenanceWithCustomHIstoryIdEvent,
   SRRCommitment as SRRCommitmentEvent,
   SRRCommitmentCancelled as SRRCommitmentCancelledEvent,
   UpdateSRR as UpdateSRREvent,
   UpdateSRRMetadataDigest as UpdateSRRMetadataDigestEvent,
+  CustomHistory as CustomHistoryEvent,
 } from '../generated/RootLogic/RootLogic'
 import {
   LicensedUserWallet,
@@ -121,6 +124,16 @@ export function handleSRRProvenance(event: SRRProvenanceEvent): void {
   
   provenance.save()
 }
+
+export function handleSRRProvenanceWithCustomHIstoryId(event: SRRProvenanceWithCustomHIstoryIdEvent): void {
+// Not sure if this will work or not.
+}
+
+export function handleCustomHistory(event: CustomHistoryEvent): void {
+
+  
+}
+
 
 export function handleSRRCommitment(event: SRRCommitmentEvent): void {
   let srrId = event.params.tokenId.toString()
