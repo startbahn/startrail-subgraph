@@ -52,19 +52,30 @@ type SRR @entity {
   updatedAt: BigInt!          # block.timestamp when entity last updated
 }
 
-type SRRProvenance @entity {
-  id: ID!                     # keccak256(tokenId,timestamp)
-  timestamp: BigInt!          # event Provenance.timestamp (block.timestamp)
+type CustomHistory @entity {
+  id: ID! # event CustomHistoryCreated.id
+  historyType: String!
+  name: String!
+  metadataDigest: Bytes!
+  # TODO: add a link back to Provenance:
+  # provenances: [SRRProvenance!] @derivedFrom(field: "customHistory")
+  createdAt: BigInt! # block.timestamp when entity created
+}
 
-  srr: SRR!                   # SRR for event Provenance.tokenId
-  from: Bytes!                # event Provenance.from - ownership transferred from
-  to: Bytes!                  # event Provenance.to - ownership transferred to
-  metadataDigest: Bytes!      # event Provenance.metadataDigest
-  metadataURI: String!        # event Provenance.metadataURI
+type SRRProvenance @entity {
+  id: ID!                      # keccak256(tokenId,timestamp)
+  timestamp: BigInt!           # event Provenance.timestamp (block.timestamp)
+
+  srr: SRR!                    # SRR for event Provenance.tokenId
+  from: Bytes!                 # event Provenance.from - ownership transferred from
+  to: Bytes!                   # event Provenance.to - ownership transferred to
+  metadataDigest: Bytes!       # event Provenance.metadataDigest
+  metadataURI: String!         # event Provenance.metadataURI
+  customHistory: CustomHistory # event Provenance.customHistoryId (in overloaded event only)
 
   # NOTE: this is redundant because we have timestamp above but it's included 
   #       for consistency as all entities have createdAt
-  createdAt: BigInt!          # block.timestamp when entity created
+  createdAt: BigInt!           # block.timestamp when entity created
 }
 
 type SRRMetadataHistory @entity {
@@ -83,6 +94,8 @@ enum TransferCommitLastAction {
 type SRRTransferCommit @entity {
   id: ID!                     # tokenId.toString()
   commitment: Bytes           # event Provenance.from - ownership transferred from
+  historyMetadata: Bytes!     
+  customHistory: CustomHistory
   lastAction: TransferCommitLastAction!
   createdAt: BigInt!          # block.timestamp when entity created
   updatedAt: BigInt!          # block.timestamp when entity last updated
