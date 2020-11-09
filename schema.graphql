@@ -94,7 +94,6 @@ enum TransferCommitLastAction {
 type SRRTransferCommit @entity {
   id: ID!                     # tokenId.toString()
   commitment: Bytes           # event Provenance.from - ownership transferred from
-  historyMetadata: Bytes!     
   customHistory: CustomHistory
   lastAction: TransferCommitLastAction!
   createdAt: BigInt!          # block.timestamp when entity created
