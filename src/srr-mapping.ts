@@ -1,4 +1,6 @@
 import {
+  Address,
+  BigInt,
   ByteArray,
   Bytes,
   crypto,
@@ -15,13 +17,19 @@ import {
   UpdateSRRMetadataDigest as UpdateSRRMetadataDigestEvent,
 } from '../generated/RootLogic/RootLogic'
 import {
+  CustomHistory,
   LicensedUserWallet,
   SRR,
   SRRMetadataHistory,
   SRRProvenance,
   SRRTransferCommit,
 } from '../generated/schema'
-import { Transfer as TransferEvent } from '../generated/StartrailRegistry/StartrailRegistry'
+import {
+  CustomHistoryCreated as CustomHistoryCreatedEvent,
+  Provenance1 as SRRProvenanceWithCustomHistoryEvent,
+  SRRCommitment1 as SRRCommitmentWithCustomHistoryEvent,
+  Transfer as TransferEvent,
+} from '../generated/StartrailRegistry/StartrailRegistry'
 import { eventUTCMillis } from './utils'
 
 export function handleTransfer(event: TransferEvent): void {
@@ -86,8 +94,52 @@ export function handleCreateSRR(event: CreateSRREvent): void {
   saveSRRMetadataHistory(srr as SRR, event)
 }
 
+
 export function handleSRRProvenance(event: SRRProvenanceEvent): void {
-  let srrId = event.params.tokenId.toString()
+  let params = event.params
+  handleSRRProvenanceInternal(
+    event,
+    params.tokenId,
+    params.from,
+    params.to,
+    params.timestamp,
+    null,
+    params.historyMetadataDigest,
+    params.historyMetadataURI,
+  )
+}
+
+export function handleSRRProvenanceWithCustomHistory(event: SRRProvenanceWithCustomHistoryEvent): void {
+  let params = event.params
+  handleSRRProvenanceInternal(
+    event,
+    params.tokenId,
+    params.from,
+    params.to,
+    params.timestamp,
+    params.customHistoryId,
+    params.historyMetadataDigest,
+    params.historyMetadataURI,
+  )
+}
+
+/**
+ * Can't use a union type to handle the 2 Provenance events with one function.
+ * 
+ * So this function exists to handle both with a superset of the 
+ * available parameters.
+ */
+function handleSRRProvenanceInternal(
+  event: ethereum.Event,
+  tokenId: BigInt,
+  from: Address,
+  to: Address,
+  timestamp: BigInt,
+  customHistoryId: BigInt,
+  historyMetadataDigest: string,
+  historyMetadataURI: string
+): void {
+  let srrId = tokenId.toString()
   let srr = SRR.load(srrId)
   if (srr == null) {
     log.error('received event for unknown SRR: {}', [srrId])
@@ -95,46 +147,91 @@ export function handleSRRProvenance(event: SRRProvenanceEvent): void {
   }
 
   // Update existing SRR
-  srr.ownerAddress = event.params.to 
+  srr.ownerAddress = to 
   srr.updatedAt = eventUTCMillis(event)
   srr.save()
 
   // Create new Provenance
   let provenanceId = crypto.keccak256(
     ByteArray.fromUTF8(
-      event.params.tokenId.toString() +
-      event.params.timestamp.toString()
+      tokenId.toString() +
+      timestamp.toString()
     )
   ).toHexString()
   
   let provenance = new SRRProvenance(provenanceId)
 
   provenance.srr = srr.id
-  provenance.from = event.params.from
-  provenance.to = event.params.to
+  provenance.from = from
+  provenance.to = to
   
-  provenance.metadataDigest = Bytes.fromHexString(event.params.historyMetadataDigest) as Bytes
-  provenance.metadataURI = event.params.historyMetadataURI
-  
-  provenance.timestamp = event.params.timestamp
+  provenance.metadataDigest = Bytes.fromHexString(historyMetadataDigest) as Bytes
+  provenance.metadataURI = historyMetadataURI
+
+  if (customHistoryId) {
+    // CustomHistory.load(event.params.customHistoryId)
+    provenance.customHistory = customHistoryId.toString()
+  } 
+
+  provenance.timestamp = timestamp
   provenance.createdAt = eventUTCMillis(event)
   
   provenance.save()
 }
 
+export function handleCustomHistory(event: CustomHistoryCreatedEvent): void {
+  let id = event.params.id.toString()
+
+  let ch = new CustomHistory(id)
+  ch.name = event.params.name 
+  ch.historyType = event.params.historyType 
+  ch.metadataDigest = Bytes.fromHexString(event.params.metadataDigest) as Bytes
+  ch.createdAt = eventUTCMillis(event)
+
+  ch.save()
+}
+
 export function handleSRRCommitment(event: SRRCommitmentEvent): void {
-  let srrId = event.params.tokenId.toString()
+  let params = event.params
+  handleSRRCommitmentInternal(
+    event,
+    params.owner,
+    params.commitment,
+    params.tokenId,
+    null
+  )
+}
+
+export function handleSRRCommitmentWithCustomHistory(event: SRRCommitmentWithCustomHistoryEvent): void {
+  let params = event.params
+  handleSRRCommitmentInternal(
+    event,
+    params.owner,
+    params.commitment,
+    params.tokenId,
+    params.customHistoryId
+  )
+}
+
+function handleSRRCommitmentInternal(
+  event: ethereum.Event,
+  owner: Address,
+  commitment: Bytes,
+  tokenId: BigInt,
+  customHistoryId: BigInt
+): void {
+  let srrId = tokenId.toString()
   let srr = SRR.load(srrId)
   if (srr == null) {
     log.error('received event for unknown SRR: {}', [srrId])
     return
   }
 
-  log.info('SRRCommitment commitment = {}', [event.params.commitment.toHexString()])
+  log.info('SRRCommitment commitment = {}', [commitment.toHexString()])
 
   let blockTime = eventUTCMillis(event)
 
-  srr.transferCommitment = event.params.commitment
+  srr.transferCommitment = commitment
   srr.updatedAt = blockTime
   srr.save()
 
@@ -146,6 +243,11 @@ export function handleSRRCommitment(event: SRRCommitmentEvent): void {
 
   srrCommit.commitment = srr.transferCommitment
   srrCommit.lastAction = 'approve'
+
+  if (customHistoryId != null) {
+    srrCommit.customHistory = customHistoryId.toString()
+  }
+
   srrCommit.updatedAt = blockTime
   srrCommit.save()
 }
