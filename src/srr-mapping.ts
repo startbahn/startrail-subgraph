@@ -127,11 +127,48 @@ export function handleSRRProvenance(event: SRRProvenanceEvent): void {
 
 export function handleSRRProvenanceWithCustomHIstoryId(event: SRRProvenanceWithCustomHIstoryIdEvent): void {
 // Not sure if this will work or not.
+
+  let srrId = event.params.tokenId.toString()
+  let srr = SRR.load(srrId)
+  if (srr == null) {
+    log.error('received event for unknown SRR: {}', [srrId])
+    return
+  }
+
+  // Update existing SRR
+  srr.ownerAddress = event.params.to 
+  srr.updatedAt = eventUTCMillis(event)
+  srr.save()
+
+  // Create new Provenance
+  let provenanceId = crypto.keccak256(
+    ByteArray.fromUTF8(
+      event.params.tokenId.toString() +
+      event.params.timestamp.toString()
+    )
+  ).toHexString()
+
+  let provenance = new SRRProvenanceWithCustomHIstoryIdEvent(provenanceId)
+
+  provenance.srr = srr.id
+  provenance.from = event.params.from
+  provenance.to = event.params.to
+
+  provenance.customHistoryId = event.params.customHistoryId.toString()
+
+  provenance.metadataDigest = Bytes.fromHexString(event.params.historyMetadataDigest) as Bytes
+  provenance.metadataURI = event.params.historyMetadataURI
+
+  provenance.timestamp = event.params.timestamp
+  provenance.createdAt = eventUTCMillis(event)
+
+  provenance.save()
+
 }
 
 export function handleCustomHistory(event: CustomHistoryEvent): void {
 
-  
+
 }
 
 
