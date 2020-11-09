@@ -55,6 +55,8 @@ dataSources:
           handler: handleSRRProvenance
         - event: SRRCommitment(address,bytes32,uint256)
           handler: handleSRRCommitment
+        - event: SRRCommitment(address,bytes32,uint256,uint256)
+          handler: handleSRRCommitment
         - event: SRRCommitmentCancelled(uint256)
           handler: handleSRRCommitmentCancelled
         - event: UpdateSRRMetadataDigest(indexed uint256,bytes32)
