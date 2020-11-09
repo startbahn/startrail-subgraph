@@ -15,7 +15,7 @@ import {
   SRRCommitmentCancelled as SRRCommitmentCancelledEvent,
   UpdateSRR as UpdateSRREvent,
   UpdateSRRMetadataDigest as UpdateSRRMetadataDigestEvent,
-  CustomHistory as CustomHistoryEvent,
+  CustomHistoryCreated as CustomHistoryCreatedEvent,
 } from '../generated/RootLogic/RootLogic'
 import {
   LicensedUserWallet,
@@ -166,9 +166,8 @@ export function handleSRRProvenanceWithCustomHIstoryId(event: SRRProvenanceWithC
 
 }
 
-export function handleCustomHistory(event: CustomHistoryEvent): void {
-
-
+export function handleCustomHistory(event: CustomHistoryCreatedEvent): void {
+  
 }
 
 
