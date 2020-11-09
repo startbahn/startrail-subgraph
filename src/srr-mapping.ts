@@ -27,6 +27,7 @@ import {
 import {
   CustomHistoryCreated as CustomHistoryCreatedEvent,
   Provenance1 as SRRProvenanceWithCustomHistoryEvent,
+  SRRCommitment1 as SRRCommitmentWithCustomHistoryEvent,
   Transfer as TransferEvent,
 } from '../generated/StartrailRegistry/StartrailRegistry'
 import { eventUTCMillis } from './utils'
@@ -190,20 +191,47 @@ export function handleCustomHistory(event: CustomHistoryCreatedEvent): void {
   ch.save()
 }
 
-
 export function handleSRRCommitment(event: SRRCommitmentEvent): void {
-  let srrId = event.params.tokenId.toString()
+  let params = event.params
+  handleSRRCommitmentInternal(
+    event,
+    params.owner,
+    params.commitment,
+    params.tokenId,
+    null
+  )
+}
+
+export function handleSRRCommitmentWithCustomHistory(event: SRRCommitmentWithCustomHistoryEvent): void {
+  let params = event.params
+  handleSRRCommitmentInternal(
+    event,
+    params.owner,
+    params.commitment,
+    params.tokenId,
+    params.customHistoryId
+  )
+}
+
+function handleSRRCommitmentInternal(
+  event: ethereum.Event,
+  owner: Address,
+  commitment: Bytes,
+  tokenId: BigInt,
+  customHistoryId: BigInt
+): void {
+  let srrId = tokenId.toString()
   let srr = SRR.load(srrId)
   if (srr == null) {
     log.error('received event for unknown SRR: {}', [srrId])
     return
   }
 
-  log.info('SRRCommitment commitment = {}', [event.params.commitment.toHexString()])
+  log.info('SRRCommitment commitment = {}', [commitment.toHexString()])
 
   let blockTime = eventUTCMillis(event)
 
-  srr.transferCommitment = event.params.commitment
+  srr.transferCommitment = commitment
   srr.updatedAt = blockTime
   srr.save()
 
@@ -215,6 +243,11 @@ export function handleSRRCommitment(event: SRRCommitmentEvent): void {
 
   srrCommit.commitment = srr.transferCommitment
   srrCommit.lastAction = 'approve'
+
+  if (customHistoryId != null) {
+    srrCommit.customHistory = customHistoryId.toString()
+  }
+
   srrCommit.updatedAt = blockTime
   srrCommit.save()
 }
