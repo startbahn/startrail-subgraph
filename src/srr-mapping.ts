@@ -36,13 +36,19 @@ export function handleTransfer(event: TransferEvent): void {
   let timestampMillis = eventUTCMillis(event)
   let srrId = event.params.tokenId.toString()
   
+  log.info('Transfer for {}', [srrId])
+  log.info('from: {}', [event.params.from.toHexString()])
+  log.info('to: {}', [event.params.to.toHexString()])
+ 
+  
   let srr = SRR.load(srrId)
   if (srr == null) {
     srr = new SRR(srrId)
     srr.tokenId = srrId
     srr.createdAt = timestampMillis
     srr.txHash = event.transaction.hash
-  } else if (srr.transferCommitment != null) {
+  } else if (srr.transferCommitment != null && event.params.from.toU32() != 0) {
+    log.info('clearing transferCommitment on token = {}', [srr.tokenId])
     srr.transferCommitment = null
   }
 
