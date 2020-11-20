@@ -30,11 +30,15 @@ import {
   SRRCommitment1 as SRRCommitmentWithCustomHistoryEvent,
   Transfer as TransferEvent,
 } from '../generated/StartrailRegistry/StartrailRegistry'
-import { eventUTCMillis } from './utils'
+import { eventUTCMillis, ZERO_ADDRESS } from './utils'
 
 export function handleTransfer(event: TransferEvent): void {
   let timestampMillis = eventUTCMillis(event)
   let srrId = event.params.tokenId.toString()
+  
+  log.info('Transfer for {}', [srrId])
+  log.info('from: {}', [event.params.from.toHexString()])
+  log.info('to: {}', [event.params.to.toHexString()])
   
   let srr = SRR.load(srrId)
   if (srr == null) {
@@ -42,7 +46,12 @@ export function handleTransfer(event: TransferEvent): void {
     srr.tokenId = srrId
     srr.createdAt = timestampMillis
     srr.txHash = event.transaction.hash
-  } else if (srr.transferCommitment != null) {
+  } else if (
+    srr.transferCommitment != null && 
+    event.params.from.toHexString() != ZERO_ADDRESS.toHexString()
+  ) {
+    // Transfer by commit/reveal
+    log.info('clearing transferCommitment on token = {}', [srr.tokenId])
     srr.transferCommitment = null
   }
 
