@@ -63,7 +63,7 @@ type CustomHistory @entity {
 }
 
 type CustomHistoryType @entity {
-  id: ID! # event CreateCustomHistoryType.historyTypeId
+  id: ID! # event CreateCustomHistoryType.id
   historyType: String!
 
   createdAt: BigInt! # block.timestamp when entity created
