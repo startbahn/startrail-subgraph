@@ -63,7 +63,7 @@ dataSources:
           handler: handleUpdateSRRMetadataDigest
         - event: CreateCustomHistoryType(indexed uint256,string)
           handler: handleCustomHistoryType
-        - event: CreateCustomHistory(indexed uint256,string,string,bytes32)
+        - event: CreateCustomHistory(indexed uint256,string,uint256,bytes32)
           handler: handleCustomHistory
 
   - kind: ethereum/contract

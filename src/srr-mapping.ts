@@ -205,7 +205,7 @@ export function handleCustomHistory(event: CustomHistoryCreatedEvent): void {
 
   let ch = new CustomHistory(id)
   ch.name = event.params.name 
-  ch.historyType = event.params.historyType
+  ch.historyType = event.params.customHistoryTypeId.toString()
   ch.metadataDigest = event.params.metadataDigest
   ch.createdAt = eventUTCMillis(event)
 
