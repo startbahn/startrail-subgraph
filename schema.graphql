@@ -53,12 +53,18 @@ type SRR @entity {
 }
 
 type CustomHistory @entity {
-  id: ID! # event CustomHistoryCreated.id
-  historyType: String!
+  id: ID! # event CreateCustomHistory.id
+  historyType: CustomHistoryType!
   name: String!
   metadataDigest: Bytes!
   # TODO: add a link back to Provenance:
   # provenances: [SRRProvenance!] @derivedFrom(field: "customHistory")
+  createdAt: BigInt! # block.timestamp when entity created
+}
+
+type CustomHistoryType @entity {
+  id: ID! # event CreateCustomHistoryType.id
+  name: String!
   createdAt: BigInt! # block.timestamp when entity created
 }
 
