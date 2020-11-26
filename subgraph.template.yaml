@@ -61,9 +61,7 @@ dataSources:
           handler: handleSRRCommitmentCancelled
         - event: UpdateSRRMetadataDigest(indexed uint256,bytes32)
           handler: handleUpdateSRRMetadataDigest
-        - event: CreateCustomHistoryType(indexed uint256,string)
-          handler: handleCustomHistoryType
-        - event: CreateCustomHistory(indexed uint256,string,string,bytes32)
+        - event: CustomHistoryCreated(indexed uint256,string,string,string)
           handler: handleCustomHistory
 
   - kind: ethereum/contract
