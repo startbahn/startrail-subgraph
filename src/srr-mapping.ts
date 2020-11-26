@@ -17,7 +17,7 @@ import {
   UpdateSRRMetadataDigest as UpdateSRRMetadataDigestEvent,
 } from '../generated/RootLogic/RootLogic'
 import {
-  CustomHistoryType,
+updated  CustomHistoryType,
   CustomHistory,
   LicensedUserWallet,
   SRR,
@@ -194,7 +194,7 @@ export function handleCustomHistoryType(event: CustomHistoryTypeCreatedEvent): v
   let historyTypeId = event.params.historyTypeId.toString()
 
   let cht = new CustomHistoryType(historyTypeId)
-  cht.name = event.params.historyType
+  cht.historyType = event.params.historyType
   cht.save()
 }
 
