@@ -17,6 +17,7 @@ import {
   UpdateSRRMetadataDigest as UpdateSRRMetadataDigestEvent,
 } from '../generated/RootLogic/RootLogic'
 import {
+  CustomHistoryType,
   CustomHistory,
   LicensedUserWallet,
   SRR,
@@ -25,7 +26,8 @@ import {
   SRRTransferCommit,
 } from '../generated/schema'
 import {
-  CustomHistoryCreated as CustomHistoryCreatedEvent,
+  CreateCustomHistoryType as CustomHistoryTypeCreatedEvent,
+  CreateCustomHistory as CustomHistoryCreatedEvent,
   Provenance1 as SRRProvenanceWithCustomHistoryEvent,
   SRRCommitment1 as SRRCommitmentWithCustomHistoryEvent,
   Transfer as TransferEvent,
@@ -188,13 +190,21 @@ function handleSRRProvenanceInternal(
   provenance.save()
 }
 
+export function handleCustomHistoryType(event: CustomHistoryTypeCreatedEvent): void {
+  let historyTypeId = event.params.historyTypeId.toString()
+
+  let cht = new CustomHistoryType(historyTypeId)
+  cht.name = event.params.historyType
+  cht.save()
+}
+
 export function handleCustomHistory(event: CustomHistoryCreatedEvent): void {
   let id = event.params.id.toString()
 
   let ch = new CustomHistory(id)
   ch.name = event.params.name 
   ch.historyType = event.params.historyType 
-  ch.metadataDigest = Bytes.fromHexString(event.params.metadataDigest) as Bytes
+  ch.metadataDigest = event.params.metadataDigest
   ch.createdAt = eventUTCMillis(event)
 
   ch.save()
