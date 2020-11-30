@@ -1,6 +1,10 @@
 # subgraph
 build/
 generated/
+subgraph.develop.yaml
+subgraph.local.yaml
+subgraph.mainnet.yaml
+subgraph.release.yaml
 
 # Logs
 logs
