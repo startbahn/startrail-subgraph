@@ -49,7 +49,6 @@ commands:
       - run:
           name: deploy rinkeby release subgraph into startbahn GKE node
           command: npm run deploy-gke-release
-
   deploy_gke_master:
     steps:
       - run:
