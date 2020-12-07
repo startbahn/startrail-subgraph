@@ -86,7 +86,6 @@ jobs:
       - restore_node_dependencies
       - install_node_dependencies
       - install_graph_cli
-      - save_node_dependencies
       - build_sub_graph
       - deploy_develop
       - deploy_gke_develop
@@ -97,7 +96,6 @@ jobs:
       - restore_node_dependencies
       - install_node_dependencies
       - install_graph_cli
-      - save_node_dependencies
       - build_sub_graph
       - deploy_release
       - deploy_gke_release
