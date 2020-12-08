@@ -20,7 +20,7 @@ commands:
     steps:
       - save_cache:
           name: Save node dependencies cache
-          key: v1-node-dependencies-{{ checksum "yarn.lock" }}
+          key: v2-node-dependencies-{{ checksum "yarn.lock" }}
           paths:
             - node_modules
   restore_node_dependencies:
