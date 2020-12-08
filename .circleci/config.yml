@@ -10,12 +10,26 @@ commands:
     steps:
       - run:
           name: Install node dependencies
-          command: npm ci
+          command: yarn install
   install_graph_cli:
     steps:
       - run:
           name: Install graph cli
           command: sudo npm i -g --loglevel=silent --unsafe-perm=true --allow-root @graphprotocol/graph-cli
+  save_node_dependencies:
+    steps:
+      - save_cache:
+          name: Save node dependencies cache
+          key: v2-node-dependencies-{{ checksum "yarn.lock" }}
+          paths:
+            - node_modules
+  restore_node_dependencies:
+    steps:
+      - restore_cache:
+          name: Restore node dependencies cache
+          keys:
+            - v2-node-dependencies-{{ checksum "yarn.lock" }}
+            - v2-node-dependencies
   build_sub_graph:
     steps:
       - run:
@@ -60,13 +74,16 @@ jobs:
     executor: default
     steps:
       - checkout
+      - restore_node_dependencies
       - install_node_dependencies
       - install_graph_cli
+      - save_node_dependencies
       - build_sub_graph
   rinkeby-develop:
     executor: default
     steps:
       - checkout
+      - restore_node_dependencies
       - install_node_dependencies
       - install_graph_cli
       - build_sub_graph
@@ -76,6 +93,7 @@ jobs:
     executor: default
     steps:
       - checkout
+      - restore_node_dependencies
       - install_node_dependencies
       - install_graph_cli
       - build_sub_graph
@@ -85,6 +103,7 @@ jobs:
     executor: default
     steps:
       - checkout
+      - restore_node_dependencies
       - install_node_dependencies
       - install_graph_cli
       - build_sub_graph
