@@ -5,12 +5,12 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: LicensedUserEvent
-    network: mainnet
+    name: LicensedUserManager
+    network: ##AUTOFILL##
     source:
-      address: "0x2A07fBCD64BE0e2329890C21c6F34e81889a5912"
-      abi: LicensedUserEvent
-      startBlock: 10720704 # contract creation block
+      address: ##AUTOFILL##
+      abi: LicensedUserManager
+      startBlock: ##AUTOFILL##
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -18,20 +18,28 @@ dataSources:
       entities:
         - LicensedUserWallet
       abis:
-        - name: LicensedUserEvent
-          file: ./abis/LicensedUserEvent.json
+        - name: LicensedUserManager
+          file: ./abis/LicensedUserManager.json
       eventHandlers:
-        - event: CreateLicensedUserWallet(indexed address,address[],uint256,string,string,uint8)
-          handler: handleCreateLicensedUserWallet
+        - event: CreateLicensedUserWalletMulti(indexed address,address[],uint256,string,string,uint8)
+          handler: handleCreateLicensedUserWalletMulti
+        - event: CreateLicensedUserWalletSingle(indexed address,address,string,string,uint8)
+          handler: handleCreateLicensedUserWalletSingle
+        - event: UpgradeLicensedUserWalletToMulti(indexed address,address[],uint256)
+          handler: handleUpgradeLicensedUserWalletToMulti
+        - event: UpdateEnglishName(indexed address,string)
+          handler: handleUpdateEnglishName
+        - event: UpdateOriginalName(indexed address,string)
+          handler: handleUpdateOriginalName
       file: ./src/luw-mapping.ts
 
   - kind: ethereum/contract
     name: StartrailRegistry
-    network: mainnet
+    network: ##AUTOFILL##
     source:
-      address: "0x7f556e211a3E4b57d005D3aa49a31306FA8Bb34d"
+      address: ##AUTOFILL##
       abi: StartrailRegistry
-      startBlock: 10720664 # contract creation block
+      startBlock: ##AUTOFILL##
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -66,16 +74,63 @@ dataSources:
         - event: CreateCustomHistory(indexed uint256,string,uint256,bytes32)
           handler: handleCustomHistory
 
+  - kind: ethereum/contract
+    name: BulkIssue
+    network: ##AUTOFILL##
+    source:
+      address: ##AUTOFILL##
+      abi: BulkIssue
+      startBlock: ##AUTOFILL##
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - SRR
+      abis:
+        - name: BulkIssue
+          file: ./abis/BulkIssue.json
+      file: ./src/bulk-mapping.ts
+      eventHandlers:
+        - event: BatchPrepared(indexed bytes32)
+          handler: handleBatchPrepared
+        - event: CreateSRRWithProof(indexed bytes32,bytes32)
+          handler: handleCreateSRRWithProof
+
+  # NOTE: LicensedUserEvent contract holds historical events only.
+  #       We leave it here to index the old events.
+  #       No changes should be made here.
+  - kind: ethereum/contract
+    name: LicensedUserEvent
+    network: ##AUTOFILL##
+    source:
+      address: ##AUTOFILL##
+      abi: LicensedUserEvent
+      startBlock: ##AUTOFILL##
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - LicensedUserWallet
+      abis:
+        - name: LicensedUserEvent
+          file: ./abis/LicensedUserEvent.json
+      eventHandlers:
+        - event: CreateLicensedUserWallet(indexed address,address[],uint256,string,string,uint8)
+          handler: legacyHandleCreateLicensedUserWallet
+      file: ./src/luw-mapping.ts
+
   # NOTE: RootLogic contract holds historical events only.
   #       We leave it here to index the old events.
   #       No changes should be made here.
   - kind: ethereum/contract
     name: RootLogic
-    network: mainnet
+    network: ##AUTOFILL##
     source:
-      address: "0x7f556e211a3E4b57d005D3aa49a31306FA8Bb34d"
+      address: ##AUTOFILL##
       abi: RootLogic
-      startBlock: 10720801 # contract creation block
+      startBlock: ##AUTOFILL##
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -99,26 +154,3 @@ dataSources:
           handler: handleSRRCommitmentCancelled
         - event: UpdateSRRMetadataDigest(indexed uint256,bytes32)
           handler: handleUpdateSRRMetadataDigest
-
-  - kind: ethereum/contract
-    name: BulkIssue
-    network: mainnet
-    source:
-      address: "0x1cE784a1c9C244397Ab812633Ca4122eE8aFD49B"
-      abi: BulkIssue
-      startBlock: 10720832 # contract creation block
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.4
-      language: wasm/assemblyscript
-      entities:
-        - SRR
-      abis:
-        - name: BulkIssue
-          file: ./abis/BulkIssue.json
-      file: ./src/bulk-mapping.ts
-      eventHandlers:
-        - event: BatchPrepared(indexed bytes32)
-          handler: handleBatchPrepared
-        - event: CreateSRRWithProof(indexed bytes32,bytes32)
-          handler: handleCreateSRRWithProof
