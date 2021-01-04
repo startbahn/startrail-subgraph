@@ -97,8 +97,7 @@ export function handleCreateSRR(event: CreateSRREvent): void {
     srr.issuer = luw.id
   }
 
-  let blockTime = eventUTCMillis(event)
-  srr.updatedAt = blockTime
+  srr.updatedAt = timestampMillis
   
   srr.save()
 

@@ -1,14 +1,8 @@
-enum UserType {
-  admin
-  handler
-  artist
-}
-
 type LicensedUserWallet @entity {
   id: ID! # walletAddress.toHexString()
   walletAddress: Bytes!
 
-  threshold: Int!
+  threshold: BigInt!
   englishName: String!
   originalName: String!
   userType: String!
