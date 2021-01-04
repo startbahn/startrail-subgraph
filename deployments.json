@@ -54,6 +54,10 @@
     }
   },
   "local": {
+    "LicensedUserManager": {
+      "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "startBlock": 1
+    },
     "StartrailRegistry": {
       "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
       "startBlock": 1
