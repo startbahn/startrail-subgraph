@@ -23,6 +23,8 @@ dataSources:
       eventHandlers:
         - event: CreateLicensedUserWallet(indexed address,address[],uint256,string,string,uint8)
           handler: handleCreateLicensedUserWallet
+        - event: MultiSigOwnerAddition(indexed address,indexed address)
+          handler: handleOwnerAddition
       file: ./src/luw-mapping.ts
 
   - kind: ethereum/contract
