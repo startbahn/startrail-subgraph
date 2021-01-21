@@ -105,3 +105,16 @@ type BulkIssue @entity {
   # TO add when contracts updated:
   # issuer: Bytes!              # batch issuer address
 }
+
+type MetaTxRequestType @entity {
+  id: ID! # typeHash.toHexString()
+  typeHash: Bytes!
+  typeString: String!
+  createdAt: BigInt! # block.timestamp when entity created
+}
+
+type MetaTxExecution @entity {
+  id: ID! # txHash.toHexString()
+  txHash: Bytes!
+  createdAt: BigInt! # block.timestamp when entity created
+}

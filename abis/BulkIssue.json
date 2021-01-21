@@ -128,7 +128,7 @@
     "name": "getNameRegistry",
     "outputs": [
       {
-        "internalType": "contract NameRegistry",
+        "internalType": "contract INameRegistry",
         "name": "",
         "type": "address"
       }

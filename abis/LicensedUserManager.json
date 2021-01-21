@@ -77,44 +77,7 @@
         "type": "uint8"
       }
     ],
-    "name": "CreateLicensedUserWalletMulti",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "walletAddress",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "englishName",
-        "type": "string"
-      },
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "originalName",
-        "type": "string"
-      },
-      {
-        "indexed": false,
-        "internalType": "enum LicensedUserManager.UserType",
-        "name": "userType",
-        "type": "uint8"
-      }
-    ],
-    "name": "CreateLicensedUserWalletSingle",
+    "name": "CreateLicensedUserWallet",
     "type": "event"
   },
   {
@@ -313,7 +276,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_wallet",
+        "name": "_walletAddress",
         "type": "address"
       },
       {
@@ -353,29 +316,36 @@
   {
     "inputs": [
       {
-        "internalType": "address[]",
-        "name": "_owners",
-        "type": "address[]"
-      },
-      {
-        "internalType": "uint8",
-        "name": "_threshold",
-        "type": "uint8"
-      },
-      {
-        "internalType": "enum LicensedUserManager.UserType",
-        "name": "_userType",
-        "type": "uint8"
-      },
-      {
-        "internalType": "string",
-        "name": "_originalName",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "_englishName",
-        "type": "string"
+        "components": [
+          {
+            "internalType": "address[]",
+            "name": "owners",
+            "type": "address[]"
+          },
+          {
+            "internalType": "uint8",
+            "name": "threshold",
+            "type": "uint8"
+          },
+          {
+            "internalType": "enum LicensedUserManager.UserType",
+            "name": "userType",
+            "type": "uint8"
+          },
+          {
+            "internalType": "string",
+            "name": "englishName",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "originalName",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct LicensedUserManager.LicensedUserDto",
+        "name": "_details",
+        "type": "tuple"
       },
       {
         "internalType": "bytes32",
@@ -383,7 +353,7 @@
         "type": "bytes32"
       }
     ],
-    "name": "createUserMulti",
+    "name": "createWallet",
     "outputs": [
       {
         "internalType": "address",
@@ -397,101 +367,36 @@
   {
     "inputs": [
       {
-        "internalType": "address[]",
-        "name": "_owners",
-        "type": "address[]"
-      },
-      {
-        "internalType": "uint8",
-        "name": "_threshold",
-        "type": "uint8"
-      },
-      {
-        "internalType": "enum LicensedUserManager.UserType",
-        "name": "_userType",
-        "type": "uint8"
-      },
-      {
-        "internalType": "string",
-        "name": "_originalName",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "_englishName",
-        "type": "string"
-      },
-      {
-        "internalType": "address",
-        "name": "_walletAddress",
-        "type": "address"
-      }
-    ],
-    "name": "createUserMultiFromMigration",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_owner",
-        "type": "address"
-      },
-      {
-        "internalType": "enum LicensedUserManager.UserType",
-        "name": "_userType",
-        "type": "uint8"
-      },
-      {
-        "internalType": "string",
-        "name": "_originalName",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "_englishName",
-        "type": "string"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "_salt",
-        "type": "bytes32"
-      }
-    ],
-    "name": "createUserSingle",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "walletAddress",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_owner",
-        "type": "address"
-      },
-      {
-        "internalType": "enum LicensedUserManager.UserType",
-        "name": "_userType",
-        "type": "uint8"
-      },
-      {
-        "internalType": "string",
-        "name": "_originalName",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "_englishName",
-        "type": "string"
+        "components": [
+          {
+            "internalType": "address[]",
+            "name": "owners",
+            "type": "address[]"
+          },
+          {
+            "internalType": "uint8",
+            "name": "threshold",
+            "type": "uint8"
+          },
+          {
+            "internalType": "enum LicensedUserManager.UserType",
+            "name": "userType",
+            "type": "uint8"
+          },
+          {
+            "internalType": "string",
+            "name": "englishName",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "originalName",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct LicensedUserManager.LicensedUserDto",
+        "name": "_details",
+        "type": "tuple"
       },
       {
         "internalType": "address",
@@ -499,7 +404,7 @@
         "type": "address"
       }
     ],
-    "name": "createUserSingleFromMigration",
+    "name": "createWalletFromMigration",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -593,63 +498,7 @@
         "type": "bytes"
       }
     ],
-    "name": "executeTransactionFromMulti",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "success",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "components": [
-          {
-            "internalType": "bytes32",
-            "name": "typeHash",
-            "type": "bytes32"
-          },
-          {
-            "internalType": "address",
-            "name": "from",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "nonce",
-            "type": "uint256"
-          },
-          {
-            "internalType": "bytes",
-            "name": "suffixData",
-            "type": "bytes"
-          }
-        ],
-        "internalType": "struct IMetaTxRequest.ExecutionRequest",
-        "name": "_request",
-        "type": "tuple"
-      },
-      {
-        "internalType": "uint8",
-        "name": "_v",
-        "type": "uint8"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "_r",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "_s",
-        "type": "bytes32"
-      }
-    ],
-    "name": "executeTransactionFromSingle",
+    "name": "executeTransaction",
     "outputs": [
       {
         "internalType": "bool",
@@ -671,6 +520,16 @@
     "name": "getLicensedUser",
     "outputs": [
       {
+        "internalType": "address[]",
+        "name": "owners",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint8",
+        "name": "threshold",
+        "type": "uint8"
+      },
+      {
         "internalType": "bool",
         "name": "active",
         "type": "bool"
@@ -682,12 +541,12 @@
       },
       {
         "internalType": "string",
-        "name": "originalName",
+        "name": "englishName",
         "type": "string"
       },
       {
         "internalType": "string",
-        "name": "englishName",
+        "name": "originalName",
         "type": "string"
       }
     ],
@@ -699,7 +558,7 @@
     "name": "getNameRegistry",
     "outputs": [
       {
-        "internalType": "contract NameRegistry",
+        "internalType": "contract INameRegistry",
         "name": "",
         "type": "address"
       }
@@ -739,30 +598,11 @@
         "type": "address"
       }
     ],
-    "name": "getOwner",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_wallet",
-        "type": "address"
-      }
-    ],
     "name": "getOwners",
     "outputs": [
       {
         "internalType": "address[]",
-        "name": "",
+        "name": "owners",
         "type": "address[]"
       }
     ],
@@ -773,7 +613,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_wallet",
+        "name": "_walletAddress",
         "type": "address"
       }
     ],
@@ -807,25 +647,6 @@
         "internalType": "address",
         "name": "_walletAddress",
         "type": "address"
-      }
-    ],
-    "name": "isMultiWallet",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_wallet",
-        "type": "address"
       },
       {
         "internalType": "address",
@@ -852,7 +673,7 @@
         "type": "address"
       }
     ],
-    "name": "isSingleWallet",
+    "name": "isWallet",
     "outputs": [
       {
         "internalType": "bool",
@@ -1012,29 +833,6 @@
       }
     ],
     "name": "setOriginalName",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_wallet",
-        "type": "address"
-      },
-      {
-        "internalType": "address[]",
-        "name": "_owners",
-        "type": "address[]"
-      },
-      {
-        "internalType": "uint8",
-        "name": "_threshold",
-        "type": "uint8"
-      }
-    ],
-    "name": "singleToMulti",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

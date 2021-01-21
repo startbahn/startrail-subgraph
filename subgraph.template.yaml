@@ -21,16 +21,26 @@ dataSources:
         - name: LicensedUserManager
           file: ./abis/LicensedUserManager.json
       eventHandlers:
-        - event: CreateLicensedUserWalletMulti(indexed address,address[],uint256,string,string,uint8)
-          handler: handleCreateLicensedUserWalletMulti
-        - event: CreateLicensedUserWalletSingle(indexed address,address,string,string,uint8)
-          handler: handleCreateLicensedUserWalletSingle
+        - event: CreateLicensedUserWallet(indexed address,address[],uint256,string,string,uint8)
+          handler: handleCreateLicensedUserWallet
         - event: UpgradeLicensedUserWalletToMulti(indexed address,address[],uint256)
           handler: handleUpgradeLicensedUserWalletToMulti
         - event: UpdateEnglishName(indexed address,string)
           handler: handleUpdateEnglishName
         - event: UpdateOriginalName(indexed address,string)
           handler: handleUpdateOriginalName
+        - event: AddedOwner(address,address)
+          handler: handleAddedOwner
+        - event: RemovedOwner(address,address)
+          handler: handleRemovedOwner
+        - event: ChangedThreshold(address,uint8)
+          handler: handleChangedThreshold
+        - event: RequestTypeRegistered(indexed bytes32,string)
+          handler: handleRequestTypeRegistered
+        - event: RequestTypeUnregistered(indexed bytes32)
+          handler: handleRequestTypeUnregistered
+        - event: ExecutionSuccess(bytes32)
+          handler: handleExecutionSuccess
       file: ./src/luw-mapping.ts
 
   - kind: ethereum/contract
