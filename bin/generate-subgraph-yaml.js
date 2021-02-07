@@ -117,12 +117,17 @@ subgraphYamlTemplate.dataSources.forEach((ds) => {
   }
 
   //
+  // Set ABI folder
+  //
+  const abisFolder = ['LicensedUserEvent', 'RootLogic'].indexOf(contractName) === -1 ? abisPath : rootPath('abis-legacy')
+
+  //
   // Set dataSource properties
   //
   ds.network = network
   ds.source.address = contractAddress
   ds.source.startBlock = startBlock
-  ds.mapping.abis[0].file = path.join(abisPath, `${contractName}.json`)
+  ds.mapping.abis[0].file = path.join(abisFolder, `${contractName}.json`)
 })
 
 fs.writeFileSync(
