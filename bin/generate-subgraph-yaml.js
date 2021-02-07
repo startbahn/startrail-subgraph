@@ -13,6 +13,8 @@ const startrailPackagePath = rootPath(
   path.join('node_modules', '@startbahn', 'startrail')
 )
 
+const isLegacyContract = (contractName) => ['LicensedUserEvent', 'RootLogic'].indexOf(contractName) !== -1
+
 if (process.argv.length !== 3 && process.argv.length !== 6) {
   console.log(`
   Usage: node ${process.argv[1]} <deployment name> [ <deploy.json path> <abis folder path> <startBlock> ]
@@ -89,15 +91,29 @@ subgraphYamlTemplate.dataSources.forEach((ds) => {
   // Get contractAddress
   //
   const contractName = ds.name
-  const addressKey = `${contractName[0].toLowerCase()}${contractName.substring(
-    1
-  )}ProxyAddress`
-  const contractAddress = contractAddresses[addressKey]
-  if (!contractAddress) {
-    console.error(
-      `ERROR: contract address not set for contract '${contractName}'\n`
-    )
-    process.exit(4)
+
+  let contractAddress
+  if (!isLegacyContract(contractName)) {
+    // For non legact contracts the address MUST be in the deploy.json
+    // contractAddresses lookup
+    const addressKey = `${contractName[0].toLowerCase()}${contractName.substring(
+      1
+    )}ProxyAddress`
+    contractAddress = contractAddresses[addressKey]
+    if (!contractAddress) {
+      console.error(
+        `ERROR: contract address not set for contract '${contractName}'\n`
+      )
+      process.exit(4)
+    }
+  } else {
+    // For legacy contracts see if the address is in the subgraph deployment
+    // json. If it's not then assume it's not deployed (a local or new
+    // contracts only deployment) and just set the zero address
+    contractAddress = subgraphDeployments[deploymentName][contractName]?.address
+    if (!contractAddress) {
+      contractAddress = '0x0000000000000000000000000000000000000000'
+    }
   }
 
   //
@@ -119,7 +135,7 @@ subgraphYamlTemplate.dataSources.forEach((ds) => {
   //
   // Set ABI folder
   //
-  const abisFolder = ['LicensedUserEvent', 'RootLogic'].indexOf(contractName) === -1 ? abisPath : rootPath('abis-legacy')
+  const abisFolder = !isLegacyContract(contractName) ? abisPath : rootPath('abis-legacy')
 
   //
   // Set dataSource properties
