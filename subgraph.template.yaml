@@ -23,6 +23,7 @@ dataSources:
       eventHandlers:
         - event: CreateLicensedUserWallet(indexed address,address[],uint256,string,string,uint8)
           handler: handleCreateLicensedUserWallet
+<<<<<<< HEAD
         - event: UpgradeLicensedUserWalletToMulti(indexed address,address[],uint256)
           handler: handleUpgradeLicensedUserWalletToMulti
         - event: UpdateEnglishName(indexed address,string)
@@ -129,6 +130,8 @@ dataSources:
       eventHandlers:
         - event: CreateLicensedUserWallet(indexed address,address[],uint256,string,string,uint8)
           handler: legacyHandleCreateLicensedUserWallet
+        - event: MultiSigOwnerAddition(indexed address,indexed address)
+          handler: handleOwnerAddition
       file: ./src/luw-mapping.ts
 
   # NOTE: RootLogic contract holds historical events only.

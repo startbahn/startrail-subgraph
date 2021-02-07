@@ -1,6 +1,9 @@
 import { BigInt, Bytes, log, store } from '@graphprotocol/graph-ts'
 
-import { CreateLicensedUserWallet as LegacyCreateLUWEvent } from '../generated/LicensedUserEvent/LicensedUserEvent'
+import {
+  CreateLicensedUserWallet as LegacyCreateLUWEvent,
+  MultiSigOwnerAddition as MultiSigOwnerAdditionEvent,
+} from '../generated/LicensedUserEvent/LicensedUserEvent'
 import {
   AddedOwner as AddedOwnerEvent,
   ChangedThreshold as ChangedThresholdEvent,
@@ -254,5 +257,24 @@ export function legacyHandleCreateLicensedUserWallet(
   luw.createdAt = luw.updatedAt = eventUTCMillis(event);
 
   log.info("creating new LUW (legacy) {}", [luwId]);
+  luw.save();
+}
+
+export function handleOwnerAddition(event: MultiSigOwnerAdditionEvent): void {
+  let luwId = event.params.proxyContractAddr.toHexString();
+  let luw = LicensedUserWallet.load(luwId);
+  if (luw == null) {
+    log.error("received event for unknown LUW: {}", [luwId]);
+    return;
+  }
+
+  log.info("adding owner {}", [event.params.owner.toHexString()]);
+  // this 3 step assign, push, reassign is necessary here:
+  // (see https://thegraph.com/docs/assemblyscript-api#api-reference):
+  let owners = luw.owners;
+  owners.push(event.params.owner);
+  luw.owners = owners;
+
+  luw.updatedAt = eventUTCMillis(event);
   luw.save();
 }
