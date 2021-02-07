@@ -260,7 +260,9 @@ export function legacyHandleCreateLicensedUserWallet(
   luw.save();
 }
 
-export function handleOwnerAddition(event: MultiSigOwnerAdditionEvent): void {
+export function legacyHandleOwnerAddition(
+  event: MultiSigOwnerAdditionEvent
+): void {
   let luwId = event.params.proxyContractAddr.toHexString();
   let luw = LicensedUserWallet.load(luwId);
   if (luw == null) {

@@ -1,77 +1,77 @@
 {
-  "develop": {
+  "rinkeby-develop": {
     "StartrailRegistry": {
-      "address": "0x8824382015de561Dc42A68968f46A5D12491d481",
       "startBlock": 7370000
     },
     "BulkIssue": {
-      "address": "0x82f794c63c711e842656cfDE3BA45dF67953FD7F",
       "startBlock": 6951000
     },
     "LicensedUserEvent": {
-      "address": "0xb269CF0f173DD0c0794BE4641ECa54fbdf3c32cc",
       "startBlock": 6951000
     },
     "RootLogic": {
-      "address": "0x8824382015de561Dc42A68968f46A5D12491d481",
       "startBlock": 6951000
     }
   },
-  "release": {
+  "rinkeby-release": {
     "StartrailRegistry": {
-      "address": "0x9Ef1095432A1E236CAdF84248CF6cE271cC5926C",
       "startBlock": 7280000
     },
     "BulkIssue": {
-      "address": "0xc86D1d6b3D6642D5d8d8634a2628a1d65161228A",
       "startBlock": 7280000
     },
     "LicensedUserEvent": {
-      "address": "0xaC45EcbD16daC68FF0F3fFb34aFb14009e0A5dd3",
       "startBlock": 7280000
     },
     "RootLogic": {
-      "address": "0x9Ef1095432A1E236CAdF84248CF6cE271cC5926C",
       "startBlock": 7280000
     }
   },
   "mainnet": {
     "StartrailRegistry": {
-      "address": "0x7f556e211a3E4b57d005D3aa49a31306FA8Bb34d",
       "startBlock": 10720664
     },
     "BulkIssue": {
-      "address": "0x1cE784a1c9C244397Ab812633Ca4122eE8aFD49B",
       "startBlock": 10720832
     },
     "LicensedUserEvent": {
-      "address": "0x2A07fBCD64BE0e2329890C21c6F34e81889a5912",
       "startBlock": 10720704
     },
     "RootLogic": {
-      "address": "0x7f556e211a3E4b57d005D3aa49a31306FA8Bb34d",
       "startBlock": 10720801
+    }
+  },
+  "rinkeby-lum-beta": {
+    "StartrailRegistry": {
+      "startBlock": 7930578
+    },
+    "LicensedUserManager": {
+      "startBlock": 7930578
+    },
+    "BulkIssue": {
+      "startBlock": 7930578
+    },
+    "LicensedUserEvent": {
+      "startBlock": 7930578
+    },
+    "RootLogic": {
+      "startBlock": 7930578
     }
   },
   "local": {
     "LicensedUserManager": {
-      "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
       "startBlock": 1
     },
     "StartrailRegistry": {
-      "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
       "startBlock": 1
     },
     "BulkIssue": {
-      "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
       "startBlock": 1
     },
     "LicensedUserEvent": {
-      "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
       "startBlock": 1
     },
     "RootLogic": {
-      "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
       "startBlock": 1
     }
   }
