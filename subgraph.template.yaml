@@ -51,9 +51,9 @@ dataSources:
           handler: handleCreateSRR
         - event: UpdateSRR(indexed uint256,(bool,address,address))
           handler: handleUpdateSRR
-        - event: Provenance(indexed uint256,indexed address,indexed address,uint256,string,string)
+        - event: Provenance(indexed uint256,indexed address,indexed address,string,string)
           handler: handleSRRProvenance
-        - event: Provenance(indexed uint256,indexed address,indexed address,uint256,uint256,string,string)
+        - event: Provenance(indexed uint256,indexed address,indexed address,uint256,string,string)
           handler: handleSRRProvenanceWithCustomHistory
         - event: SRRCommitment(address,bytes32,uint256)
           handler: handleSRRCommitment
@@ -67,6 +67,8 @@ dataSources:
           handler: handleCustomHistoryType
         - event: CreateCustomHistory(indexed uint256,string,uint256,bytes32)
           handler: handleCustomHistory
+        - event: Approval(indexed address,indexed address,indexed uint256);
+          handler: handleApproval
 
   # NOTE: RootLogic contract holds historical events only.
   #       We leave it here to index the old events.

@@ -31,6 +31,7 @@ import {
   Provenance1 as SRRProvenanceWithCustomHistoryEvent,
   SRRCommitment1 as SRRCommitmentWithCustomHistoryEvent,
   Transfer as TransferEvent,
+  Approval as ApprovalEvent,
 } from '../generated/StartrailRegistry/StartrailRegistry'
 import { eventUTCMillis, ZERO_ADDRESS } from './utils'
 
@@ -68,6 +69,40 @@ export function handleTransfer(event: TransferEvent): void {
     srrCommit.updatedAt = timestampMillis
     srrCommit.save()
   }
+}
+
+export function handleApproval(event: ApprovalEvent): void {
+  let timestampMillis = eventUTCMillis(event)
+  let srrId = event.params.tokenId.toString()
+  let owner = event.params.owner.toHexString()
+  let approved = event.params.approved.toHexString()
+  
+  log.info('Approval for {}', [srrId])
+  log.info('owner: {}', [owner])
+  log.info('approved: {}', [approved])
+  
+
+  let srr = SRR.load(srrId)
+  if (srr == null) {
+    log.error('received event for unknown SRR: {}', [srrId])
+    return
+  }
+
+  // Create new approval
+  let approvalId = crypto.keccak256(
+    ByteArray.fromUTF8(
+      srrId.toString()
+    )
+  ).toHexString()
+
+  let approval = new SRRApproval(srrId)
+
+  approval.srr = srr.id
+  approval.owner = owner
+  approval.approved = approved
+  approval.createdAt = timestampMillis
+  approval.save()
+
 }
 
 export function handleCreateSRR(event: CreateSRREvent): void {
@@ -113,7 +148,6 @@ export function handleSRRProvenance(event: SRRProvenanceEvent): void {
     params.tokenId,
     params.from,
     params.to,
-    params.timestamp,
     null,
     params.historyMetadataDigest,
     params.historyMetadataURI,
@@ -127,7 +161,6 @@ export function handleSRRProvenanceWithCustomHistory(event: SRRProvenanceWithCus
     params.tokenId,
     params.from,
     params.to,
-    params.timestamp,
     params.customHistoryId,
     params.historyMetadataDigest,
     params.historyMetadataURI,
@@ -145,7 +178,6 @@ function handleSRRProvenanceInternal(
   tokenId: BigInt,
   from: Address,
   to: Address,
-  timestamp: BigInt,
   customHistoryId: BigInt,
   historyMetadataDigest: string,
   historyMetadataURI: string
@@ -165,8 +197,7 @@ function handleSRRProvenanceInternal(
   // Create new Provenance
   let provenanceId = crypto.keccak256(
     ByteArray.fromUTF8(
-      tokenId.toString() +
-      timestamp.toString()
+      tokenId.toString()
     )
   ).toHexString()
   
@@ -184,7 +215,6 @@ function handleSRRProvenanceInternal(
     provenance.customHistory = customHistoryId.toString()
   } 
 
-  provenance.timestamp = timestamp
   provenance.createdAt = eventUTCMillis(event)
   
   provenance.save()
