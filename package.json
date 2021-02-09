@@ -18,7 +18,7 @@
     "deploy-gke-master": "npm run generate-master && graph deploy --ipfs https://subgraph.startrail.io/ipfs/ --node https://subgraph.startrail.io/admin/ startbahn/startrail subgraph.mainnet.yaml",
     "deploy-develop": "npm run generate-develop && graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail-rinkeby-develop --access-token $TOKEN subgraph.develop.yaml",
     "deploy-release": "npm run generate-release && graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail-rinkeby-release --access-token $TOKEN subgraph.release.yaml",
-    "deploy-lum-beta": "npm run generate-release && graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail-rinkeby-lum-beta --access-token $TOKEN subgraph.rinkeby-lum-beta.yaml",
+    "deploy-lum-beta": "npm run generate-lum-beta && graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail-rinkeby-lum-beta --access-token $TOKEN subgraph.rinkeby-lum-beta.yaml",
     "deploy-master": "npm run generate-master && graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail --access-token $TOKEN subgraph.mainnet.yaml",
     "generate-local": "node bin/generate-subgraph-yaml local",
     "generate-develop": "node bin/generate-subgraph-yaml rinkeby-develop",
