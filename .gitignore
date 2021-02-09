@@ -1,10 +1,11 @@
 # subgraph
 build/
 generated/
-subgraph.develop.yaml
-subgraph.local.yaml
-subgraph.mainnet.yaml
-subgraph.release.yaml
+subgraph.*.yaml
+# subgraph.local.yaml
+# subgraph.mainnet.yaml
+# subgraph.release.yaml
+# subgraph.rinkeby-lum-beta.yaml
 *hatch*.sh
 
 # Logs
