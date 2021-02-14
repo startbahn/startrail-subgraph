@@ -63,10 +63,10 @@
   resolved "https://registry.yarnpkg.com/@protobufjs/utf8/-/utf8-1.1.0.tgz#a777360b5b39a1a2e5106f8e858f2fd2d060c570"
   integrity sha1-p3c2C1s5oaLlEG+OhY8v0tBgxXA=
 
-"@startbahn/startrail@^1.4.0-lum-beta-4":
-  version "1.4.0-lum-beta-4"
-  resolved "https://registry.yarnpkg.com/@startbahn/startrail/-/startrail-1.4.0-lum-beta-4.tgz#02c5538de8eda318daf025f6d93e24a76d7962cc"
-  integrity sha512-vyBREM5fdPyJCHQ0LgVMU1hrQbZaupLiBy/7YhfrUUO7cndXGNnglJfmXShimWNXIR7ddnP1jkRnMTwwIeSnpQ==
+"@startbahn/startrail@^1.4.0-lum-beta-5":
+  version "1.4.0-lum-beta-5"
+  resolved "https://registry.yarnpkg.com/@startbahn/startrail/-/startrail-1.4.0-lum-beta-5.tgz#c92dd50a9ea4a8f99712f636c87414f6c7723857"
+  integrity sha512-wLjSuUfu2WLTwb8FHuIpkXuWES6RviPJ5jzrVD/SkeB/xyKOlEGgfTri/twvIYUG2DQvQ6uRBn8f4seHAhcfBw==
 
 "@types/connect@^3.4.33":
   version "3.4.33"

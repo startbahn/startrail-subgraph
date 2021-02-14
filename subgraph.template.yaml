@@ -21,19 +21,17 @@ dataSources:
         - name: LicensedUserManager
           file: ./abis/LicensedUserManager.json
       eventHandlers:
-        - event: CreateLicensedUserWallet(indexed address,address[],uint256,string,string,uint8)
+        - event: CreateLicensedUserWallet(indexed address,address[],uint8,string,string,uint8)
           handler: handleCreateLicensedUserWallet
-        - event: UpgradeLicensedUserWalletToMulti(indexed address,address[],uint256)
+        - event: UpgradeLicensedUserWalletToMulti(indexed address,address[],uint8)
           handler: handleUpgradeLicensedUserWalletToMulti
-        - event: UpdateEnglishName(indexed address,string)
-          handler: handleUpdateEnglishName
-        - event: UpdateOriginalName(indexed address,string)
-          handler: handleUpdateOriginalName
-        - event: AddedOwner(address,address)
+        - event: UpdateLicensedUserDetail(indexed address,string,string)
+          handler: handleUpdateLicensedUserDetail
+        - event: AddedOwner(indexed address,address)
           handler: handleAddedOwner
-        - event: RemovedOwner(address,address)
+        - event: RemovedOwner(indexed address,address)
           handler: handleRemovedOwner
-        - event: ChangedThreshold(address,uint8)
+        - event: ChangedThreshold(indexed address,uint8)
           handler: handleChangedThreshold
         - event: RequestTypeRegistered(indexed bytes32,string)
           handler: handleRequestTypeRegistered

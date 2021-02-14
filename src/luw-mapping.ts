@@ -12,8 +12,7 @@ import {
   RemovedOwner as RemovedOwnerEvent,
   RequestTypeRegistered as RequestTypeRegisteredEvent,
   RequestTypeUnregistered as RequestTypeUnregisteredEvent,
-  UpdateEnglishName as UpdateEnglishNameEvent,
-  UpdateOriginalName as UpdateOriginalNameEvent,
+  UpdateLicensedUserDetail as UpdateLicensedUserDetailEvent,
   UpgradeLicensedUserWalletToMulti as UpgradeLicensedUserWalletToMultiEvent,
 } from '../generated/LicensedUserManager/LicensedUserManager'
 import {
@@ -135,12 +134,11 @@ export function handleChangedThreshold(event: ChangedThresholdEvent): void {
     return;
   }
 
-  let threshold = BigInt.fromI32(event.params.threshold);
   log.info("changing threshold to [{}] for LUW [{}]", [
-    threshold.toString(),
+    BigInt.fromI32(event.params.threshold).toString(),
     luwId,
   ]);
-  luw.threshold = threshold;
+  luw.threshold = event.params.threshold;
   luw.updatedAt = eventUTCMillis(event);
   luw.save();
 }
@@ -165,30 +163,30 @@ export function handleUpgradeLicensedUserWalletToMulti(
   luw.save();
 }
 
-export function handleUpdateEnglishName(event: UpdateEnglishNameEvent): void {
+export function handleUpdateLicensedUserDetail(
+  event: UpdateLicensedUserDetailEvent
+): void {
   let luwId = event.params.walletAddress.toHexString();
   let luw = LicensedUserWallet.load(luwId);
   if (luw == null) {
-    log.error("received UpdateEnglishName event for unknown LUW: {}", [luwId]);
+    log.error("received UpdateLicensedUserDetail event for unknown LUW: {}", [
+      luwId,
+    ]);
     return;
   }
 
-  log.info("updating LUW {} englishName to {}", [luwId, event.params.name]);
-  luw.englishName = event.params.name;
-  luw.updatedAt = eventUTCMillis(event);
-  luw.save();
-}
+  log.info("updating LUW {} {} to {}", [
+    luwId,
+    event.params.key,
+    event.params.value,
+  ]);
 
-export function handleUpdateOriginalName(event: UpdateOriginalNameEvent): void {
-  let luwId = event.params.walletAddress.toHexString();
-  let luw = LicensedUserWallet.load(luwId);
-  if (luw == null) {
-    log.error("received UpdateOriginalName event for unknown LUW: {}", [luwId]);
-    return;
+  if (event.params.key == "englishName") {
+    luw.englishName = event.params.value;
+  } else if (event.params.key == "originalName") {
+    luw.originalName = event.params.value;
   }
 
-  log.info("updating LUW {} originalName to {}", [luwId, event.params.name]);
-  luw.originalName = event.params.name;
   luw.updatedAt = eventUTCMillis(event);
   luw.save();
 }
@@ -249,7 +247,7 @@ export function legacyHandleCreateLicensedUserWallet(
 
   let luw = new LicensedUserWallet(luwId);
   luw.walletAddress = event.params.contractAddress;
-  luw.threshold = event.params.requiredConfirmation;
+  luw.threshold = event.params.requiredConfirmation.toI32();
   luw.englishName = event.params.englishName;
   luw.originalName = event.params.originalName;
   luw.owners = event.params.owners as Array<Bytes>;

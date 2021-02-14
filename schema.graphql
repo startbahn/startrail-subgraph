@@ -2,7 +2,7 @@ type LicensedUserWallet @entity {
   id: ID! # walletAddress.toHexString()
   walletAddress: Bytes!
 
-  threshold: BigInt!
+  threshold: Int!
   englishName: String!
   originalName: String!
   userType: String!
