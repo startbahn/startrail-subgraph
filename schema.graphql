@@ -118,6 +118,8 @@ type BulkIssue @entity {
   id: ID!                     # merkleRoot.toHexString()
   merkleRoot: Bytes!          # batch merkle root
   srrs: [Bytes!]              # Hashes of SRRs processed
+  sender: Bytes!              # batchprepared sender
+  tokenId: String             # ERC721 token id for createSRRwithPrrof event
 
   createdAt: BigInt!          # block.timestamp when entity created
   updatedAt: BigInt!          # block.timestamp when entity last updated
