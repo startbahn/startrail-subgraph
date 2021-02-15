@@ -92,12 +92,12 @@ export function handleApproval(event: ApprovalEvent): void {
   // Create new approval
   let approvalId = crypto.keccak256(
     ByteArray.fromUTF8(
-      srrId.toString() //+ 
-      // timestampMillis
+      srrId.toString() + 
+      timestampMillis.toString()
     )
   ).toHexString()
 
-  let approval = new SRRApproval(srrId)
+  let approval = new SRRApproval(approvalId)
 
   approval.srr = srr.id
   approval.owner = event.params.owner
