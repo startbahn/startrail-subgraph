@@ -97,7 +97,7 @@ export function handleApproval(event: ApprovalEvent): void {
     )
   ).toHexString()
 
-  let approval = new SRRApproval(srrId)
+  let approval = new SRRApproval(approvalId)
 
   approval.srr = srr.id
   approval.owner = event.params.owner
