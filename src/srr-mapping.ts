@@ -24,6 +24,7 @@ import {
   SRRMetadataHistory,
   SRRProvenance,
   SRRTransferCommit,
+  SRRApproval,
 } from '../generated/schema'
 import {
   CreateCustomHistory as CustomHistoryCreatedEvent,
@@ -98,8 +99,8 @@ export function handleApproval(event: ApprovalEvent): void {
   let approval = new SRRApproval(srrId)
 
   approval.srr = srr.id
-  approval.owner = owner
-  approval.approved = approved
+  approval.owner = event.params.owner
+  approval.approved = event.params.approved
   approval.createdAt = timestampMillis
   approval.save()
 

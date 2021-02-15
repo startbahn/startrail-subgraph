@@ -67,7 +67,7 @@ dataSources:
           handler: handleCustomHistoryType
         - event: CreateCustomHistory(indexed uint256,string,uint256,bytes32)
           handler: handleCustomHistory
-        - event: Approval(indexed address,indexed address,indexed uint256);
+        - event: Approval(indexed address,indexed address,indexed uint256)
           handler: handleApproval
 
   # NOTE: RootLogic contract holds historical events only.
