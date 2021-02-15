@@ -1,6 +1,6 @@
 {
   "name": "startrail-subgraph",
-  "version": "1.0.0",
+  "version": "1.3.0",
   "scripts": {
     "build": "npm run generate-local && graph build subgraph.local.yaml",
     "codegen": "npm run generate-local && graph codegen subgraph.local.yaml",
