@@ -93,7 +93,7 @@ export function handleApproval(event: ApprovalEvent): void {
   let approvalId = crypto.keccak256(
     ByteArray.fromUTF8(
       srrId.toString() + 
-      timestampMillis
+      timestampMillis.toString()
     )
   ).toHexString()
 
