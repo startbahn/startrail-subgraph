@@ -28,7 +28,7 @@ dataSources:
       file: ./src/luw-mapping.ts
 
   - kind: ethereum/contract
-    name: StartrailRegistry
+    name: StartrailRegistry_legacy
     network: mainnet
     source:
       address: "0x7f556e211a3E4b57d005D3aa49a31306FA8Bb34d"
@@ -145,7 +145,7 @@ dataSources:
         - event: UpdateSRRMetadataDigest(indexed uint256,bytes32)
           handler: handleUpdateSRRMetadataDigest
   - kind: ethereum/contract
-    name: BulkIssue
+    name: BulkIssue_legacy
     network: mainnet
     source:
       address: "0x1cE784a1c9C244397Ab812633Ca4122eE8aFD49B"
