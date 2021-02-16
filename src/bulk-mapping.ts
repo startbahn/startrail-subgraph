@@ -19,7 +19,7 @@ export function handleBatchPrepared(event: BatchPreparedEvent): void {
   batch = new BulkIssue(merkleRoot)
   batch.srrs = []
   batch.merkleRoot = event.params.merkleRoot
-  batch.sender = event.params.sender
+  batch.issuer = event.params.sender
   batch.createdAt = batch.updatedAt = eventUTCMillis(event)
   batch.save()
 }
