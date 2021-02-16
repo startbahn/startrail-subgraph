@@ -42,6 +42,47 @@ dataSources:
         - SRR
       abis:
         - name: StartrailRegistry
+          file: ./abis/legacy/StartrailRegistry.json
+      file: ./src/srr-mapping.ts
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+        - event: CreateSRR(indexed uint256,(bool,address,address),bytes32)
+          handler: handleCreateSRR
+        - event: UpdateSRR(indexed uint256,(bool,address,address))
+          handler: handleUpdateSRR
+        - event: Provenance(indexed uint256,indexed address,indexed address,uint256,string,string)
+          handler: handleSRRProvenance
+        - event: Provenance(indexed uint256,indexed address,indexed address,uint256,uint256,string,string)
+          handler: handleSRRProvenanceWithCustomHistory
+        - event: SRRCommitment(address,bytes32,uint256)
+          handler: handleSRRCommitment
+        - event: SRRCommitment(address,bytes32,uint256,uint256)
+          handler: handleSRRCommitmentWithCustomHistory
+        - event: SRRCommitmentCancelled(uint256)
+          handler: handleSRRCommitmentCancelled
+        - event: UpdateSRRMetadataDigest(indexed uint256,bytes32)
+          handler: handleUpdateSRRMetadataDigest
+        - event: CreateCustomHistoryType(indexed uint256,string)
+          handler: handleCustomHistoryType
+        - event: CreateCustomHistory(indexed uint256,string,uint256,bytes32)
+          handler: handleCustomHistory
+
+  - kind: ethereum/contract
+    name: StartrailRegistry
+    network: mainnet
+    source:
+      address: "0x7f556e211a3E4b57d005D3aa49a31306FA8Bb34d"
+      abi: StartrailRegistry
+      startBlock: 10720664 # contract creation block
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - SRR
+      abis:
+        - name: StartrailRegistry
           file: ./abis/StartrailRegistry.json
       file: ./src/srr-mapping.ts
       eventHandlers:
@@ -103,7 +144,29 @@ dataSources:
           handler: handleSRRCommitmentCancelled
         - event: UpdateSRRMetadataDigest(indexed uint256,bytes32)
           handler: handleUpdateSRRMetadataDigest
-
+  - kind: ethereum/contract
+    name: BulkIssue
+    network: mainnet
+    source:
+      address: "0x1cE784a1c9C244397Ab812633Ca4122eE8aFD49B"
+      abi: BulkIssue
+      startBlock: 10720832 # contract creation block
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - SRR
+      abis:
+        - name: BulkIssue
+          file: ./abis/legacy/BulkIssue.json
+      file: ./src/bulk-mapping.ts
+      eventHandlers:
+        - event: BatchPrepared(indexed bytes32)
+          handler: handleBatchPrepared
+        - event: CreateSRRWithProof(indexed bytes32,bytes32)
+          handler: handleCreateSRRWithProof
+  
   - kind: ethereum/contract
     name: BulkIssue
     network: mainnet
