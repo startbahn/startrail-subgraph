@@ -134,7 +134,7 @@ export function handleCreateSRR(event: CreateSRREvent): void {
     srr.issuer = luw.id
   }
 
-  let blockTime = eventUTCMillis(event)
+  let blockTime = timestampMillis
   srr.updatedAt = blockTime
   
   srr.save()
@@ -220,7 +220,7 @@ function handleSRRProvenanceInternal(
     provenance.customHistory = customHistoryId.toString()
   } 
 
-  provenance.createdAt = eventUTCMillis(event)
+  provenance.createdAt = timestampMillis
   
   provenance.save()
 }
