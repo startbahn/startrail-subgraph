@@ -9,6 +9,7 @@ import { eventUTCMillis } from './utils'
 
 export function handleBatchPrepared(event: BatchPreparedEvent): void {
   let merkleRoot = event.params.merkleRoot.toHexString()
+  let sender = event.params.sender.toHexString()
   let batch = BulkIssue.load(merkleRoot)
   if (batch != null) {
     log.info('already received this event for merkleRoot: {}', [event.params.merkleRoot.toString()])
@@ -18,12 +19,14 @@ export function handleBatchPrepared(event: BatchPreparedEvent): void {
   batch = new BulkIssue(merkleRoot)
   batch.srrs = []
   batch.merkleRoot = event.params.merkleRoot
+  batch.sender = event.params.sender
   batch.createdAt = batch.updatedAt = eventUTCMillis(event)
   batch.save()
 }
 
 export function handleCreateSRRWithProof(event: CreateSRRWithProofEvent): void {
   let merkleRoot = event.params.merkleRoot.toHexString()
+  let srrId = event.params.tokenId.toString()
   log.info('handleCreateSRRWithProof: merkleRoot {}', [merkleRoot])
   let batch = BulkIssue.load(merkleRoot)
   if (batch == null) {
@@ -39,7 +42,7 @@ export function handleCreateSRRWithProof(event: CreateSRRWithProofEvent): void {
   let srrs = batch.srrs
   srrs.push(event.params.srrHash)  
   batch.srrs = srrs
-
+  batch.tokenId = srrId
   batch.updatedAt = eventUTCMillis(event)
   batch.save()
 }
