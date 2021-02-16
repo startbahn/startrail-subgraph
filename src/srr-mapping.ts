@@ -191,12 +191,13 @@ function handleSRRProvenanceInternal(
     return
   }
 
+  let timestampMillis = eventUTCMillis(event)
+
   // Update existing SRR
   srr.ownerAddress = to 
-  srr.updatedAt = eventUTCMillis(event)
+  srr.updatedAt = timestampMillis
   srr.save()
 
-  let timestampMillis = eventUTCMillis(event)
   // Create new Provenance
   let provenanceId = crypto.keccak256(
     ByteArray.fromUTF8(
