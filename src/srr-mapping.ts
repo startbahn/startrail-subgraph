@@ -196,10 +196,12 @@ function handleSRRProvenanceInternal(
   srr.updatedAt = eventUTCMillis(event)
   srr.save()
 
+  let timestampMillis = eventUTCMillis(event)
   // Create new Provenance
   let provenanceId = crypto.keccak256(
     ByteArray.fromUTF8(
-      tokenId.toString()
+      tokenId.toString() +
+      timestampMillis.toString()
     )
   ).toHexString()
   
