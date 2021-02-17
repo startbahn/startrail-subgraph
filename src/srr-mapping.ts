@@ -34,6 +34,10 @@ import {
   Transfer as TransferEvent,
   Approval as ApprovalEvent,
 } from '../generated/StartrailRegistry/StartrailRegistry'
+import {
+  Provenance as SRRProvenanceLegacy,
+  Provenance1 as SRRProvenanceWithCustomHistoryLegacy,
+} from '../generated/StartrailRegistry_legacy/StartrailRegistry'
 import { eventUTCMillis, ZERO_ADDRESS } from './utils'
 
 export function handleTransfer(event: TransferEvent): void {
@@ -143,6 +147,34 @@ export function handleCreateSRR(event: CreateSRREvent): void {
 }
 
 
+export function handleSRRProvenanceLegacy(event: SRRProvenanceLegacy): void {
+  let params = event.params
+  handleSRRProvenanceInternal(
+    event,
+    params.tokenId,
+    params.from,
+    params.to,
+    params.timestamp,
+    null,
+    params.historyMetadataDigest,
+    params.historyMetadataURI,
+  )
+}
+
+export function handleSRRProvenanceWithCustomHistoryLegacy(event: SRRProvenanceWithCustomHistoryLegacy): void {
+  let params = event.params
+  handleSRRProvenanceInternal(
+    event,
+    params.tokenId,
+    params.from,
+    params.to,
+    params.timestamp,
+    params.customHistoryId,
+    params.historyMetadataDigest,
+    params.historyMetadataURI,
+  )
+}
+
 export function handleSRRProvenance(event: SRRProvenanceEvent): void {
   let params = event.params
   handleSRRProvenanceInternal(
@@ -150,6 +182,7 @@ export function handleSRRProvenance(event: SRRProvenanceEvent): void {
     params.tokenId,
     params.from,
     params.to,
+    null,
     null,
     params.historyMetadataDigest,
     params.historyMetadataURI,
@@ -163,6 +196,7 @@ export function handleSRRProvenanceWithCustomHistory(event: SRRProvenanceWithCus
     params.tokenId,
     params.from,
     params.to,
+    null,
     params.customHistoryId,
     params.historyMetadataDigest,
     params.historyMetadataURI,
@@ -180,6 +214,7 @@ function handleSRRProvenanceInternal(
   tokenId: BigInt,
   from: Address,
   to: Address,
+  timestamp: BigInt,
   customHistoryId: BigInt,
   historyMetadataDigest: string,
   historyMetadataURI: string
@@ -220,6 +255,7 @@ function handleSRRProvenanceInternal(
     provenance.customHistory = customHistoryId.toString()
   } 
 
+  provenance.timestamp = timestamp
   provenance.createdAt = timestampMillis
   
   provenance.save()

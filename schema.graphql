@@ -70,6 +70,7 @@ type CustomHistoryType @entity {
 
 type SRRProvenance @entity {
   id: ID!                      # keccak256(tokenId,timestamp)
+  timestamp: BigInt!           # event Provenance.timestamp (block.timestamp)
 
   srr: SRR!                    # SRR for event Provenance.tokenId
   from: Bytes!                 # event Provenance.from - ownership transferred from
