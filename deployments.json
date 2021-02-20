@@ -1,34 +1,16 @@
 {
-  "rinkeby-develop": {
+  "mumbai-develop": {
     "StartrailRegistry": {
-      "startBlock": 7370000
+      "startBlock": 10694381
+    },
+    "LicensedUserManager": {
+      "startBlock": 10694381
     },
     "BulkIssue": {
-      "startBlock": 6951000
+      "startBlock": 10694381
     },
     "LicensedUserEvent": {
-      "address": "0xb269CF0f173DD0c0794BE4641ECa54fbdf3c32cc",
-      "startBlock": 6951000
-    },
-    "RootLogic": {
-      "address": "0x8824382015de561Dc42A68968f46A5D12491d481",
-      "startBlock": 6951000
-    }
-  },
-  "rinkeby-release": {
-    "StartrailRegistry": {
-      "startBlock": 7280000
-    },
-    "BulkIssue": {
-      "startBlock": 7280000
-    },
-    "LicensedUserEvent": {
-      "address": "0xaC45EcbD16daC68FF0F3fFb34aFb14009e0A5dd3",
-      "startBlock": 7280000
-    },
-    "RootLogic": {
-      "address": "0x9Ef1095432A1E236CAdF84248CF6cE271cC5926C",
-      "startBlock": 7280000
+      "startBlock": 10694381
     }
   },
   "mainnet": {
@@ -47,23 +29,6 @@
       "startBlock": 10720801
     }
   },
-  "rinkeby-lum-beta": {
-    "StartrailRegistry": {
-      "startBlock": 7930578
-    },
-    "LicensedUserManager": {
-      "startBlock": 7930578
-    },
-    "BulkIssue": {
-      "startBlock": 7930578
-    },
-    "LicensedUserEvent": {
-      "startBlock": 7930578
-    },
-    "RootLogic": {
-      "startBlock": 7930578
-    }
-  },
   "local": {
     "LicensedUserManager": {
       "startBlock": 1
@@ -75,9 +40,6 @@
       "startBlock": 1
     },
     "LicensedUserEvent": {
-      "startBlock": 1
-    },
-    "RootLogic": {
       "startBlock": 1
     }
   }

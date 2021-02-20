@@ -9,14 +9,6 @@ import {
 } from '@graphprotocol/graph-ts'
 
 import {
-  CreateSRR as CreateSRREvent,
-  Provenance as SRRProvenanceEvent,
-  SRRCommitment as SRRCommitmentEvent,
-  SRRCommitmentCancelled as SRRCommitmentCancelledEvent,
-  UpdateSRR as UpdateSRREvent,
-  UpdateSRRMetadataDigest as UpdateSRRMetadataDigestEvent,
-} from '../generated/RootLogic/RootLogic'
-import {
   CustomHistory,
   CustomHistoryType,
   LicensedUserWallet,
@@ -28,9 +20,15 @@ import {
 import {
   CreateCustomHistory as CustomHistoryCreatedEvent,
   CreateCustomHistoryType as CustomHistoryTypeCreatedEvent,
+  CreateSRR as CreateSRREvent,
+  Provenance as SRRProvenanceEvent,
   Provenance1 as SRRProvenanceWithCustomHistoryEvent,
+  SRRCommitment as SRRCommitmentEvent,
   SRRCommitment1 as SRRCommitmentWithCustomHistoryEvent,
+  SRRCommitmentCancelled as SRRCommitmentCancelledEvent,
   Transfer as TransferEvent,
+  UpdateSRR as UpdateSRREvent,
+  UpdateSRRMetadataDigest as UpdateSRRMetadataDigestEvent,
 } from '../generated/StartrailRegistry/StartrailRegistry'
 import { eventUTCMillis, ZERO_ADDRESS } from './utils'
 

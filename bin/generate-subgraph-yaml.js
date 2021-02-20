@@ -35,7 +35,16 @@ if (process.argv.length !== 3 && process.argv.length !== 6) {
 }
 
 const deploymentName = process.argv[2]
-const network = deploymentName === 'mainnet' ? 'mainnet' : 'rinkeby'
+let network
+if (deploymentName === 'mainnet') {
+  network = 'mainnet'
+} else if (deploymentName.startsWith('mumbai')) {
+  network = 'mumbai'
+} else if (deploymentName.startsWith('rinkeby')) {
+  network = 'rinkeby'
+} else {
+  throw new Error(`network unknown for deployment [${deploymentName}]`)
+}
 
 //
 // Collect and validate input arguments
