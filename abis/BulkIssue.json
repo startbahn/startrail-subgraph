@@ -7,6 +7,12 @@
         "internalType": "bytes32",
         "name": "merkleRoot",
         "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "sender",
+        "type": "address"
       }
     ],
     "name": "BatchPrepared",
@@ -20,6 +26,12 @@
         "internalType": "bytes32",
         "name": "merkleRoot",
         "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
       },
       {
         "indexed": false,
