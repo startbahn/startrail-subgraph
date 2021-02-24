@@ -183,6 +183,12 @@
         },
         {
           "indexed": false,
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
           "internalType": "string",
           "name": "historyMetadataDigest",
           "type": "string"
@@ -217,6 +223,12 @@
           "internalType": "address",
           "name": "to",
           "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
         },
         {
           "indexed": false,
@@ -765,6 +777,42 @@
     {
       "inputs": [
         {
+          "internalType": "string",
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "symbol",
+          "type": "string"
+        }
+      ],
+      "name": "migrationInit",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address[]",
+          "name": "sender",
+          "type": "address[]"
+        },
+        {
+          "internalType": "uint256[]",
+          "name": "tokenIds",
+          "type": "uint256[]"
+        }
+      ],
+      "name": "tokenMigrationBatch",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
           "internalType": "address",
           "name": "to",
           "type": "address"
@@ -1007,6 +1055,11 @@
           "internalType": "string",
           "name": "historyMetadataDigest",
           "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "customHistoryId",
+          "type": "uint256"
         }
       ],
       "name": "approveSRRByCommitment",
@@ -1030,11 +1083,6 @@
           "internalType": "string",
           "name": "historyMetadataDigest",
           "type": "string"
-        },
-        {
-          "internalType": "uint256",
-          "name": "customHistoryId",
-          "type": "uint256"
         }
       ],
       "name": "approveSRRByCommitment",
@@ -1082,80 +1130,24 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "to",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
-        }
-      ],
-      "name": "approveFromAdmin",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "to",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "string",
-          "name": "historyMetadataDigest",
-          "type": "string"
-        },
-        {
-          "internalType": "uint256",
-          "name": "customHistoryId",
-          "type": "uint256"
-        }
-      ],
-      "name": "transferSRR",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "to",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "string",
-          "name": "historyMetadataDigest",
-          "type": "string"
-        }
-      ],
-      "name": "transferSRR",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
           "name": "nameRegistry",
           "type": "address"
         }
       ],
       "name": "setNameRegistryAddress",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "digest",
+          "type": "bytes32"
+        }
+      ],
+      "name": "setTokenURISchemaIntegrityDigest",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -1417,6 +1409,29 @@
       "stateMutability": "view",
       "type": "function",
       "constant": true
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "from",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
+        }
+      ],
+      "name": "transferSRRFrom",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
     },
     {
       "inputs": [
