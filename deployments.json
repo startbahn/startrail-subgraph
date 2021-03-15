@@ -8,9 +8,6 @@
     },
     "BulkIssue": {
       "startBlock": 10694381
-    },
-    "LicensedUserEvent": {
-      "startBlock": 10694381
     }
   },
   "mainnet": {
@@ -19,14 +16,6 @@
     },
     "BulkIssue": {
       "startBlock": 10720832
-    },
-    "LicensedUserEvent": {
-      "address": "0x2A07fBCD64BE0e2329890C21c6F34e81889a5912",
-      "startBlock": 10720704
-    },
-    "RootLogic": {
-      "address": "0x7f556e211a3E4b57d005D3aa49a31306FA8Bb34d",
-      "startBlock": 10720801
     }
   },
   "local": {
@@ -37,9 +26,6 @@
       "startBlock": 1
     },
     "BulkIssue": {
-      "startBlock": 1
-    },
-    "LicensedUserEvent": {
       "startBlock": 1
     }
   }
