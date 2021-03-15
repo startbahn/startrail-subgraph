@@ -1,13 +1,13 @@
 {
   "mumbai-develop": {
     "StartrailRegistry": {
-      "startBlock": 10694381
+      "startBlock": 11583191
     },
     "LicensedUserManager": {
-      "startBlock": 10694381
+      "startBlock": 11583191
     },
     "BulkIssue": {
-      "startBlock": 10694381
+      "startBlock": 11583191
     }
   },
   "polygon": {

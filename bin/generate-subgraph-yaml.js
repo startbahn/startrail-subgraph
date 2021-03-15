@@ -109,6 +109,7 @@ subgraphYamlTemplate.dataSources.forEach((ds) => {
     process.exit(4)
   }
 
+
   //
   // Get and set startBlock
   //

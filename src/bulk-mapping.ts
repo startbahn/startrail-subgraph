@@ -20,6 +20,8 @@ export function handleBatchPrepared(event: BatchPreparedEvent): void {
   batch = new BulkIssue(merkleRoot);
   batch.srrs = [];
   batch.merkleRoot = event.params.merkleRoot;
+  batch.issuer = event.params.sender;
+
   batch.createdAt = batch.updatedAt = eventUTCMillis(event);
   batch.save();
 }
@@ -42,7 +44,7 @@ export function handleCreateSRRWithProof(event: CreateSRRWithProofEvent): void {
   let srrs = batch.srrs;
   srrs.push(event.params.srrHash);
   batch.srrs = srrs;
-
+  batch.tokenId = event.params.tokenId.toString()
   batch.updatedAt = eventUTCMillis(event);
   batch.save();
 }
