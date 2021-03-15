@@ -19,26 +19,109 @@ import {
 } from '../generated/schema'
 import {
   CreateCustomHistory as CustomHistoryCreatedEvent,
+  CreateCustomHistoryFromMigration as CustomHistoryCreatedFromMigrationEvent,
   CreateCustomHistoryType as CustomHistoryTypeCreatedEvent,
   CreateSRR as CreateSRREvent,
+  CreateSRRFromMigration as CreateSRRFromMigrationEvent,
+  MigrateSRR as MigrateSRREvent,
   Provenance as SRRProvenanceEvent,
   Provenance1 as SRRProvenanceWithCustomHistoryEvent,
+  ProvenanceFromMigration as SRRProvenanceFromMigrationEvent,
+  ProvenanceFromMigration1 as SRRProvenanceWithCustomHistoryFromMigrationEvent,
   SRRCommitment as SRRCommitmentEvent,
   SRRCommitment1 as SRRCommitmentWithCustomHistoryEvent,
   SRRCommitmentCancelled as SRRCommitmentCancelledEvent,
+  SRRCommitmentCancelledFromMigration as SRRCommitmentCancelledFromMigrationEvent,
+  SRRCommitmentFromMigration as SRRCommitmentFromMigrationEvent,
+  SRRCommitmentFromMigration1 as SRRCommitmentWithCustomHistoryFromMigrationEvent,
   Transfer as TransferEvent,
+  TransferFromMigration as TransferFromMigrationEvent,
   UpdateSRR as UpdateSRREvent,
+  UpdateSRRFromMigration as UpdateSRRFromMigrationEvent,
   UpdateSRRMetadataDigest as UpdateSRRMetadataDigestEvent,
+  UpdateSRRMetadataDigestFromMigration as UpdateSRRMetadataDigestFromMigrationEvent,
 } from '../generated/StartrailRegistry/StartrailRegistry'
-import { eventUTCMillis, ZERO_ADDRESS } from './utils'
+import { eventUTCMillis, logInvocation, ZERO_ADDRESS } from './utils'
+
+export function handleMigrateSRR(event: MigrateSRREvent): void {
+  logInvocation("handleMigrateSRR", event);
+}
+
+export function handleCreateCustomHistoryFromMigration(
+  event: CustomHistoryCreatedFromMigrationEvent
+): void {
+  logInvocation("handleCreateCustomHistoryFromMigration", event);
+}
+export function handleSRRProvenanceFromMigration(
+  event: SRRProvenanceFromMigrationEvent
+): void {
+  logInvocation("handleSRRProvenanceFromMigration", event);
+}
+export function handleSRRProvenanceWithCustomHistoryFromMigration(
+  event: SRRProvenanceWithCustomHistoryFromMigrationEvent
+): void {
+  logInvocation("handleSRRProvenanceWithCustomHistoryFromMigration", event);
+}
+export function handleSRRCommitmentFromMigration(
+  event: SRRCommitmentFromMigrationEvent
+): void {
+  logInvocation("handleSRRCommitmentFromMigration", event);
+}
+export function handleSRRCommitmentWithCustomHistoryFromMigration(
+  event: SRRCommitmentWithCustomHistoryFromMigrationEvent
+): void {
+  logInvocation("handleSRRCommitmentWithCustomHistoryFromMigration", event);
+}
+export function handleSRRCommitmentCancelledFromMigration(
+  event: SRRCommitmentCancelledFromMigrationEvent
+): void {
+  logInvocation("handleSRRCommitmentCancelledFromMigration", event);
+}
+export function handleUpdateSRRFromMigration(
+  event: UpdateSRRFromMigrationEvent
+): void {
+  logInvocation("handleUpdateSRRFromMigration", event);
+}
+export function handleUpdateSRRMetadataDigestFromMigration(
+  event: UpdateSRRMetadataDigestFromMigrationEvent
+): void {
+  logInvocation("handleUpdateSRRMetadataDigestFromMigration", event);
+}
 
 export function handleTransfer(event: TransferEvent): void {
+  logInvocation("handleTransfer", event);
+  handleTransferInternal(
+    event,
+    event.params.tokenId,
+    event.params.from,
+    event.params.to
+  );
+}
+
+export function handleTransferFromMigration(
+  event: TransferFromMigrationEvent
+): void {
+  logInvocation("handleTransferFromMigration", event);
+  handleTransferInternal(
+    event,
+    event.params.tokenId,
+    event.params.from,
+    event.params.to
+  );
+}
+
+function handleTransferInternal(
+  event: ethereum.Event,
+  tokenId: BigInt,
+  from: Address,
+  to: Address
+): void {
   let timestampMillis = eventUTCMillis(event);
-  let srrId = event.params.tokenId.toString();
+  let srrId = tokenId.toString();
 
   log.info("Transfer for {}", [srrId]);
-  log.info("from: {}", [event.params.from.toHexString()]);
-  log.info("to: {}", [event.params.to.toHexString()]);
+  log.info("from: {}", [from.toHexString()]);
+  log.info("to: {}", [to.toHexString()]);
 
   let srr = SRR.load(srrId);
   if (srr == null) {
@@ -48,14 +131,14 @@ export function handleTransfer(event: TransferEvent): void {
     srr.txHash = event.transaction.hash;
   } else if (
     srr.transferCommitment != null &&
-    event.params.from.toHexString() != ZERO_ADDRESS.toHexString()
+    from.toHexString() != ZERO_ADDRESS.toHexString()
   ) {
     // Transfer by commit/reveal
     log.info("clearing transferCommitment on token = {}", [srr.tokenId]);
     srr.transferCommitment = null;
   }
 
-  srr.ownerAddress = event.params.to;
+  srr.ownerAddress = to;
   srr.updatedAt = timestampMillis;
   srr.save();
 
@@ -68,7 +151,46 @@ export function handleTransfer(event: TransferEvent): void {
   }
 }
 
+export function handleCreateSRRFromMigration(
+  event: CreateSRRFromMigrationEvent
+): void {
+  logInvocation("handleCreateSRRFromMigration", event);
+  let timestampMillis = eventUTCMillis(event);
+
+  let srrId = event.params.tokenId.toString();
+  let srr = SRR.load(srrId);
+
+  // SRR should already exist for most tokens because handleTransfer will fire
+  // first. However some tokens created under the old scheme
+  // (RootLogic->StartrailRegistry) will be processed by CreateSRR only.
+  // So we handle this here and create the SRR:
+  if (srr == null) {
+    srr = new SRR(srrId);
+    srr.tokenId = srrId;
+    srr.createdAt = timestampMillis;
+    srr.txHash = event.transaction.hash;
+  }
+
+  srr.artistAddress = event.params.registryRecord.artistAddress;
+  srr.isPrimaryIssuer = event.params.registryRecord.isPrimaryIssuer;
+  srr.metadataDigest = event.params.metadataDigest;
+
+  let issuerId = event.params.registryRecord.issuer.toHexString();
+  let luw = LicensedUserWallet.load(issuerId);
+  if (luw != null) {
+    srr.issuer = luw.id;
+  }
+
+  srr.updatedAt = timestampMillis;
+
+  srr.save();
+
+  saveSRRMetadataHistory(srr as SRR, event);
+}
+
 export function handleCreateSRR(event: CreateSRREvent): void {
+  logInvocation("handleCreateSRR", event);
+
   let timestampMillis = eventUTCMillis(event);
 
   let srrId = event.params.tokenId.toString();
@@ -103,6 +225,7 @@ export function handleCreateSRR(event: CreateSRREvent): void {
 }
 
 export function handleSRRProvenance(event: SRRProvenanceEvent): void {
+  logInvocation("handleSRRProvenance", event);
   let params = event.params;
   handleSRRProvenanceInternal(
     event,
@@ -119,6 +242,7 @@ export function handleSRRProvenance(event: SRRProvenanceEvent): void {
 export function handleSRRProvenanceWithCustomHistory(
   event: SRRProvenanceWithCustomHistoryEvent
 ): void {
+  logInvocation("handleSRRProvenanceWithCustomHistory", event);
   let params = event.params;
   handleSRRProvenanceInternal(
     event,
@@ -190,6 +314,8 @@ function handleSRRProvenanceInternal(
 export function handleCustomHistoryType(
   event: CustomHistoryTypeCreatedEvent
 ): void {
+  logInvocation("handleCustomHistoryType", event);
+
   let id = event.params.id.toString();
 
   let cht = new CustomHistoryType(id);
@@ -200,6 +326,8 @@ export function handleCustomHistoryType(
 }
 
 export function handleCustomHistory(event: CustomHistoryCreatedEvent): void {
+  logInvocation("handleCustomHistory", event);
+
   let id = event.params.id.toString();
 
   let ch = new CustomHistory(id);
@@ -212,6 +340,7 @@ export function handleCustomHistory(event: CustomHistoryCreatedEvent): void {
 }
 
 export function handleSRRCommitment(event: SRRCommitmentEvent): void {
+  logInvocation("handleSRRCommitment", event);
   let params = event.params;
   handleSRRCommitmentInternal(
     event,
@@ -225,6 +354,7 @@ export function handleSRRCommitment(event: SRRCommitmentEvent): void {
 export function handleSRRCommitmentWithCustomHistory(
   event: SRRCommitmentWithCustomHistoryEvent
 ): void {
+  logInvocation("handleSRRCommitmentWithCustomHistory", event);
   let params = event.params;
   handleSRRCommitmentInternal(
     event,
@@ -277,6 +407,7 @@ function handleSRRCommitmentInternal(
 export function handleSRRCommitmentCancelled(
   event: SRRCommitmentCancelledEvent
 ): void {
+  logInvocation("handleSRRCommitmentCancelled", event);
   let srrId = event.params.tokenId.toString();
   let srr = SRR.load(srrId);
   if (srr == null) {
@@ -306,6 +437,7 @@ export function handleSRRCommitmentCancelled(
 }
 
 export function handleUpdateSRR(event: UpdateSRREvent): void {
+  logInvocation("handleUpdateSRR", event);
   let srrId = event.params.tokenId.toString();
   let srr = SRR.load(srrId);
   if (srr == null) {
@@ -323,6 +455,7 @@ export function handleUpdateSRR(event: UpdateSRREvent): void {
 export function handleUpdateSRRMetadataDigest(
   event: UpdateSRRMetadataDigestEvent
 ): void {
+  logInvocation("handleUpdateSRRMetadataDigest", event);
   let srrId = event.params.tokenId.toString();
   let srr = SRR.load(srrId);
   if (srr == null) {

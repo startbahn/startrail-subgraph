@@ -13,8 +13,6 @@ const startrailPackagePath = rootPath(
   path.join('node_modules', '@startbahn', 'startrail')
 )
 
-const isLegacyContract = (contractName) => ['LicensedUserEvent', 'RootLogic'].indexOf(contractName) !== -1
-
 if (process.argv.length !== 3 && process.argv.length !== 6) {
   console.log(`
   Usage: node ${process.argv[1]} <deployment name> [ <deploy.json path> <abis folder path> <startBlock> ]
@@ -24,20 +22,20 @@ if (process.argv.length !== 3 && process.argv.length !== 6) {
   1) Pass a single argument which is the name of a deployment under 
      'node_modules/@startbahn/startrail/deployments'.
 
-     In the case all contract address information and ABIs are available under
+     In this case all contract address information and ABIs are available under
      the startrail package and startBlock information in ./deployments.json so
      no extra arguments are required.
 
-  2) Pass a logical name plus ALL information required to populate the subgraph
-     yaml file.
+  2) Pass a logical name for the deployment name plus provide ALL the optional
+     arguments in the Usage note above.
 `)
   process.exit(1)
 }
 
 const deploymentName = process.argv[2]
 let network
-if (deploymentName === 'mainnet') {
-  network = 'mainnet'
+if (deploymentName === 'mainnet' || deploymentName === 'local') {
+  network = deploymentName
 } else if (deploymentName.startsWith('mumbai')) {
   network = 'mumbai'
 } else if (deploymentName.startsWith('rinkeby')) {
@@ -100,29 +98,15 @@ subgraphYamlTemplate.dataSources.forEach((ds) => {
   // Get contractAddress
   //
   const contractName = ds.name
-
-  let contractAddress
-  if (!isLegacyContract(contractName)) {
-    // For non legact contracts the address MUST be in the deploy.json
-    // contractAddresses lookup
-    const addressKey = `${contractName[0].toLowerCase()}${contractName.substring(
-      1
-    )}ProxyAddress`
-    contractAddress = contractAddresses[addressKey]
-    if (!contractAddress) {
-      console.error(
-        `ERROR: contract address not set for contract '${contractName}'\n`
-      )
-      process.exit(4)
-    }
-  } else {
-    // For legacy contracts see if the address is in the subgraph deployment
-    // json. If it's not then assume it's not deployed (a local or new
-    // contracts only deployment) and just set the zero address
-    contractAddress = subgraphDeployments[deploymentName][contractName]?.address
-    if (!contractAddress) {
-      contractAddress = '0x0000000000000000000000000000000000000000'
-    }
+  const addressKey = `${contractName[0].toLowerCase()}${contractName.substring(
+    1
+  )}ProxyAddress`
+  const contractAddress = contractAddresses[addressKey]
+  if (!contractAddress) {
+    console.error(
+      `ERROR: contract address not set for contract '${contractName}'\n`
+    )
+    process.exit(4)
   }
 
   //
@@ -142,17 +126,12 @@ subgraphYamlTemplate.dataSources.forEach((ds) => {
   }
 
   //
-  // Set ABI folder
-  //
-  const abisFolder = !isLegacyContract(contractName) ? abisPath : rootPath('abis-legacy')
-
-  //
   // Set dataSource properties
   //
   ds.network = network
   ds.source.address = contractAddress
   ds.source.startBlock = startBlock
-  ds.mapping.abis[0].file = path.join(abisFolder, `${contractName}.json`)
+  ds.mapping.abis[0].file = path.join(abisPath, `${contractName}.json`)
 })
 
 fs.writeFileSync(

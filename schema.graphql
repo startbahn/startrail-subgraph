@@ -38,7 +38,8 @@ type SRR @entity {
   provenance: [SRRProvenance!]! @derivedFrom(field: "srr")
   metadataHistory: [SRRMetadataHistory!]! @derivedFrom(field: "srr")
 
-  txHash: Bytes! # txHash created at
+  originalTxHash: Bytes! # txHash created at
+  originalChainId: Bytes! # txHash created at
   createdAt: BigInt! # block.timestamp when entity created
   updatedAt: BigInt! # block.timestamp when entity last updated
 }

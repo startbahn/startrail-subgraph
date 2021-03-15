@@ -69,11 +69,11 @@ dataSources:
           handler: handleSRRProvenance
         - event: Provenance(indexed uint256,indexed address,indexed address,uint256,uint256,string,string)
           handler: handleSRRProvenanceWithCustomHistory
-        - event: SRRCommitment(address,bytes32,uint256)
+        - event: SRRCommitment(indexed uint256,address,bytes32)
           handler: handleSRRCommitment
-        - event: SRRCommitment(address,bytes32,uint256,uint256)
+        - event: SRRCommitment(indexed uint256,address,bytes32,uint256)
           handler: handleSRRCommitmentWithCustomHistory
-        - event: SRRCommitmentCancelled(uint256)
+        - event: SRRCommitmentCancelled(indexed uint256)
           handler: handleSRRCommitmentCancelled
         - event: UpdateSRRMetadataDigest(indexed uint256,bytes32)
           handler: handleUpdateSRRMetadataDigest
@@ -81,6 +81,32 @@ dataSources:
           handler: handleCustomHistoryType
         - event: CreateCustomHistory(indexed uint256,string,uint256,bytes32)
           handler: handleCustomHistory
+
+        #
+        # Events related to the migration
+        #
+        - event: MigrateSRR(indexed uint256,address,string)
+          handler: handleMigrateSRR
+        - event: TransferFromMigration(indexed address,indexed address,indexed uint256,uint256,bytes32)
+          handler: handleTransfer
+        - event: CreateSRRFromMigration(indexed uint256,(bool,address,address),bytes32,uint256,bytes32)
+          handler: handleCreateSRRFromMigration
+        - event: UpdateSRRFromMigration(indexed uint256,(bool,address,address),uint256,bytes32)
+          handler: handleUpdateSRRFromMigration
+        - event: ProvenanceFromMigration(indexed uint256,indexed address,indexed address,uint256,string,string,uint256,bytes32)
+          handler: handleSRRProvenanceFromMigration
+        - event: ProvenanceFromMigration(indexed uint256,indexed address,indexed address,uint256,uint256,string,string,uint256,bytes32)
+          handler: handleSRRProvenanceWithCustomHistoryFromMigration
+        - event: SRRCommitmentFromMigration(address,bytes32,uint256,uint256,bytes32)
+          handler: handleSRRCommitmentFromMigration
+        - event: SRRCommitmentFromMigration(address,bytes32,uint256,uint256,uint256,bytes32)
+          handler: handleSRRCommitmentWithCustomHistoryFromMigration
+        - event: SRRCommitmentCancelledFromMigration(uint256,uint256,bytes32)
+          handler: handleSRRCommitmentCancelledFromMigration
+        - event: UpdateSRRMetadataDigestFromMigration(indexed uint256,bytes32,uint256,bytes32)
+          handler: handleUpdateSRRMetadataDigestFromMigration
+        - event: CreateCustomHistoryFromMigration(indexed uint256,string,uint256,bytes32,uint256,bytes32)
+          handler: handleCustomHistoryFromMigration
 
   - kind: ethereum/contract
     name: BulkIssue
