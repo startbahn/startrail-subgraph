@@ -31,6 +31,7 @@ import {
   SRRCommitment as SRRCommitmentEvent,
   SRRCommitment1 as SRRCommitmentWithCustomHistoryEvent,
   SRRCommitmentCancelled as SRRCommitmentCancelledEvent,
+  SRRCommitmentCancelledFromMigration as SRRCommitmentCancelledFromMigrationEvent,
   SRRCommitmentFromMigration as SRRCommitmentFromMigrationEvent,
   SRRCommitmentFromMigration1 as SRRCommitmentWithCustomHistoryFromMigrationEvent,
   Transfer as TransferEvent,
@@ -460,17 +461,35 @@ export function handleSRRCommitmentCancelled(
   event: SRRCommitmentCancelledEvent
 ): void {
   logInvocation("handleSRRCommitmentCancelled", event);
-  let srrId = event.params.tokenId.toString();
+  handleSRRCommitmentCancelledInternal(
+    eventUTCMillis(event),
+    event.params.tokenId
+  )
+}
+
+  export function handleSRRCommitmentCancelledFromMigration(
+  event: SRRCommitmentCancelledFromMigrationEvent
+): void {
+  logInvocation("handleSRRCommitmentCancelledFromMigration", event);
+  handleSRRCommitmentCancelledInternal(
+    secondsToMillis(event.params.originTimestamp),
+    event.params.tokenId
+  )
+}
+
+function handleSRRCommitmentCancelledInternal(
+  eventTimestampMillis: BigInt,
+  tokenId: BigInt
+): void {
+  let srrId = tokenId.toString();
   let srr = SRR.load(srrId);
   if (srr == null) {
     log.error("received event for unknown SRR: {}", [srrId])
     return
   }
 
-  let blockTime = eventUTCMillis(event)
-
   srr.transferCommitment = null
-  srr.updatedAt = blockTime
+  srr.updatedAt = eventTimestampMillis
   srr.save()
 
   let srrCommit = SRRTransferCommit.load(srrId)
@@ -484,7 +503,7 @@ export function handleSRRCommitmentCancelled(
 
   srrCommit.lastAction = "cancel"
   srrCommit.commitment = null
-  srrCommit.updatedAt = blockTime
+  srrCommit.updatedAt = eventTimestampMillis
   srrCommit.save()
 }
 
@@ -564,10 +583,4 @@ export function handleMigrateSRR(event: MigrateSRREvent): void {
 //   event: UpdateSRRMetadataDigestFromMigrationEvent
 // ): void {
 //   logInvocation("handleUpdateSRRMetadataDigestFromMigration", event);
-// }
-
-// export function handleSRRCommitmentCancelledFromMigration(
-//   event: SRRCommitmentCancelledFromMigrationEvent
-// ): void {
-//   logInvocation("handleSRRCommitmentCancelledFromMigration", event);
 // }
