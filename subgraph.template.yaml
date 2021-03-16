@@ -85,10 +85,10 @@ dataSources:
         #
         # Events related to the migration
         #
-        - event: MigrateSRR(indexed uint256,address,string)
+        - event: MigrateSRR(indexed uint256,string)
           handler: handleMigrateSRR
         - event: TransferFromMigration(indexed address,indexed address,indexed uint256,uint256,bytes32)
-          handler: handleTransfer
+          handler: handleTransferFromMigration
         - event: CreateSRRFromMigration(indexed uint256,(bool,address,address),bytes32,uint256,bytes32)
           handler: handleCreateSRRFromMigration
         - event: UpdateSRRFromMigration(indexed uint256,(bool,address,address),uint256,bytes32)

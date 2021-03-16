@@ -38,10 +38,11 @@ type SRR @entity {
   provenance: [SRRProvenance!]! @derivedFrom(field: "srr")
   metadataHistory: [SRRMetadataHistory!]! @derivedFrom(field: "srr")
 
-  # TODO: one tx hash:
-  txHash: Bytes! # txHash created at
-  originalTxHash: Bytes! # txHash created at
-  originalChainId: Bytes! # txHash created at
+  # chain and tx hash where the SRR was issued
+  # a number of SRRs were issued on Ethereum mainnet then moved to Polygon
+  originChain: String
+  originTxHash: Bytes
+
   createdAt: BigInt! # block.timestamp when entity created
   updatedAt: BigInt! # block.timestamp when entity last updated
 }

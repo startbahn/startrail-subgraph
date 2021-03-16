@@ -1,17 +1,39 @@
 import {
   Address,
   BigInt,
+  dataSource,
   ethereum,
   log,
-  ValueKind,
 } from '@graphprotocol/graph-ts'
+
+export let currentChainId = (): string => {
+  let network: string = dataSource.network()
+
+  let chainId: string
+
+  if (network === 'polygon') {
+    chainId = "eip155:137"
+  } else if (network.indexOf("mumbai") !== -1) {
+    chainId = "eip155:80001"
+  } else if (network === "hardhat" || network.indexOf('local') !== -1) {
+    chainId = "eip155:31337"
+  } else {
+    chainId = "eip155:unknown"
+  }
+  
+  return chainId
+}
 
 export let ZERO_ADDRESS = Address.fromString(
   "0x0000000000000000000000000000000000000000"
 );
 
+export function secondsToMillis(timestampSeconds: BigInt): BigInt {
+  return timestampSeconds.times(BigInt.fromI32(1000));
+}
+
 export function eventUTCMillis(event: ethereum.Event): BigInt {
-  return event.block.timestamp.times(BigInt.fromI32(1000));
+  return secondsToMillis(event.block.timestamp);
 }
 
 export function ethereumValueToString(v: ethereum.Value): string {
@@ -54,9 +76,9 @@ export function logInvocation(
   let paramLog: string[] = event.parameters.map<string>(
     (p) => p.name + ":" + ethereumValueToString(p.value)
   );
-  log.info("{} [tx: {}] [params: {}]", [
+  log.info("{} [params: {}] [tx: {}]", [
     handlerName,
-    event.transaction.hash.toHexString(),
     paramLog.toString(),
+    event.transaction.hash.toHexString(),
   ]);
 }
