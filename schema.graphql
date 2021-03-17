@@ -73,6 +73,14 @@ type SRRProvenance @entity {
   createdAt: BigInt! # block.timestamp when entity created
 }
 
+type SRRApproval @entity {
+  id: ID!                      # keccak256(tokenId,timestamp)
+  srr: SRR!                    # SRR for event Provenance.tokenId
+  owner: Bytes!                # event Approval.owner - ownership Approved from
+  approved: Bytes!             # event Provenance.approved - ownership Approved to
+  createdAt: BigInt!           # block.timestamp when entity created
+}
+
 type SRRMetadataHistory @entity {
   id: ID! # keccak256(tokenId,metadataDigest)
   srr: SRR! # SRR for event Provenance.tokenId
@@ -99,11 +107,11 @@ type BulkIssue @entity {
   id: ID! # merkleRoot.toHexString()
   merkleRoot: Bytes! # batch merkle root
   srrs: [Bytes!] # Hashes of SRRs processed
+  issuer: Bytes! # batchprepared issuer
+  tokenId: String # ERC721 token id for createSRRwithProof event
+
   createdAt: BigInt! # block.timestamp when entity created
   updatedAt: BigInt! # block.timestamp when entity last updated
-
-  # TO add when contracts updated:
-  # issuer: Bytes!              # batch issuer address
 }
 
 type MetaTxRequestType @entity {

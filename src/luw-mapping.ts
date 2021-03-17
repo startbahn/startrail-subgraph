@@ -1,10 +1,6 @@
 import { BigInt, Bytes, log, store } from '@graphprotocol/graph-ts'
 
 import {
-  CreateLicensedUserWallet as LegacyCreateLUWEvent,
-  MultiSigOwnerAddition as MultiSigOwnerAdditionEvent,
-} from '../generated/LicensedUserEvent/LicensedUserEvent'
-import {
   AddedOwner as AddedOwnerEvent,
   ChangedThreshold as ChangedThresholdEvent,
   CreateLicensedUserWallet as CreateLUWEvent,
@@ -30,20 +26,6 @@ function userType(n: i32): string {
       return "artist";
     default:
       log.error(`unhandled userType: {}`, [n.toString()]);
-      return "";
-  }
-}
-
-function legacyUserType(n: i32): string {
-  switch (n) {
-    case 0:
-      return "admin";
-    case 1:
-      return "handler";
-    case 2:
-      return "artist";
-    default:
-      log.error(`unhandled legacyUserType: {}`, [n.toString()]);
       return "";
   }
 }
@@ -234,47 +216,4 @@ export function handleExecutionSuccess(event: ExecutionSuccessEvent): void {
   log.info("creating MetaTxExecution hash [{}]", [txHash.toHexString()]);
   execution.createdAt = eventUTCMillis(event);
   execution.save();
-}
-
-/* --------------------------------------------------------------------
- * Legacy handlers
- * --------------------------------------------------------------------*/
-
-export function legacyHandleCreateLicensedUserWallet(
-  event: LegacyCreateLUWEvent
-): void {
-  let luwId = event.params.contractAddress.toHexString();
-
-  let luw = new LicensedUserWallet(luwId);
-  luw.walletAddress = event.params.contractAddress;
-  luw.threshold = event.params.requiredConfirmation.toI32();
-  luw.englishName = event.params.englishName;
-  luw.originalName = event.params.originalName;
-  luw.owners = event.params.owners as Array<Bytes>;
-  luw.userType = legacyUserType(event.params.userType);
-  luw.createdAt = luw.updatedAt = eventUTCMillis(event);
-
-  log.info("creating new LUW (legacy) {}", [luwId]);
-  luw.save();
-}
-
-export function legacyHandleOwnerAddition(
-  event: MultiSigOwnerAdditionEvent
-): void {
-  let luwId = event.params.proxyContractAddr.toHexString();
-  let luw = LicensedUserWallet.load(luwId);
-  if (luw == null) {
-    log.error("received event for unknown LUW: {}", [luwId]);
-    return;
-  }
-
-  log.info("adding owner {}", [event.params.owner.toHexString()]);
-  // this 3 step assign, push, reassign is necessary here:
-  // (see https://thegraph.com/docs/assemblyscript-api#api-reference):
-  let owners = luw.owners;
-  owners.push(event.params.owner);
-  luw.owners = owners;
-
-  luw.updatedAt = eventUTCMillis(event);
-  luw.save();
 }
