@@ -39,6 +39,8 @@ dataSources:
           handler: handleRequestTypeUnregistered
         - event: ExecutionSuccess(bytes32)
           handler: handleExecutionSuccess
+        - event: MigrateLicensedUserWallet(indexed address,string,uint256)
+          handler: handleMigrateLicensedUser
       file: ./src/luw-mapping.ts
 
   - kind: ethereum/contract
@@ -130,3 +132,5 @@ dataSources:
           handler: handleBatchPrepared
         - event: CreateSRRWithProof(indexed bytes32,indexed uint256,bytes32)
           handler: handleCreateSRRWithProof
+        - event: MigrateBatch(indexed bytes32,bytes32[],address)
+          handler: handleMigrateBatch

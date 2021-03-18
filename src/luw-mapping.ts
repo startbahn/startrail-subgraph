@@ -5,6 +5,7 @@ import {
   ChangedThreshold as ChangedThresholdEvent,
   CreateLicensedUserWallet as CreateLUWEvent,
   ExecutionSuccess as ExecutionSuccessEvent,
+  MigrateLicensedUserWallet as MigrateLicensedUserWalletEvent,
   RemovedOwner as RemovedOwnerEvent,
   RequestTypeRegistered as RequestTypeRegisteredEvent,
   RequestTypeUnregistered as RequestTypeUnregisteredEvent,
@@ -16,7 +17,7 @@ import {
   MetaTxExecution,
   MetaTxRequestType,
 } from '../generated/schema'
-import { eventUTCMillis } from './utils'
+import { eventUTCMillis, logInvocation, secondsToMillis } from './utils'
 
 function userType(n: i32): string {
   switch (n) {
@@ -31,6 +32,8 @@ function userType(n: i32): string {
 }
 
 export function handleCreateLicensedUserWallet(event: CreateLUWEvent): void {
+  logInvocation("handleCreateLicensedUserWallet", event);
+
   let timestampMillis = eventUTCMillis(event);
   let luwId = event.params.walletAddress.toHexString();
   let luw = LicensedUserWallet.load(luwId);
@@ -57,6 +60,8 @@ export function handleCreateLicensedUserWallet(event: CreateLUWEvent): void {
 }
 
 export function handleAddedOwner(event: AddedOwnerEvent): void {
+  logInvocation("handleAddedOwner", event);
+
   let luwId = event.params.wallet.toHexString();
   let luw = LicensedUserWallet.load(luwId);
 
@@ -79,6 +84,8 @@ export function handleAddedOwner(event: AddedOwnerEvent): void {
 }
 
 export function handleRemovedOwner(event: RemovedOwnerEvent): void {
+  logInvocation("handleRemovedOwner", event);
+
   let luwId = event.params.wallet.toHexString();
   let luw = LicensedUserWallet.load(luwId);
 
@@ -108,6 +115,8 @@ export function handleRemovedOwner(event: RemovedOwnerEvent): void {
 }
 
 export function handleChangedThreshold(event: ChangedThresholdEvent): void {
+  logInvocation("handleChangedThreshold", event);
+
   let luwId = event.params.wallet.toHexString();
   let luw = LicensedUserWallet.load(luwId);
 
@@ -128,6 +137,8 @@ export function handleChangedThreshold(event: ChangedThresholdEvent): void {
 export function handleUpgradeLicensedUserWalletToMulti(
   event: UpgradeLicensedUserWalletToMultiEvent
 ): void {
+  logInvocation("handleUpgradeLicensedUserWalletToMulti", event);
+
   let luwId = event.params.walletAddress.toHexString();
   let luw = LicensedUserWallet.load(luwId);
   if (luw == null) {
@@ -148,6 +159,8 @@ export function handleUpgradeLicensedUserWalletToMulti(
 export function handleUpdateLicensedUserDetail(
   event: UpdateLicensedUserDetailEvent
 ): void {
+  logInvocation("handleUpdateLicensedUserDetail", event);
+
   let luwId = event.params.walletAddress.toHexString();
   let luw = LicensedUserWallet.load(luwId);
   if (luw == null) {
@@ -176,6 +189,8 @@ export function handleUpdateLicensedUserDetail(
 export function handleRequestTypeRegistered(
   event: RequestTypeRegisteredEvent
 ): void {
+  logInvocation("handleRequestTypeRegistered", event);
+
   let typeHash = event.params.typeHash;
   let requestType = new MetaTxRequestType(typeHash.toHexString());
   requestType.typeHash = typeHash;
@@ -192,6 +207,8 @@ export function handleRequestTypeRegistered(
 export function handleRequestTypeUnregistered(
   event: RequestTypeUnregisteredEvent
 ): void {
+  logInvocation("handleRequestTypeUnregistered", event);
+
   let requestTypeId = event.params.typeHash.toHexString();
   let requestType = MetaTxRequestType.load(requestTypeId);
   if (requestType == null) {
@@ -210,10 +227,28 @@ export function handleRequestTypeUnregistered(
 }
 
 export function handleExecutionSuccess(event: ExecutionSuccessEvent): void {
+  logInvocation("handleExecutionSuccess", event);
+
   let txHash = event.params.txHash;
   let execution = new MetaTxExecution(txHash.toHexString());
   execution.txHash = txHash;
   log.info("creating MetaTxExecution hash [{}]", [txHash.toHexString()]);
   execution.createdAt = eventUTCMillis(event);
   execution.save();
+}
+
+export function handleMigrateLicensedUser(
+  event: MigrateLicensedUserWalletEvent
+): void {
+  logInvocation("handleMigrateLicensedUser", event);
+  let luwId = event.params.walletAddress.toHexString();
+  let luw = LicensedUserWallet.load(luwId);
+
+  let createTime = secondsToMillis(event.params.originTimestamp);
+  luw.createdAt = createTime;
+  luw.updatedAt = createTime;
+
+  luw.originChain = event.params.originChain;
+
+  luw.save();
 }
