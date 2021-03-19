@@ -324,9 +324,11 @@ export function handleCustomHistoryType(
   cht.save();
 }
 
-export function handleCustomHistory(event: CustomHistoryCreatedEvent): void {
-  logInvocation("handleCustomHistory", event);
-  handleCustomHistoryInternal(
+export function handleCreateCustomHistory(
+  event: CustomHistoryCreatedEvent
+): void {
+  logInvocation("handleCreateCustomHistory", event);
+  handleCreateCustomHistoryInternal(
     eventUTCMillis(event),
     event.params.id,
     event.params.name,
@@ -339,7 +341,7 @@ export function handleCreateCustomHistoryFromMigration(
   event: CustomHistoryCreatedFromMigrationEvent
 ): void {
   logInvocation("handleCreateCustomHistoryFromMigration", event);
-  handleCustomHistoryInternal(
+  handleCreateCustomHistoryInternal(
     secondsToMillis(event.params.originTimestamp),
     event.params.id,
     event.params.name,
@@ -348,7 +350,7 @@ export function handleCreateCustomHistoryFromMigration(
   );
 }
 
-function handleCustomHistoryInternal(
+function handleCreateCustomHistoryInternal(
   eventTimestampMillis: BigInt,
   id: BigInt,
   name: string,

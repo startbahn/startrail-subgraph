@@ -82,7 +82,7 @@ dataSources:
         - event: CreateCustomHistoryType(indexed uint256,string)
           handler: handleCustomHistoryType
         - event: CreateCustomHistory(indexed uint256,string,uint256,bytes32)
-          handler: handleCustomHistory
+          handler: handleCreateCustomHistory
 
         #
         # Events related to the migration
@@ -108,7 +108,7 @@ dataSources:
         - event: UpdateSRRMetadataDigestFromMigration(indexed uint256,bytes32,uint256,bytes32)
           handler: handleUpdateSRRMetadataDigestFromMigration
         - event: CreateCustomHistoryFromMigration(indexed uint256,string,uint256,bytes32,uint256,bytes32)
-          handler: handleCustomHistoryFromMigration
+          handler: handleCreateCustomHistoryFromMigration
 
   - kind: ethereum/contract
     name: BulkIssue
