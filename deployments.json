@@ -1,13 +1,16 @@
 {
   "mumbai-develop": {
     "StartrailRegistry": {
-      "startBlock": 11583191
+      "startBlock": 11907787
     },
     "LicensedUserManager": {
-      "startBlock": 11583191
+      "startBlock": 11907787
+    },
+    "MetaTxForwarder": {
+      "startBlock": 11907787
     },
     "BulkIssue": {
-      "startBlock": 11583191
+      "startBlock": 11907787
     }
   },
   "polygon": {
@@ -17,15 +20,21 @@
     "LicensedUserManager": {
       "startBlock": 12000000
     },
+    "MetaTxForwarder": {
+      "startBlock": 12000000
+    },
     "BulkIssue": {
       "startBlock": 12000000
     }
   },
   "local": {
+    "StartrailRegistry": {
+      "startBlock": 1
+    },
     "LicensedUserManager": {
       "startBlock": 1
     },
-    "StartrailRegistry": {
+    "MetaTxForwarder": {
       "startBlock": 1
     },
     "BulkIssue": {

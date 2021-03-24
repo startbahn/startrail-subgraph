@@ -63,10 +63,10 @@
   resolved "https://registry.yarnpkg.com/@protobufjs/utf8/-/utf8-1.1.0.tgz#a777360b5b39a1a2e5106f8e858f2fd2d060c570"
   integrity sha1-p3c2C1s5oaLlEG+OhY8v0tBgxXA=
 
-"@startbahn/startrail@1.2.1-mumbai-4":
-  version "1.2.1-mumbai-4"
-  resolved "https://registry.yarnpkg.com/@startbahn/startrail/-/startrail-1.2.1-mumbai-4.tgz#39ebe57a30c8e6cb059e516c05f09dc13534943c"
-  integrity sha512-vI42iwqiMjJno+ps/UvYe7kjW8jBO9wA9N/7RBqqXZNU1gK5ZY/0uRGgOC558Ggn3OK7jyFX+9Us8PfzfsJoEQ==
+"@startbahn/startrail@1.2.1-mumbai-7":
+  version "1.2.1-mumbai-7"
+  resolved "https://registry.yarnpkg.com/@startbahn/startrail/-/startrail-1.2.1-mumbai-7.tgz#f279e63831b24c582956461bfe217e41992c9042"
+  integrity sha512-q3xqqalxuCyRgnTAPJRqklcePw5yn9cjcqMHGOvqZV0w45VoRjqwqilgvC+vcNrVaTRd4MdrS6X2TUksev9QxA==
 
 "@types/connect@^3.4.33":
   version "3.4.33"
