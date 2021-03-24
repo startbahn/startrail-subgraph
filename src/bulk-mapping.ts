@@ -3,11 +3,14 @@ import { log } from '@graphprotocol/graph-ts'
 import {
   BatchPrepared as BatchPreparedEvent,
   CreateSRRWithProof as CreateSRRWithProofEvent,
+  MigrateBatch as MigrateBatchEvent,
 } from '../generated/BulkIssue/BulkIssue'
 import { BulkIssue } from '../generated/schema'
-import { eventUTCMillis } from './utils'
+import { eventUTCMillis, logInvocation } from './utils'
 
 export function handleBatchPrepared(event: BatchPreparedEvent): void {
+  logInvocation("handleBatchPrepared", event);
+  
   let merkleRoot = event.params.merkleRoot.toHexString();
   let batch = BulkIssue.load(merkleRoot);
   if (batch != null) {
@@ -27,8 +30,9 @@ export function handleBatchPrepared(event: BatchPreparedEvent): void {
 }
 
 export function handleCreateSRRWithProof(event: CreateSRRWithProofEvent): void {
+  logInvocation("handleCreateSRRWithProof", event);
+  
   let merkleRoot = event.params.merkleRoot.toHexString();
-  log.info("handleCreateSRRWithProof: merkleRoot {}", [merkleRoot]);
   let batch = BulkIssue.load(merkleRoot);
   if (batch == null) {
     log.error(
@@ -46,5 +50,19 @@ export function handleCreateSRRWithProof(event: CreateSRRWithProofEvent): void {
   batch.srrs = srrs;
   batch.tokenId = event.params.tokenId.toString()
   batch.updatedAt = eventUTCMillis(event);
+  batch.save();
+}
+
+export function handleMigrateBatch(event: MigrateBatchEvent): void {
+  logInvocation("handleMigrateBatch", event);
+
+  let merkleRoot = event.params.merkleRoot.toHexString();
+
+  let batch = new BulkIssue(merkleRoot);
+  batch.merkleRoot = event.params.merkleRoot;
+  batch.issuer = event.params.issuer;
+  batch.srrs = event.params.processedLeaves
+
+  batch.createdAt = batch.updatedAt = eventUTCMillis(event);
   batch.save();
 }

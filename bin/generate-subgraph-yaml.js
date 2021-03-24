@@ -98,9 +98,6 @@ subgraphYamlTemplate.dataSources.forEach((ds) => {
   // Get contractAddress
   //
   const contractName = ds.name
-
-  // For non legact contracts the address MUST be in the deploy.json
-  // contractAddresses lookup
   const addressKey = `${contractName[0].toLowerCase()}${contractName.substring(
     1
   )}ProxyAddress`

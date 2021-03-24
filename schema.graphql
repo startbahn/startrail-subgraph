@@ -13,6 +13,9 @@ type LicensedUserWallet @entity {
   # How to map this:
   # ownedSRRs: [SRR!]! @derivedFrom(field: "ownerAddress")
 
+  # chain where the SRR was issued
+  originChain: String
+
   createdAt: BigInt! # block.timestamp when entity created
   updatedAt: BigInt! # block.timestamp when entity last updated
 }
@@ -38,7 +41,11 @@ type SRR @entity {
   provenance: [SRRProvenance!]! @derivedFrom(field: "srr")
   metadataHistory: [SRRMetadataHistory!]! @derivedFrom(field: "srr")
 
-  txHash: Bytes! # txHash created at
+  # chain and tx hash where the SRR was issued
+  # a number of SRRs were issued on Ethereum mainnet then moved to Polygon
+  originChain: String
+  originTxHash: Bytes
+
   createdAt: BigInt! # block.timestamp when entity created
   updatedAt: BigInt! # block.timestamp when entity last updated
 }

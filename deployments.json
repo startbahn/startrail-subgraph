@@ -10,12 +10,15 @@
       "startBlock": 11583191
     }
   },
-  "mainnet": {
+  "polygon": {
     "StartrailRegistry": {
-      "startBlock": 10720664
+      "startBlock": 12000000
+    },
+    "LicensedUserManager": {
+      "startBlock": 12000000
     },
     "BulkIssue": {
-      "startBlock": 10720832
+      "startBlock": 12000000
     }
   },
   "local": {
