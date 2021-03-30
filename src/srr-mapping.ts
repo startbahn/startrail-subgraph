@@ -10,7 +10,6 @@ import {
 
 import {
   CreateSRR as CreateSRREvent,
-  Provenance as SRRProvenanceEvent,
   SRRCommitment as SRRCommitmentEvent,
   SRRCommitmentCancelled as SRRCommitmentCancelledEvent,
   UpdateSRR as UpdateSRREvent,
@@ -29,6 +28,7 @@ import {
 import {
   CreateCustomHistory as CustomHistoryCreatedEvent,
   CreateCustomHistoryType as CustomHistoryTypeCreatedEvent,
+  Provenance as SRRProvenanceEvent,
   Provenance1 as SRRProvenanceWithCustomHistoryEvent,
   SRRCommitment1 as SRRCommitmentWithCustomHistoryEvent,
   Transfer as TransferEvent,
