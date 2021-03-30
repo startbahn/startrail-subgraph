@@ -30,7 +30,7 @@
     "js-yaml": "^3.14.0"
   },
   "dependencies": {
-    "@startbahn/startrail": "1.2.1-mumbai-4",
+    "@startbahn/startrail": "1.2.1-mumbai-7",
     "babel-polyfill": "^6.26.0",
     "babel-register": "^6.26.0"
   }

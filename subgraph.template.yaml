@@ -33,15 +33,34 @@ dataSources:
           handler: handleRemovedOwner
         - event: ChangedThreshold(indexed address,uint8)
           handler: handleChangedThreshold
+        - event: MigrateLicensedUserWallet(indexed address,string,uint256)
+          handler: handleMigrateLicensedUser
+      file: ./src/luw-mapping.ts
+
+  - kind: ethereum/contract
+    name: MetaTxForwarder
+    network: ##AUTOFILL##
+    source:
+      address: ##AUTOFILL##
+      abi: MetaTxForwarder
+      startBlock: ##AUTOFILL##
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - MetaTxForwarder
+      abis:
+        - name: MetaTxForwarder
+          file: ./abis/MetaTxForwarder.json
+      eventHandlers:
         - event: RequestTypeRegistered(indexed bytes32,string)
           handler: handleRequestTypeRegistered
         - event: RequestTypeUnregistered(indexed bytes32)
           handler: handleRequestTypeUnregistered
         - event: ExecutionSuccess(bytes32)
           handler: handleExecutionSuccess
-        - event: MigrateLicensedUserWallet(indexed address,string,uint256)
-          handler: handleMigrateLicensedUser
-      file: ./src/luw-mapping.ts
+      file: ./src/mtf-mapping.ts
 
   - kind: ethereum/contract
     name: StartrailRegistry
