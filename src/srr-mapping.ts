@@ -46,7 +46,6 @@ import {
   eventUTCMillis,
   logInvocation,
   secondsToMillis,
-  ZERO_ADDRESS,
 } from './utils'
 
 export function handleTransfer(event: TransferEvent): void {
@@ -105,19 +104,16 @@ function checkAndClearCommitOnTransfer(
 ): void {
   // A second transfer (after initial issuance is from zero address)
   // AND from the commit/reveal process:
-  if (
-    from.toHexString() != ZERO_ADDRESS.toHexString() &&
-    srr.transferCommitment != null
-  ) {
-    log.info("clearing transferCommitment on token = {}", [srr.tokenId]);
-    let srrCommit = SRRTransferCommit.load(srr.tokenId);
-    if (srrCommit != null) {
-      srrCommit.commitment = null;
-      srrCommit.lastAction = "transfer";
-      srrCommit.updatedAt = eventTime;
-      srrCommit.save();
-    }
+  // if (from != ZERO_ADDRESS && srr.transferCommitment != null) {
+  log.info("clearing transferCommitment on token = {}", [srr.tokenId]);
+  let srrCommit = SRRTransferCommit.load(srr.tokenId);
+  if (srrCommit != null) {
+    srrCommit.commitment = null;
+    srrCommit.lastAction = "transfer";
+    srrCommit.updatedAt = eventTime;
+    srrCommit.save();
   }
+  // }
   srr.transferCommitment = null;
 }
 
@@ -191,7 +187,7 @@ function saveCreateSRRInternal(
   srr.updatedAt = updateTimestamp;
   srr.save();
 
-  saveSRRMetadataHistory(srr as SRR, event);
+  saveSRRMetadataHistory(srr as SRR, updateTimestamp, event);
 }
 
 export function handleSRRProvenance(event: SRRProvenanceEvent): void {
@@ -586,10 +582,14 @@ function handleUpdateSRRMetadataDigestInternal(
   srr.metadataDigest = metadataDigest;
   srr.save();
 
-  saveSRRMetadataHistory(srr as SRR, event);
+  saveSRRMetadataHistory(srr as SRR, eventTimestampMillis, event);
 }
 
-function saveSRRMetadataHistory(srr: SRR, event: ethereum.Event): void {
+function saveSRRMetadataHistory(
+  srr: SRR,
+  eventTimestampMillis: BigInt,
+  event: ethereum.Event
+): void {
   let metadataHistoryId = crypto
     .keccak256(
       ByteArray.fromUTF8(
@@ -602,7 +602,7 @@ function saveSRRMetadataHistory(srr: SRR, event: ethereum.Event): void {
 
   let srrMetadataHistory = new SRRMetadataHistory(metadataHistoryId); // metadataHistoryId)
   srrMetadataHistory.srr = srr.id;
-  srrMetadataHistory.createdAt = eventUTCMillis(event);
+  srrMetadataHistory.createdAt = eventTimestampMillis;
   srrMetadataHistory.metadataDigest = Bytes.fromHexString(
     srr.metadataDigest.toHexString()
   ) as Bytes;
