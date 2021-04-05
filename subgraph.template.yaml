@@ -151,5 +151,5 @@ dataSources:
           handler: handleBatchPrepared
         - event: CreateSRRWithProof(indexed bytes32,indexed uint256,bytes32)
           handler: handleCreateSRRWithProof
-        - event: MigrateBatch(indexed bytes32,bytes32[],address)
+        - event: MigrateBatch(indexed bytes32,bytes32[],address,uint256,uint256)
           handler: handleMigrateBatch

@@ -37,14 +37,15 @@ import {
   Transfer as TransferEvent,
   TransferFromMigration as TransferFromMigrationEvent,
   UpdateSRR as UpdateSRREvent,
+  UpdateSRRFromMigration as UpdateSRRFromMigrationEvent,
   UpdateSRRMetadataDigest as UpdateSRRMetadataDigestEvent,
+  UpdateSRRMetadataDigestFromMigration as UpdateSRRMetadataDigestFromMigrationEvent,
 } from '../generated/StartrailRegistry/StartrailRegistry'
 import {
   currentChainId,
   eventUTCMillis,
   logInvocation,
   secondsToMillis,
-  ZERO_ADDRESS,
 } from './utils'
 
 export function handleTransfer(event: TransferEvent): void {
@@ -103,19 +104,16 @@ function checkAndClearCommitOnTransfer(
 ): void {
   // A second transfer (after initial issuance is from zero address)
   // AND from the commit/reveal process:
-  if (
-    from.toHexString() != ZERO_ADDRESS.toHexString() &&
-    srr.transferCommitment != null
-  ) {
-    log.info("clearing transferCommitment on token = {}", [srr.tokenId]);
-    let srrCommit = SRRTransferCommit.load(srr.tokenId);
-    if (srrCommit != null) {
-      srrCommit.commitment = null;
-      srrCommit.lastAction = "transfer";
-      srrCommit.updatedAt = eventTime;
-      srrCommit.save();
-    }
+  // if (from != ZERO_ADDRESS && srr.transferCommitment != null) {
+  log.info("clearing transferCommitment on token = {}", [srr.tokenId]);
+  let srrCommit = SRRTransferCommit.load(srr.tokenId);
+  if (srrCommit != null) {
+    srrCommit.commitment = null;
+    srrCommit.lastAction = "transfer";
+    srrCommit.updatedAt = eventTime;
+    srrCommit.save();
   }
+  // }
   srr.transferCommitment = null;
 }
 
@@ -189,7 +187,7 @@ function saveCreateSRRInternal(
   srr.updatedAt = updateTimestamp;
   srr.save();
 
-  saveSRRMetadataHistory(srr as SRR, event);
+  saveSRRMetadataHistory(srr as SRR, updateTimestamp, event);
 }
 
 export function handleSRRProvenance(event: SRRProvenanceEvent): void {
@@ -503,16 +501,42 @@ function handleSRRCommitmentCancelledInternal(
 
 export function handleUpdateSRR(event: UpdateSRREvent): void {
   logInvocation("handleUpdateSRR", event);
-  let srrId = event.params.tokenId.toString();
+  handleUpdateSRRInternal(
+    eventUTCMillis(event),
+    event.params.registryRecord.isPrimaryIssuer,
+    event.params.registryRecord.artistAddress,
+    event.params.tokenId
+  );
+}
+
+export function handleUpdateSRRFromMigration(
+  event: UpdateSRRFromMigrationEvent
+): void {
+  logInvocation("handleUpdateSRRFromMigration", event);
+  handleUpdateSRRInternal(
+    secondsToMillis(event.params.originTimestamp),
+    event.params.registryRecord.isPrimaryIssuer,
+    event.params.registryRecord.artistAddress,
+    event.params.tokenId
+  );
+}
+
+function handleUpdateSRRInternal(
+  eventTimestampMillis: BigInt,
+  isPrimaryIssuer: boolean,
+  artistAddress: Address,
+  tokenId: BigInt
+): void {
+  let srrId = tokenId.toString();
   let srr = SRR.load(srrId);
   if (srr == null) {
     log.error("received event for unknown SRR: {}", [srrId]);
     return;
   }
 
-  srr.artistAddress = event.params.registryRecord.artistAddress;
-  srr.isPrimaryIssuer = event.params.registryRecord.isPrimaryIssuer;
-  srr.updatedAt = eventUTCMillis(event);
+  srr.isPrimaryIssuer = isPrimaryIssuer;
+  srr.artistAddress = artistAddress;
+  srr.updatedAt = eventTimestampMillis;
 
   srr.save();
 }
@@ -521,21 +545,51 @@ export function handleUpdateSRRMetadataDigest(
   event: UpdateSRRMetadataDigestEvent
 ): void {
   logInvocation("handleUpdateSRRMetadataDigest", event);
-  let srrId = event.params.tokenId.toString();
+  handleUpdateSRRMetadataDigestInternal(
+    eventUTCMillis(event),
+    event.params.tokenId,
+    event.params.metadataDigest,
+    event
+  );
+}
+
+export function handleUpdateSRRMetadataDigestFromMigration(
+  event: UpdateSRRMetadataDigestFromMigrationEvent
+): void {
+  logInvocation("handleUpdateSRRMetadataDigestFromMigration", event);
+  handleUpdateSRRMetadataDigestInternal(
+    secondsToMillis(event.params.originTimestamp),
+    event.params.tokenId,
+    event.params.metadataDigest,
+    event
+  );
+}
+
+function handleUpdateSRRMetadataDigestInternal(
+  eventTimestampMillis: BigInt,
+  tokenId: BigInt,
+  metadataDigest: Bytes,
+  event: ethereum.Event
+): void {
+  let srrId = tokenId.toString();
   let srr = SRR.load(srrId);
   if (srr == null) {
     log.error("received event for unknown SRR: {}", [srrId]);
     return;
   }
 
-  srr.updatedAt = eventUTCMillis(event);
-  srr.metadataDigest = event.params.metadataDigest;
+  srr.updatedAt = eventTimestampMillis;
+  srr.metadataDigest = metadataDigest;
   srr.save();
 
-  saveSRRMetadataHistory(srr as SRR, event);
+  saveSRRMetadataHistory(srr as SRR, eventTimestampMillis, event);
 }
 
-function saveSRRMetadataHistory(srr: SRR, event: ethereum.Event): void {
+function saveSRRMetadataHistory(
+  srr: SRR,
+  eventTimestampMillis: BigInt,
+  event: ethereum.Event
+): void {
   let metadataHistoryId = crypto
     .keccak256(
       ByteArray.fromUTF8(
@@ -548,7 +602,7 @@ function saveSRRMetadataHistory(srr: SRR, event: ethereum.Event): void {
 
   let srrMetadataHistory = new SRRMetadataHistory(metadataHistoryId); // metadataHistoryId)
   srrMetadataHistory.srr = srr.id;
-  srrMetadataHistory.createdAt = eventUTCMillis(event);
+  srrMetadataHistory.createdAt = eventTimestampMillis;
   srrMetadataHistory.metadataDigest = Bytes.fromHexString(
     srr.metadataDigest.toHexString()
   ) as Bytes;
@@ -562,19 +616,3 @@ export function handleMigrateSRR(event: MigrateSRREvent): void {
   srr.originChain = event.params.originChain;
   srr.save();
 }
-
-//
-// Not required at this stage as they've never been emitted on Mainnet:
-//
-
-// export function handleUpdateSRRFromMigration(
-//   event: UpdateSRRFromMigrationEvent
-// ): void {
-//   logInvocation("handleUpdateSRRFromMigration", event);
-// }
-
-// export function handleUpdateSRRMetadataDigestFromMigration(
-//   event: UpdateSRRMetadataDigestFromMigrationEvent
-// ): void {
-//   logInvocation("handleUpdateSRRMetadataDigestFromMigration", event);
-// }
