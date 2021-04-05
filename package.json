@@ -6,13 +6,13 @@
     "codegen": "npm run generate-develop && graph codegen subgraph.mumbai-develop.yaml",
     "create-local-develop": "graph create --node http://127.0.0.1:8020 startbahn/startrail-mumbai-develop",
     "create-local-release": "graph create --node http://127.0.0.1:8020 startbahn/startrail-mumbai-release",
-    "create-gke-develop": "graph create --node https://subgraph.startbahn.jp/admin/ startbahn/startrail-mumbai-develop",
-    "create-gke-release": "graph create --node https://subgraph.startbahn.jp/admin/ startbahn/startrail-mumbai-release",
+    "create-gke-develop": "graph create --node https://subgraph-qa-lum.startbahn.jp/admin/ startbahn/startrail-mumbai-develop",
+    "create-gke-release": "graph create --node https://subgraph-qa-lum.startbahn.jp/admin/ startbahn/startrail-mumbai-release",
     "create-gke-master": "graph create --node https://subgraph.startrail.io/admin/ startbahn/startrail",
     "deploy-local-release": "npm run generate-release && graph deploy --ipfs http://localhost:5001 --node http://127.0.0.1:8020 startbahn/startrail-mumbai-release subgraph.release.yaml",
     "deploy-local-develop": "npm run generate-develop && graph deploy --ipfs http://localhost:5001 --node http://127.0.0.1:8020 startbahn/startrail-mumbai-develop subgraph.develop.yaml",
-    "deploy-gke-develop": "npm run generate-develop && graph deploy --ipfs https://subgraph.startbahn.jp/ipfs/ --node https://subgraph.startbahn.jp/admin/ startbahn/startrail-mumbai-develop subgraph.develop.yaml",
-    "deploy-gke-release": "npm run generate-release && graph deploy --ipfs https://subgraph.startbahn.jp/ipfs/ --node https://subgraph.startbahn.jp/admin/ startbahn/startrail-mumbai-release subgraph.release.yaml",
+    "deploy-gke-develop": "npm run generate-develop && graph deploy --ipfs https://subgraph-qa-lum.startbahn.jp/ipfs/ --node https://subgraph-qa-lum.startbahn.jp/admin/ startbahn/startrail-mumbai-develop subgraph.develop.yaml",
+    "deploy-gke-release": "npm run generate-release && graph deploy --ipfs https://subgraph-qa-lum.startbahn.jp/ipfs/ --node https://subgraph-qa-lum.startbahn.jp/admin/ startbahn/startrail-mumbai-release subgraph.release.yaml",
     "deploy-gke-master": "npm run generate-master && graph deploy --ipfs https://subgraph.startrail.io/ipfs/ --node https://subgraph.startrail.io/admin/ startbahn/startrail subgraph.mainnet.yaml",
     "deploy-develop": "npm run generate-develop && graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail-mumbai-develop --access-token $TOKEN subgraph.develop.yaml",
     "deploy-release": "npm run generate-release && graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail-mumbai-release --access-token $TOKEN subgraph.release.yaml",
@@ -30,7 +30,7 @@
     "js-yaml": "^3.14.0"
   },
   "dependencies": {
-    "@startbahn/startrail": "1.2.1-mumbai-7",
+    "@startbahn/startrail": "1.3.0-beta-1",
     "babel-polyfill": "^6.26.0",
     "babel-register": "^6.26.0"
   }
