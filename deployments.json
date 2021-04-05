@@ -13,6 +13,20 @@
       "startBlock": 11907787
     }
   },
+  "mumbai-release": {
+    "StartrailRegistry": {
+      "startBlock": 12363938
+    },
+    "LicensedUserManager": {
+      "startBlock": 12363938
+    },
+    "MetaTxForwarder": {
+      "startBlock": 12363938
+    },
+    "BulkIssue": {
+      "startBlock": 12363938
+    }
+  },
   "polygon": {
     "StartrailRegistry": {
       "startBlock": 12000000
