@@ -15,6 +15,10 @@
     "RootLogic": {
       "address": "0x8824382015de561Dc42A68968f46A5D12491d481",
       "startBlock": 6951000
+    },
+    "StartrailRegistryPreMerge": {
+      "address": "0xf245C39C50DBac453ab36407f0886ae10409419f",
+      "startBlock": 7418436
     }
   },
   "release": {
@@ -33,6 +37,10 @@
     "RootLogic": {
       "address": "0x9Ef1095432A1E236CAdF84248CF6cE271cC5926C",
       "startBlock": 7280000
+    },
+    "StartrailRegistryPreMerge": {
+      "address": "0x0a3EE5d7f3d128dA12Af6DC8731358c3c4E18A7F",
+      "startBlock": 7418043
     }
   },
   "mainnet": {
@@ -51,6 +59,10 @@
     "RootLogic": {
       "address": "0x7f556e211a3E4b57d005D3aa49a31306FA8Bb34d",
       "startBlock": 10720801
+    },
+    "StartrailRegistryPreMerge": {
+      "address": "0xd5D31A30Dd78b4A8a4effb8c9aE410C8e86C1812",
+      "startBlock": 10720664
     }
   },
   "local": {
@@ -67,6 +79,10 @@
       "startBlock": 1
     },
     "RootLogic": {
+      "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "startBlock": 1
+    },
+    "StartrailRegistryPreMerge": {
       "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
       "startBlock": 1
     }
