@@ -46,6 +46,7 @@ import {
   eventUTCMillis,
   logInvocation,
   secondsToMillis,
+  ZERO_ADDRESS,
 } from './utils'
 
 export function handleTransfer(event: TransferEvent): void {
@@ -64,7 +65,7 @@ export function handleTransfer(event: TransferEvent): void {
   srr.createdAt = timestampMillis;
   srr.updatedAt = timestampMillis;
 
-  checkAndClearCommitOnTransfer(srr, event.params.from, timestampMillis);
+  checkAndClearCommitOnTransfer(srr, timestampMillis);
 
   srr.save();
 }
@@ -88,8 +89,17 @@ export function handleTransferFromMigration(
     srr.originChain = currentChainId();
     srr.originTxHash = event.params.originTxHash;
   }
+  let fromIsZero =
+    event.params.from.toHexString() != ZERO_ADDRESS.toHexString();
 
-  checkAndClearCommitOnTransfer(srr as SRR, event.params.from, timestampMillis);
+  log.info("zero = {} from = {} not equal? = {}", [
+    ZERO_ADDRESS.toHexString(),
+    event.params.from.toHexString(),
+    fromIsZero.toString(),
+  ]);
+  if (event.params.from.toHexString() != ZERO_ADDRESS.toHexString()) {
+    checkAndClearCommitOnTransfer(srr as SRR, timestampMillis);
+  }
 
   srr.ownerAddress = event.params.to;
   srr.updatedAt = timestampMillis;
@@ -97,14 +107,7 @@ export function handleTransferFromMigration(
   srr.save();
 }
 
-function checkAndClearCommitOnTransfer(
-  srr: SRR,
-  from: Address,
-  eventTime: BigInt
-): void {
-  // A second transfer (after initial issuance is from zero address)
-  // AND from the commit/reveal process:
-  // if (from != ZERO_ADDRESS && srr.transferCommitment != null) {
+function checkAndClearCommitOnTransfer(srr: SRR, eventTime: BigInt): void {
   log.info("clearing transferCommitment on token = {}", [srr.tokenId]);
   let srrCommit = SRRTransferCommit.load(srr.tokenId);
   if (srrCommit != null) {
@@ -113,7 +116,6 @@ function checkAndClearCommitOnTransfer(
     srrCommit.updatedAt = eventTime;
     srrCommit.save();
   }
-  // }
   srr.transferCommitment = null;
 }
 
