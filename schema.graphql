@@ -7,6 +7,7 @@ type LicensedUserWallet @entity {
   originalName: String!
   userType: String!
   owners: [Bytes!]!
+  salt: Bytes!
 
   issuedSRRs: [SRR!]! @derivedFrom(field: "issuer")
 
@@ -55,6 +56,10 @@ type CustomHistory @entity {
   historyType: CustomHistoryType!
   name: String!
   metadataDigest: Bytes!
+
+  originChain: String
+  originTxHash: Bytes
+
   # TODO: add a link back to Provenance:
   # provenances: [SRRProvenance!] @derivedFrom(field: "customHistory")
   createdAt: BigInt! # block.timestamp when entity created
@@ -81,11 +86,11 @@ type SRRProvenance @entity {
 }
 
 type SRRApproval @entity {
-  id: ID!                      # keccak256(tokenId,timestamp)
-  srr: SRR!                    # SRR for event Provenance.tokenId
-  owner: Bytes!                # event Approval.owner - ownership Approved from
-  approved: Bytes!             # event Provenance.approved - ownership Approved to
-  createdAt: BigInt!           # block.timestamp when entity created
+  id: ID! # keccak256(tokenId,timestamp)
+  srr: SRR! # SRR for event Provenance.tokenId
+  owner: Bytes! # event Approval.owner - ownership Approved from
+  approved: Bytes! # event Provenance.approved - ownership Approved to
+  createdAt: BigInt! # block.timestamp when entity created
 }
 
 type SRRMetadataHistory @entity {
@@ -116,7 +121,6 @@ type BulkIssue @entity {
   srrs: [Bytes!] # Hashes of SRRs processed
   issuer: Bytes! # batchprepared issuer
   tokenId: String # ERC721 token id for createSRRwithProof event
-
   createdAt: BigInt! # block.timestamp when entity created
   updatedAt: BigInt! # block.timestamp when entity last updated
 }

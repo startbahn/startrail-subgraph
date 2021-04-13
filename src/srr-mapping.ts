@@ -333,7 +333,9 @@ export function handleCreateCustomHistory(
     event.params.id,
     event.params.name,
     event.params.customHistoryTypeId,
-    event.params.metadataDigest
+    event.params.metadataDigest,
+    currentChainId(),
+    event.transaction.hash
   );
 }
 
@@ -346,7 +348,9 @@ export function handleCreateCustomHistoryFromMigration(
     event.params.id,
     event.params.name,
     event.params.customHistoryTypeId,
-    event.params.metadataDigest
+    event.params.metadataDigest,
+    event.params.originChain,
+    event.params.originTxHash
   );
 }
 
@@ -355,12 +359,16 @@ function handleCreateCustomHistoryInternal(
   id: BigInt,
   name: string,
   customHistoryTypeId: BigInt,
-  metadataDigest: Bytes
+  metadataDigest: Bytes,
+  originChain: string,
+  originTxHash: Bytes
 ): void {
   let ch = new CustomHistory(id.toString());
   ch.name = name;
   ch.historyType = customHistoryTypeId.toString();
   ch.metadataDigest = metadataDigest;
+  ch.originChain = originChain;
+  ch.originTxHash = originTxHash;
   ch.createdAt = eventTimestampMillis;
   ch.save();
 }

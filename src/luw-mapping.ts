@@ -47,7 +47,7 @@ export function handleCreateLicensedUserWallet(event: CreateLUWEvent): void {
   }
 
   luw.userType = userType(event.params.userType);
-  luw.salt = event.params.salt.toHexString();
+  luw.salt = event.params.salt;
   luw.updatedAt = timestampMillis;
 
   luw.save();
