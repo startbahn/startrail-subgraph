@@ -34,7 +34,7 @@ if (process.argv.length !== 3 && process.argv.length !== 6) {
 
 const deploymentName = process.argv[2]
 let network
-if (deploymentName === 'mainnet' || deploymentName === 'local') {
+if (['polygon', 'local', 'mainnet'].indexOf(deploymentName) !== -1) {
   network = deploymentName
 } else if (deploymentName.startsWith('mumbai')) {
   network = 'mumbai'
