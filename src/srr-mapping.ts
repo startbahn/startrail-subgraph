@@ -16,6 +16,7 @@ import {
   SRRMetadataHistory,
   SRRProvenance,
   SRRTransferCommit,
+  SRRApproval,
 } from '../generated/schema'
 import {
   CreateCustomHistory as CustomHistoryCreatedEvent,
@@ -117,6 +118,41 @@ function checkAndClearCommitOnTransfer(srr: SRR, eventTime: BigInt): void {
     srrCommit.save();
   }
   srr.transferCommitment = null;
+}
+
+export function handleApproval(event: ApprovalEvent): void {
+  let timestampMillis = eventUTCMillis(event)
+  let srrId = event.params.tokenId.toString()
+  let owner = event.params.owner.toHexString()
+  let approved = event.params.approved.toHexString()
+  
+  log.info('Approval for {}', [srrId])
+  log.info('owner: {}', [owner])
+  log.info('approved: {}', [approved])
+  
+
+  let srr = SRR.load(srrId)
+  if (srr == null) {
+    log.error('received event for unknown SRR: {}', [srrId])
+    return
+  }
+
+  // Create new approval
+  let approvalId = crypto.keccak256(
+    ByteArray.fromUTF8(
+      srrId.toString() + 
+      timestampMillis.toString()
+    )
+  ).toHexString()
+
+  let approval = new SRRApproval(approvalId)
+
+  approval.srr = srr.id
+  approval.owner = event.params.owner
+  approval.approved = event.params.approved
+  approval.createdAt = timestampMillis
+  approval.save()
+
 }
 
 export function handleCreateSRR(event: CreateSRREvent): void {
@@ -222,6 +258,34 @@ export function handleSRRProvenanceWithCustomHistory(
   );
 }
 
+export function handleSRRProvenance(event: SRRProvenanceEvent): void {
+  let params = event.params
+  handleSRRProvenanceInternal(
+    event,
+    params.tokenId,
+    params.from,
+    params.to,
+    null,
+    null,
+    params.historyMetadataDigest,
+    params.historyMetadataURI,
+  )
+}
+
+export function handleSRRProvenanceWithCustomHistory(event: SRRProvenanceWithCustomHistoryEvent): void {
+  let params = event.params
+  handleSRRProvenanceInternal(
+    event,
+    params.tokenId,
+    params.from,
+    params.to,
+    null,
+    params.customHistoryId,
+    params.historyMetadataDigest,
+    params.historyMetadataURI,
+  )
+}
+
 /**
  * Can't use a union type to handle the 2 Provenance events with one function.
  *
@@ -243,6 +307,8 @@ function handleSRRProvenanceInternal(
     log.error("received event for unknown SRR: {}", [srrId]);
     return;
   }
+
+  let timestampMillis = eventUTCMillis(event)
 
   // Update existing SRR
   srr.ownerAddress = to;
