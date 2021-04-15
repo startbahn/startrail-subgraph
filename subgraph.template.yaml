@@ -128,28 +128,6 @@ dataSources:
           handler: handleUpdateSRRMetadataDigestFromMigration
         - event: CreateCustomHistoryFromMigration(indexed uint256,string,uint256,bytes32,string,uint256,bytes32)
           handler: handleCreateCustomHistoryFromMigration
-
-  - kind: ethereum/contract
-    name: StartrailRegistryPreMerge
-    network: mainnet
-    source:
-      address: "0x7f556e211a3E4b57d005D3aa49a31306FA8Bb34d"
-      abi: StartrailRegistry
-      startBlock: 10720664 # contract creation block
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.4
-      language: wasm/assemblyscript
-      entities:
-        - SRR
-      abis:
-        - name: StartrailRegistry
-          file: ./abis/StartrailRegistry.json
-      file: ./src/srr-mapping.ts
-      eventHandlers:
-        - event: Transfer(indexed address,indexed address,indexed uint256)
-          handler: handleTransfer
-
   - kind: ethereum/contract
     name: BulkIssue
     network: ##AUTOFILL##

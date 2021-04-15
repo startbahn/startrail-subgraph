@@ -53,10 +53,6 @@
     },
     "BulkIssue": {
       "startBlock": 1
-    },
-    "StartrailRegistryPreMerge": {
-      "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
-      "startBlock": 1
     }
   }
 }
