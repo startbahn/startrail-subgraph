@@ -29,16 +29,16 @@
   },
   "polygon": {
     "StartrailRegistry": {
-      "startBlock": 12000000
+      "startBlock": 13286271
     },
     "LicensedUserManager": {
-      "startBlock": 12000000
+      "startBlock": 13286271
     },
     "MetaTxForwarder": {
-      "startBlock": 12000000
+      "startBlock": 13286271
     },
     "BulkIssue": {
-      "startBlock": 12000000
+      "startBlock": 13286271
     }
   },
   "local": {
