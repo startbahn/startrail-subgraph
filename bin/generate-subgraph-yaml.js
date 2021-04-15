@@ -34,7 +34,7 @@ if (process.argv.length !== 3 && process.argv.length !== 6) {
 
 const deploymentName = process.argv[2]
 let network
-if (['polygon', 'local', 'mainnet'].indexOf(deploymentName) !== -1) {
+if (['matic', 'local', 'mainnet'].indexOf(deploymentName) !== -1) {
   network = deploymentName
 } else if (deploymentName.startsWith('mumbai')) {
   network = 'mumbai'
@@ -54,7 +54,7 @@ if (isStartrailPackageDeployment) {
   deploymentFilePath = path.join(
     startrailPackagePath,
     'deployments',
-    deploymentName,
+    deploymentName === 'matic' ? 'polygon' : deploymentName,
     `deploy.json`
   )
 } else {
@@ -129,7 +129,8 @@ subgraphYamlTemplate.dataSources.forEach((ds) => {
   //
   // Set dataSource properties
   //
-  ds.network = network
+  // ds.network = network
+  ds.network = network === 'polygon' ? 'matic' : deploymentName,
   ds.source.address = contractAddress
   ds.source.startBlock = startBlock
   ds.mapping.abis[0].file = path.join(abisPath, `${contractName}.json`)

@@ -23,7 +23,7 @@
     "generate-develop": "node bin/generate-subgraph-yaml mumbai-develop",
     "generate-release": "node bin/generate-subgraph-yaml mumbai-release",
     "generate-master": "node bin/generate-subgraph-yaml mainnet",
-    "generate-polygon": "node bin/generate-subgraph-yaml polygon",
+    "generate-polygon": "node bin/generate-subgraph-yaml matic",
     "remove-local-release": "graph remove --ipfs http://localhost:5001 --node http://127.0.0.1:8020 startbahn/startrail-mumbai-release",
     "remove-local-develop": "graph remove --ipfs http://localhost:5001 --node http://127.0.0.1:8020 startbahn/startrail-mumbai-develop"
   },

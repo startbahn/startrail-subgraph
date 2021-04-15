@@ -11,7 +11,7 @@ export let currentChainId = (): string => {
 
   let chainId: string
 
-  if (network === 'polygon') {
+  if (network === 'matic') {
     chainId = "eip155:137"
   } else if (network.indexOf("mumbai") !== -1) {
     chainId = "eip155:80001"
