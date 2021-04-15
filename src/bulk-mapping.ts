@@ -1,13 +1,41 @@
-import { log } from '@graphprotocol/graph-ts'
+import { 
+  log,
+  ethereum, 
+  Bytes,
+  Address,
+  BigInt,
+} from '@graphprotocol/graph-ts'
 
 import {
   BatchPrepared as BatchPreparedEvent,
   CreateSRRWithProof as CreateSRRWithProofEvent,
   MigrateBatch as MigrateBatchEvent,
 } from '../generated/BulkIssue/BulkIssue'
+import {
+  BatchPrepared as BatchPreparedEventLegacy,
+  CreateSRRWithProof as CreateSRRWithProofEventLegacy,
+} from '../generated/BulkIssue_legacy/BulkIssue'
 import { BulkIssue } from '../generated/schema'
 import { eventUTCMillis, logInvocation, secondsToMillis } from './utils'
 
+
+export function handleBatchPreparedLegacy(event: BatchPreparedEventLegacy): void {
+  let params = event.params
+  handleBatchPreparedInternal(
+    event,
+    params.merkleRoot,
+    null,
+    )
+}
+export function handleCreateSRRWithProofLegacy(event: CreateSRRWithProofEventLegacy): void {
+  let params = event.params
+  handleCreateSRRWithProofInternal(
+    event,
+    params.merkleRoot,
+    null,
+    params.srrHash
+  )
+}
 export function handleBatchPrepared(event: BatchPreparedEvent): void {
   logInvocation("handleBatchPrepared", event);
 
