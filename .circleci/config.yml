@@ -106,21 +106,21 @@ workflows:
   pull-request:
     jobs:
       - build
-      - rinkeby-develop:
-          requires:
-            - build
-          filters:
-            branches:
-              only: develop
-      - rinkeby-release:
-          requires:
-            - build
-          filters:
-            branches:
-              only: release
-      - mainnet-master:
-          requires:
-            - build
-          filters:
-            branches:
-              only: master
+      # - rinkeby-develop:
+      #     requires:
+      #       - build
+      #     filters:
+      #       branches:
+      #         only: develop
+      # - rinkeby-release:
+      #     requires:
+      #       - build
+      #     filters:
+      #       branches:
+      #         only: release
+      # - mainnet-master:
+      #     requires:
+      #       - build
+      #     filters:
+      #       branches:
+      #         only: master
