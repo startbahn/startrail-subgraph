@@ -3,72 +3,82 @@ version: 2.1
 executors:
   default:
     docker:
-      - image: circleci/node:12.18.2
+      - image: circleci/node:14.16.0
 
 commands:
   install_node_dependencies:
     steps:
       - run:
           name: Install node dependencies
-          command: npm ci
-  install_graph_cli:
+          command: yarn install
+  save_node_dependencies:
     steps:
-      - run:
-          name: Install graph cli
-          command: sudo npm i -g --loglevel=silent --unsafe-perm=true --allow-root @graphprotocol/graph-cli
+      - save_cache:
+          name: Save node dependencies cache
+          key: v2-node-dependencies-{{ checksum "yarn.lock" }}
+          paths:
+            - node_modules
+  restore_node_dependencies:
+    steps:
+      - restore_cache:
+          name: Restore node dependencies cache
+          keys:
+            - v2-node-dependencies-{{ checksum "yarn.lock" }}
+            - v2-node-dependencies
   build_sub_graph:
     steps:
       - run:
           name: Build sub-graph source and generate code
           command: |
-            npm run codegen
-            npm run build
+            yarn run codegen
+            yarn run build
   deploy_develop:
     steps:
       - run:
           name: deploy rinkeby develop subgraph into public node
-          command: npm run deploy-develop
+          command: yarn run deploy-develop
   deploy_release:
     steps:
       - run:
           name: deploy rinkeby release subgraph into public node
-          command: npm run deploy-release
+          command: yarn run deploy-release
 
   deploy_master:
     steps:
       - run:
           name: deploy mainnet master subgraph into public node
-          command: npm run deploy-master
+          command: yarn run deploy-master
   deploy_gke_develop:
     steps:
       - run:
           name: deploy rinkeby develop subgraph into startbahn GKE node
-          command: npm run deploy-gke-develop
+          command: yarn run deploy-gke-develop
   deploy_gke_release:
     steps:
       - run:
           name: deploy rinkeby release subgraph into startbahn GKE node
-          command: npm run deploy-gke-release
+          command: yarn run deploy-gke-release
   deploy_gke_master:
     steps:
       - run:
           name: deploy rinkeby master subgraph into startbahn GKE node
-          command: npm run deploy-gke-master
+          command: yarn run deploy-gke-master
 
 jobs:
   build:
     executor: default
     steps:
       - checkout
+      - restore_node_dependencies
       - install_node_dependencies
-      - install_graph_cli
+      - save_node_dependencies
       - build_sub_graph
   rinkeby-develop:
     executor: default
     steps:
       - checkout
+      - restore_node_dependencies
       - install_node_dependencies
-      - install_graph_cli
       - build_sub_graph
       - deploy_develop
       - deploy_gke_develop
@@ -76,8 +86,8 @@ jobs:
     executor: default
     steps:
       - checkout
+      - restore_node_dependencies
       - install_node_dependencies
-      - install_graph_cli
       - build_sub_graph
       - deploy_release
       - deploy_gke_release
@@ -85,8 +95,8 @@ jobs:
     executor: default
     steps:
       - checkout
+      - restore_node_dependencies
       - install_node_dependencies
-      - install_graph_cli
       - build_sub_graph
       - deploy_master
       - deploy_gke_master
@@ -96,21 +106,21 @@ workflows:
   pull-request:
     jobs:
       - build
-      - rinkeby-develop:
-          requires:
-            - build
-          filters:
-            branches:
-              only: develop
-      - rinkeby-release:
-          requires:
-            - build
-          filters:
-            branches:
-              only: release
-      - mainnet-master:
-          requires:
-            - build
-          filters:
-            branches:
-              only: master
+      # - rinkeby-develop:
+      #     requires:
+      #       - build
+      #     filters:
+      #       branches:
+      #         only: develop
+      # - rinkeby-release:
+      #     requires:
+      #       - build
+      #     filters:
+      #       branches:
+      #         only: release
+      # - mainnet-master:
+      #     requires:
+      #       - build
+      #     filters:
+      #       branches:
+      #         only: master

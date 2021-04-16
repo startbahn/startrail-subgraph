@@ -1,26 +1,24 @@
-enum UserType {
-  admin
-  handler
-  artist
-}
-
 type LicensedUserWallet @entity {
-  id: ID!                     # contractAddress.toHexString()
-  contractAddress: Bytes!
+  id: ID! # walletAddress.toHexString()
+  walletAddress: Bytes!
 
-  requiredConfirmation: Int!
+  threshold: Int!
   englishName: String!
   originalName: String!
   userType: String!
   owners: [Bytes!]!
+  salt: Bytes!
 
   issuedSRRs: [SRR!]! @derivedFrom(field: "issuer")
 
   # How to map this:
   # ownedSRRs: [SRR!]! @derivedFrom(field: "ownerAddress")
 
-  createdAt: BigInt!          # block.timestamp when entity created
-  updatedAt: BigInt!          # block.timestamp when entity last updated
+  # chain where the SRR was issued
+  originChain: String
+
+  createdAt: BigInt! # block.timestamp when entity created
+  updatedAt: BigInt! # block.timestamp when entity last updated
 }
 
 #
@@ -33,23 +31,24 @@ type LicensedUserWallet @entity {
 #        see comments on handleCreateSRR for details)
 #
 type SRR @entity {
-  id: ID!                     # tokenId.toString()
-  tokenId: String             # ERC721 token id
-  
+  id: ID! # tokenId.toString()
+  tokenId: String # ERC721 token id
   isPrimaryIssuer: Boolean
   artistAddress: Bytes
   issuer: LicensedUserWallet
   ownerAddress: Bytes
-  metadataDigest: Bytes       # sha256 hash of metadata JSON file
-  
-  transferCommitment: Bytes   # keccak256 hash transfer commitment
-  
+  metadataDigest: Bytes # sha256 hash of metadata JSON file
+  transferCommitment: Bytes # keccak256 hash transfer commitment
   provenance: [SRRProvenance!]! @derivedFrom(field: "srr")
   metadataHistory: [SRRMetadataHistory!]! @derivedFrom(field: "srr")
 
-  txHash: Bytes!              # txHash created at
-  createdAt: BigInt!          # block.timestamp when entity created
-  updatedAt: BigInt!          # block.timestamp when entity last updated
+  # chain and tx hash where the SRR was issued
+  # a number of SRRs were issued on Ethereum mainnet then moved to Polygon
+  originChain: String
+  originTxHash: Bytes
+
+  createdAt: BigInt! # block.timestamp when entity created
+  updatedAt: BigInt! # block.timestamp when entity last updated
 }
 
 type CustomHistory @entity {
@@ -57,6 +56,10 @@ type CustomHistory @entity {
   historyType: CustomHistoryType!
   name: String!
   metadataDigest: Bytes!
+
+  originChain: String
+  originTxHash: Bytes
+
   # TODO: add a link back to Provenance:
   # provenances: [SRRProvenance!] @derivedFrom(field: "customHistory")
   createdAt: BigInt! # block.timestamp when entity created
@@ -69,26 +72,32 @@ type CustomHistoryType @entity {
 }
 
 type SRRProvenance @entity {
-  id: ID!                      # keccak256(tokenId,timestamp)
-  timestamp: BigInt!           # event Provenance.timestamp (block.timestamp)
-
-  srr: SRR!                    # SRR for event Provenance.tokenId
-  from: Bytes!                 # event Provenance.from - ownership transferred from
-  to: Bytes!                   # event Provenance.to - ownership transferred to
-  metadataDigest: Bytes!       # event Provenance.metadataDigest
-  metadataURI: String!         # event Provenance.metadataURI
+  id: ID! # keccak256(tokenId,timestamp)
+  timestamp: BigInt! # event Provenance.timestamp (block.timestamp)
+  srr: SRR! # SRR for event Provenance.tokenId
+  from: Bytes! # event Provenance.from - ownership transferred from
+  to: Bytes! # event Provenance.to - ownership transferred to
+  metadataDigest: Bytes! # event Provenance.metadataDigest
+  metadataURI: String! # event Provenance.metadataURI
   customHistory: CustomHistory # event Provenance.customHistoryId (in overloaded event only)
-
-  # NOTE: this is redundant because we have timestamp above but it's included 
+  # NOTE: this is redundant because we have timestamp above but it's included
   #       for consistency as all entities have createdAt
-  createdAt: BigInt!           # block.timestamp when entity created
+  createdAt: BigInt! # block.timestamp when entity created
+}
+
+type SRRApproval @entity {
+  id: ID! # keccak256(tokenId,timestamp)
+  srr: SRR! # SRR for event Provenance.tokenId
+  owner: Bytes! # event Approval.owner - ownership Approved from
+  approved: Bytes! # event Provenance.approved - ownership Approved to
+  createdAt: BigInt! # block.timestamp when entity created
 }
 
 type SRRMetadataHistory @entity {
-  id: ID!                     # keccak256(tokenId,metadataDigest)
-  srr: SRR!                   # SRR for event Provenance.tokenId
-  metadataDigest: Bytes!      # event Provenance.metadataDigest
-  createdAt: BigInt!          # block.timestamp when entity created
+  id: ID! # keccak256(tokenId,metadataDigest)
+  srr: SRR! # SRR for event Provenance.tokenId
+  metadataDigest: Bytes! # event Provenance.metadataDigest
+  createdAt: BigInt! # block.timestamp when entity created
 }
 
 enum TransferCommitLastAction {
@@ -98,22 +107,33 @@ enum TransferCommitLastAction {
 }
 
 type SRRTransferCommit @entity {
-  id: ID!                     # tokenId.toString()
-  commitment: Bytes           # event Provenance.from - ownership transferred from
+  id: ID! # tokenId.toString()
+  commitment: Bytes # event Provenance.from - ownership transferred from
   customHistory: CustomHistory
   lastAction: TransferCommitLastAction!
-  createdAt: BigInt!          # block.timestamp when entity created
-  updatedAt: BigInt!          # block.timestamp when entity last updated
+  createdAt: BigInt! # block.timestamp when entity created
+  updatedAt: BigInt! # block.timestamp when entity last updated
 }
 
 type BulkIssue @entity {
-  id: ID!                     # merkleRoot.toHexString()
-  merkleRoot: Bytes!          # batch merkle root
-  srrs: [Bytes!]              # Hashes of SRRs processed
+  id: ID! # merkleRoot.toHexString()
+  merkleRoot: Bytes! # batch merkle root
+  srrs: [Bytes!] # Hashes of SRRs processed
+  issuer: Bytes! # batchprepared issuer
+  tokenId: String # ERC721 token id for createSRRwithProof event
+  createdAt: BigInt! # block.timestamp when entity created
+  updatedAt: BigInt! # block.timestamp when entity last updated
+}
 
-  createdAt: BigInt!          # block.timestamp when entity created
-  updatedAt: BigInt!          # block.timestamp when entity last updated
+type MetaTxRequestType @entity {
+  id: ID! # typeHash.toHexString()
+  typeHash: Bytes!
+  typeString: String!
+  createdAt: BigInt! # block.timestamp when entity created
+}
 
-  # TO add when contracts updated:
-  # issuer: Bytes!              # batch issuer address
+type MetaTxExecution @entity {
+  id: ID! # txHash.toHexString()
+  txHash: Bytes!
+  createdAt: BigInt! # block.timestamp when entity created
 }
