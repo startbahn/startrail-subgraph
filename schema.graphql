@@ -128,7 +128,7 @@ type BulkIssue @entity {
 type BulkTransfer @entity {
   id: ID! # merkleRoot.toHexString()
   merkleRoot: Bytes! # batch merkle root
-  txs: [Bytes!] # Hashes of ApproveSRRs processed
+  srrApproveHashes: [Bytes!] # Hashes of ApproveSRRs processed
   sender: Bytes! # batchprepared sender
   tokenId: String # ERC721 token id for createSRRwithProof event
   createdAt: BigInt! # block.timestamp when entity created

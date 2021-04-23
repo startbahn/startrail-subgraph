@@ -2,8 +2,7 @@ import { log } from '@graphprotocol/graph-ts'
 
 import {
   BatchPrepared as BatchPreparedEvent,
-  ApproveSRRByCommitmentWithProof as ApproveSRRByCommitmentWithProofEvent,
-  MigrateBatch as MigrateBatchEvent,
+  ApproveSRRByCommitmentWithProof as ApproveSRRByCommitmentWithProofEvent
 } from '../generated/BulkTransfer/BulkTransfer'
 import { BulkTransfer } from '../generated/schema'
 import { eventUTCMillis, logInvocation, secondsToMillis } from './utils'
@@ -21,7 +20,7 @@ export function handleBatchPrepared(event: BatchPreparedEvent): void {
   }
 
   batch = new BulkTransfer(merkleRoot);
-  batch.txs = [];
+  batch.srrApproveHashes = [];
   batch.merkleRoot = event.params.merkleRoot;
   batch.sender = event.params.sender;
 
@@ -29,14 +28,14 @@ export function handleBatchPrepared(event: BatchPreparedEvent): void {
   batch.save();
 }
 
-export function handleCreateSRRWithProof(event: ApproveSRRByCommitmentWithProofEvent): void {
-  logInvocation("handleCreateSRRWithProof", event);
+export function handleApproveSRRByCommitmentWithProof(event: ApproveSRRByCommitmentWithProofEvent): void {
+  logInvocation("handleApproveSRRByCommitmentWithProof", event);
 
   let merkleRoot = event.params.merkleRoot.toHexString();
   let batch = BulkTransfer.load(merkleRoot);
   if (batch == null) {
     log.error(
-      "received a CreateSRRWithProof event for an unknown batch. MerkleRoot: {}",
+      "received a ApproveSRRByCommitmentWithProofEvent event for an unknown batch transfer. MerkleRoot: {}",
       [event.params.merkleRoot.toString()]
     );
     return;
@@ -45,27 +44,10 @@ export function handleCreateSRRWithProof(event: ApproveSRRByCommitmentWithProofE
   log.info("adding srrApproveHash {}", [event.params.srrApproveHash.toHex()]);
   // this 3 step assign, push, reassign is necessary here:
   // (see https://thegraph.com/docs/assemblyscript-api#api-reference):
-  let txs = batch.txs;
+  let txs = batch.srrApproveHashes;
   txs.push(event.params.srrApproveHash);
-  batch.txs = txs;
+  batch.srrApproveHashes = txs;
   batch.tokenId = event.params.tokenId.toString();
   batch.updatedAt = eventUTCMillis(event);
-  batch.save();
-}
-
-export function handleMigrateBatch(event: MigrateBatchEvent): void {
-  logInvocation("handleMigrateBatch", event);
-
-  let merkleRoot = event.params.merkleRoot.toHexString();
-
-  let batch = new BulkTransfer(merkleRoot);
-
-  batch.merkleRoot = event.params.merkleRoot;
-  batch.sender = event.params.sender;
-  batch.txs = event.params.processedLeaves;
-
-  batch.createdAt = secondsToMillis(event.params.originTimestampCreated);
-  batch.updatedAt = secondsToMillis(event.params.originTimestampUpdated);
-
   batch.save();
 }

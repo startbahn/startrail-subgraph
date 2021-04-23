@@ -173,4 +173,4 @@ dataSources:
         - event: BatchPrepared(indexed bytes32,indexed address)
           handler: handleBatchPrepared
         - event: ApproveSRRByCommitmentWithProof(indexed bytes32,indexed uint256,bytes32)
-          handler: handleCreateSRRWithProof
+          handler: handleApproveSRRByCommitmentWithProof
