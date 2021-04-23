@@ -11,6 +11,9 @@
     },
     "BulkIssue": {
       "startBlock": 11907787
+    },
+    "BulkTransfer": {
+      "startBlock": 11907787
     }
   },
   "mumbai-release": {
@@ -24,6 +27,9 @@
       "startBlock": 12378987
     },
     "BulkIssue": {
+      "startBlock": 12378987
+    },
+    "BulkTransfer": {
       "startBlock": 12378987
     }
   },
@@ -39,6 +45,9 @@
     },
     "BulkIssue": {
       "startBlock": 13286271
+    },
+    "BulkTransfer": {
+      "startBlock": 13286271
     }
   },
   "local": {
@@ -52,6 +61,9 @@
       "startBlock": 1
     },
     "BulkIssue": {
+      "startBlock": 1
+    },
+    "BulkTransfer": {
       "startBlock": 1
     }
   }
