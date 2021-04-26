@@ -153,25 +153,3 @@ dataSources:
           handler: handleCreateSRRWithProof
         - event: MigrateBatch(indexed bytes32,bytes32[],address,uint256,uint256)
           handler: handleMigrateBatch
-  - kind: ethereum/contract
-    name: BulkTransfer
-    network: ##AUTOFILL##
-    source:
-      address: ##AUTOFILL##
-      abi: BulkTransfer
-      startBlock: ##AUTOFILL##
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.4
-      language: wasm/assemblyscript
-      entities:
-        - SRR
-      abis:
-        - name: BulkTransfer
-          file: ./abis/BulkTransfer.json
-      file: ./src/bulk-transfer-mapping.ts
-      eventHandlers:
-        - event: BatchPrepared(indexed bytes32,indexed address)
-          handler: handleBatchPrepared
-        - event: ApproveSRRByCommitmentWithProof(indexed bytes32,indexed uint256,bytes32)
-          handler: handleApproveSRRByCommitmentWithProof
