@@ -21,6 +21,7 @@ import {
   CreateCustomHistory as CustomHistoryCreatedEvent,
   CreateCustomHistoryFromMigration as CustomHistoryCreatedFromMigrationEvent,
   CreateCustomHistoryType as CustomHistoryTypeCreatedEvent,
+  AddCustomHistoryToSRR as AddCustomHistoryToSRREvent,
   CreateSRR as CreateSRREvent,
   CreateSRRFromMigration as CreateSRRFromMigrationEvent,
   MigrateSRR as MigrateSRREvent,
@@ -337,6 +338,19 @@ export function handleCreateCustomHistory(
     currentChainId(),
     event.transaction.hash
   );
+}
+
+export function handleAddCustomHistoryToSRR(
+  event: AddCustomHistoryToSRREvent
+): void {
+  logInvocation("handleAddCustomHistoryToSRR", event);
+
+  let ch = new CustomHistory(event.params.id.toString());
+  ch.tokenId = event.params.tokenId;
+  ch.originChain = currentChainId();
+  ch.originTxHash = event.transaction.hash;
+  ch.createdAt = eventUTCMillis(event);
+  ch.save();
 }
 
 export function handleCreateCustomHistoryFromMigration(

@@ -56,7 +56,8 @@ type CustomHistory @entity {
   historyType: CustomHistoryType!
   name: String!
   metadataDigest: Bytes!
-
+  tokenId : String # ERC721 token id
+  
   originChain: String
   originTxHash: Bytes
 

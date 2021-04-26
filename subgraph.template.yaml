@@ -102,7 +102,8 @@ dataSources:
           handler: handleCustomHistoryType
         - event: CreateCustomHistory(indexed uint256,string,uint256,bytes32)
           handler: handleCreateCustomHistory
-
+        - event: AddCustomHistoryToSRR(indexed uint256, indexed uint256)
+          handler: handleAddCustomHistoryToSRR
         #
         # Events related to the migration
         #
