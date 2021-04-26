@@ -344,9 +344,8 @@ export function handleAddCustomHistoryToSRR(
   event: AddCustomHistoryToSRREvent
 ): void {
   logInvocation("handleAddCustomHistoryToSRR", event);
-
-  let ch = new CustomHistory(event.params.id.toString());
-  ch.tokenId = event.params.tokenId;
+  let ch = new CustomHistory(event.params.customHistoryId.toString());
+  ch.tokenId = event.params.tokenId.toString();
   ch.originChain = currentChainId();
   ch.originTxHash = event.transaction.hash;
   ch.createdAt = eventUTCMillis(event);
