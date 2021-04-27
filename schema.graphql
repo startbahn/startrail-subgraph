@@ -125,6 +125,16 @@ type BulkIssue @entity {
   updatedAt: BigInt! # block.timestamp when entity last updated
 }
 
+type BulkTransfer @entity {
+  id: ID! # merkleRoot.toHexString()
+  merkleRoot: Bytes! # batch merkle root
+  srrApproveHashes: [Bytes!] # Hashes of ApproveSRRs processed
+  sender: Bytes! # batchprepared sender
+  tokenId: String # ERC721 token id for ApproveSRRCommitmentWithProof event
+  createdAt: BigInt! # block.timestamp when entity created
+  updatedAt: BigInt! # block.timestamp when entity last updated
+}
+
 type MetaTxRequestType @entity {
   id: ID! # typeHash.toHexString()
   typeHash: Bytes!
