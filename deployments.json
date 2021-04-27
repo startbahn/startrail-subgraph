@@ -1,19 +1,19 @@
 {
   "mumbai-develop": {
     "StartrailRegistry": {
-      "startBlock": 11907787
+      "startBlock": 13142583
     },
     "LicensedUserManager": {
-      "startBlock": 11907787
+      "startBlock": 13142583
     },
     "MetaTxForwarder": {
-      "startBlock": 11907787
+      "startBlock": 13142583
     },
     "BulkIssue": {
-      "startBlock": 11907787
+      "startBlock": 13142583
     },
     "BulkTransfer": {
-      "startBlock": 11907787
+      "startBlock": 13142583
     }
   },
   "mumbai-release": {
