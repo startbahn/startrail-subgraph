@@ -102,8 +102,9 @@ dataSources:
           handler: handleCustomHistoryType
         - event: CreateCustomHistory(indexed uint256,string,uint256,bytes32)
           handler: handleCreateCustomHistory
-        - event: AddCustomHistoryToSRR(indexed uint256,indexed uint256)
-          handler: handleAddCustomHistoryToSRR
+        - event: History(uint256[],uint256[])
+          handler: handleSRRHistory
+
         #
         # Events related to the migration
         #
@@ -153,3 +154,25 @@ dataSources:
           handler: handleCreateSRRWithProof
         - event: MigrateBatch(indexed bytes32,bytes32[],address,uint256,uint256)
           handler: handleMigrateBatch
+  - kind: ethereum/contract
+    name: BulkTransfer
+    network: ##AUTOFILL##
+    source:
+      address: ##AUTOFILL##
+      abi: BulkTransfer
+      startBlock: ##AUTOFILL##
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - SRR
+      abis:
+        - name: BulkTransfer
+          file: ./abis/BulkTransfer.json
+      file: ./src/bulk-transfer-mapping.ts
+      eventHandlers:
+        - event: BatchPrepared(indexed bytes32,indexed address)
+          handler: handleBatchPrepared
+        - event: ApproveSRRByCommitmentWithProof(indexed bytes32,indexed uint256,bytes32)
+          handler: handleApproveSRRByCommitmentWithProof
