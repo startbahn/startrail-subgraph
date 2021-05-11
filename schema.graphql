@@ -41,6 +41,7 @@ type SRR @entity {
   transferCommitment: Bytes # keccak256 hash transfer commitment
   provenance: [SRRProvenance!]! @derivedFrom(field: "srr")
   metadataHistory: [SRRMetadataHistory!]! @derivedFrom(field: "srr")
+  history: [SRRHistory!]! @derivedFrom(field: "srr")
 
   # chain and tx hash where the SRR was issued
   # a number of SRRs were issued on Ethereum mainnet then moved to Polygon
@@ -57,11 +58,12 @@ type CustomHistory @entity {
   name: String!
   metadataDigest: Bytes!
 
+  srrHistory: [SRRHistory!]! @derivedFrom(field: "customHistory")
+  srrProvenance: [SRRProvenance!] @derivedFrom(field: "customHistory")
+
   originChain: String
   originTxHash: Bytes
 
-  # TODO: add a link back to Provenance:
-  # provenances: [SRRProvenance!] @derivedFrom(field: "customHistory")
   createdAt: BigInt! # block.timestamp when entity created
 }
 
