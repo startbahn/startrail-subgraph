@@ -19,10 +19,7 @@ services:
       postgres_db: graph-node
       ipfs: "ipfs:5001"
       RUST_LOG: info
-      #ethereum_polling_interval: "10000"
       ethereum: "local:http://startrail-hardhat:8545"
-      # ethereum: "local:http://172.19.0.1:8545"
-      #ethereum: 'mumbai:https://rpc-mumbai.matic.today'
 
   ipfs:
     container_name: subgraph-ipfs
