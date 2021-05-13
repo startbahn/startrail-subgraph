@@ -26,8 +26,6 @@ services:
     image: ipfs/go-ipfs:v0.4.23
     ports:
       - "5001:5001"
-    volumes:
-      - ./data/ipfs:/data/ipfs
 
   postgres:
     container_name: subgraph-postgres
@@ -39,8 +37,6 @@ services:
       POSTGRES_USER: graph-node
       POSTGRES_PASSWORD: let-me-in
       POSTGRES_DB: graph-node
-    volumes:
-      - ./data/postgres:/var/lib/postgresql/data
 
 networks:
   default:
