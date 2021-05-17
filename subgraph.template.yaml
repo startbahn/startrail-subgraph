@@ -90,6 +90,10 @@ dataSources:
           handler: handleSRRProvenance
         - event: Provenance(indexed uint256,indexed address,indexed address,uint256,string,string)
           handler: handleSRRProvenanceWithCustomHistory
+        - event: Provenance(indexed uint256,indexed address,indexed address,string,string,bool)
+          handler: handleSRRProvenanceWithIntermediary
+        - event: Provenance(indexed uint256,indexed address,indexed address,uint256,string,string,bool)
+          handler: handleSRRProvenanceWithCustomHistoryAndIntermediary
         - event: SRRCommitment(indexed uint256,address,bytes32)
           handler: handleSRRCommitment
         - event: SRRCommitment(indexed uint256,address,bytes32,uint256)

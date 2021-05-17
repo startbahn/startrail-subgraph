@@ -89,6 +89,7 @@ type SRRProvenance @entity {
   metadataDigest: Bytes! # event Provenance.metadataDigest
   metadataURI: String! # event Provenance.metadataURI
   customHistory: CustomHistory # event Provenance.customHistoryId (in overloaded event only)
+  isIntermediary: Boolean # event Provenance.isIntermediary
   # NOTE: this is redundant because we have timestamp above but it's included
   #       for consistency as all entities have createdAt
   createdAt: BigInt! # block.timestamp when entity created

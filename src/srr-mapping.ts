@@ -30,6 +30,8 @@ import {
   Provenance1 as SRRProvenanceWithCustomHistoryEvent,
   ProvenanceFromMigration as SRRProvenanceFromMigrationEvent,
   ProvenanceFromMigration1 as SRRProvenanceWithCustomHistoryFromMigrationEvent,
+  Provenance2 as SRRProvenanceWithIntermediaryEvent,
+  Provenance3 as SRRProvenanceWithCustomHistoryAndIntermediaryEvent,
   SRRCommitment as SRRCommitmentEvent,
   SRRCommitment1 as SRRCommitmentWithCustomHistoryEvent,
   SRRCommitmentCancelled as SRRCommitmentCancelledEvent,
@@ -204,7 +206,8 @@ export function handleSRRProvenance(event: SRRProvenanceEvent): void {
     params.to,
     null,
     params.historyMetadataDigest,
-    params.historyMetadataURI
+    params.historyMetadataURI,
+    false
   );
 }
 
@@ -220,7 +223,40 @@ export function handleSRRProvenanceWithCustomHistory(
     params.to,
     params.customHistoryId,
     params.historyMetadataDigest,
-    params.historyMetadataURI
+    params.historyMetadataURI,
+    false
+  );
+}
+
+export function handleSRRProvenanceWithIntermediary(event: SRRProvenanceWithIntermediaryEvent): void {
+  logInvocation("handleSRRProvenance", event);
+  let params = event.params;
+  handleSRRProvenanceInternal(
+    eventUTCMillis(event),
+    params.tokenId,
+    params.from,
+    params.to,
+    null,
+    params.historyMetadataDigest,
+    params.historyMetadataURI,
+    params.isIntermediary
+  );
+}
+
+export function handleSRRProvenanceWithCustomHistoryAndIntermediary(
+  event: SRRProvenanceWithCustomHistoryAndIntermediaryEvent
+): void {
+  logInvocation("handleSRRProvenanceWithCustomHistory", event);
+  let params = event.params;
+  handleSRRProvenanceInternal(
+    eventUTCMillis(event),
+    params.tokenId,
+    params.from,
+    params.to,
+    params.customHistoryId,
+    params.historyMetadataDigest,
+    params.historyMetadataURI,
+    params.isIntermediary
   );
 }
 
@@ -237,7 +273,8 @@ function handleSRRProvenanceInternal(
   to: Address,
   customHistoryId: BigInt,
   historyMetadataDigest: string,
-  historyMetadataURI: string
+  historyMetadataURI: string,
+  isIntermediary: boolean
 ): void {
   let srrId = tokenId.toString();
   let srr = SRR.load(srrId);
@@ -273,6 +310,7 @@ function handleSRRProvenanceInternal(
     // CustomHistory.load(event.params.customHistoryId)
     provenance.customHistory = customHistoryId.toString();
   }
+  provenance.isIntermediary = isIntermediary
 
   provenance.timestamp = eventTimestampMillis;
   provenance.createdAt = eventTimestampMillis;
@@ -292,7 +330,8 @@ export function handleSRRProvenanceFromMigration(
     params.to,
     null,
     params.historyMetadataDigest,
-    params.historyMetadataURI
+    params.historyMetadataURI,
+    false
   );
 }
 
@@ -308,7 +347,8 @@ export function handleSRRProvenanceWithCustomHistoryFromMigration(
     params.to,
     params.customHistoryId,
     params.historyMetadataDigest,
-    params.historyMetadataURI
+    params.historyMetadataURI,
+    false
   );
 }
 
