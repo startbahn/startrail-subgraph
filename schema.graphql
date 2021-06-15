@@ -41,6 +41,7 @@ type SRR @entity {
   transferCommitment: Bytes # keccak256 hash transfer commitment
   provenance: [SRRProvenance!]! @derivedFrom(field: "srr")
   metadataHistory: [SRRMetadataHistory!]! @derivedFrom(field: "srr")
+  history: [SRRHistory!]! @derivedFrom(field: "srr")
 
   # chain and tx hash where the SRR was issued
   # a number of SRRs were issued on Ethereum mainnet then moved to Polygon
@@ -57,17 +58,25 @@ type CustomHistory @entity {
   name: String!
   metadataDigest: Bytes!
 
+  srrHistory: [SRRHistory!]! @derivedFrom(field: "customHistory")
+  srrProvenance: [SRRProvenance!] @derivedFrom(field: "customHistory")
+
   originChain: String
   originTxHash: Bytes
 
-  # TODO: add a link back to Provenance:
-  # provenances: [SRRProvenance!] @derivedFrom(field: "customHistory")
   createdAt: BigInt! # block.timestamp when entity created
 }
 
 type CustomHistoryType @entity {
   id: ID! # event CreateCustomHistoryType.id
   name: String!
+  createdAt: BigInt! # block.timestamp when entity created
+}
+
+type SRRHistory @entity {
+  id: ID! # keccak256(tokenId,customHistory.id)
+  srr: SRR!
+  customHistory: CustomHistory
   createdAt: BigInt! # block.timestamp when entity created
 }
 
@@ -80,6 +89,7 @@ type SRRProvenance @entity {
   metadataDigest: Bytes! # event Provenance.metadataDigest
   metadataURI: String! # event Provenance.metadataURI
   customHistory: CustomHistory # event Provenance.customHistoryId (in overloaded event only)
+  isIntermediary: Boolean # event Provenance.isIntermediary
   # NOTE: this is redundant because we have timestamp above but it's included
   #       for consistency as all entities have createdAt
   createdAt: BigInt! # block.timestamp when entity created
@@ -121,6 +131,16 @@ type BulkIssue @entity {
   srrs: [Bytes!] # Hashes of SRRs processed
   issuer: Bytes! # batchprepared issuer
   tokenId: String # ERC721 token id for createSRRwithProof event
+  createdAt: BigInt! # block.timestamp when entity created
+  updatedAt: BigInt! # block.timestamp when entity last updated
+}
+
+type BulkTransfer @entity {
+  id: ID! # merkleRoot.toHexString()
+  merkleRoot: Bytes! # batch merkle root
+  srrApproveHashes: [Bytes!] # Hashes of ApproveSRRs processed
+  sender: Bytes! # batchprepared sender
+  tokenId: String # ERC721 token id for ApproveSRRCommitmentWithProof event
   createdAt: BigInt! # block.timestamp when entity created
   updatedAt: BigInt! # block.timestamp when entity last updated
 }

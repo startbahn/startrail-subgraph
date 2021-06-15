@@ -7,22 +7,22 @@ import {
 } from '@graphprotocol/graph-ts'
 
 export let currentChainId = (): string => {
-  let network: string = dataSource.network()
+  let network: string = dataSource.network();
 
-  let chainId: string
+  let chainId: string;
 
-  if (network === 'matic') {
-    chainId = "eip155:137"
+  if (network === "matic") {
+    chainId = "eip155:137";
   } else if (network.indexOf("mumbai") !== -1) {
-    chainId = "eip155:80001"
-  } else if (network === "hardhat" || network.indexOf('local') !== -1) {
-    chainId = "eip155:31337"
+    chainId = "eip155:80001";
+  } else if (network === "hardhat" || network.indexOf("local") !== -1) {
+    chainId = "eip155:31337";
   } else {
-    chainId = "eip155:unknown"
+    chainId = "eip155:unknown";
   }
-  
-  return chainId
-}
+
+  return chainId;
+};
 
 export let ZERO_ADDRESS = Address.fromString(
   "0x0000000000000000000000000000000000000000"
@@ -52,6 +52,16 @@ export function ethereumValueToString(v: ethereum.Value): string {
     case ethereum.ValueKind.BYTES:
     case ethereum.ValueKind.FIXED_BYTES:
       valueStr = v.toBytes().toHexString();
+      break;
+    case ethereum.ValueKind.ARRAY:
+    case ethereum.ValueKind.FIXED_ARRAY:
+      valueStr =
+        "(" +
+        v
+          .toArray()
+          .map<string>((iv: ethereum.Value) => ethereumValueToString(iv))
+          .toString() +
+        ")";
       break;
     case ethereum.ValueKind.TUPLE:
       valueStr =
