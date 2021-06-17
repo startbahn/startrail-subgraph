@@ -82,7 +82,7 @@ dataSources:
       eventHandlers:
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
-        - event: CreateSRR(indexed uint256,(bool,address,address),bytes32)
+        - event: CreateSRR(indexed uint256,(bool,address,address),string)
           handler: handleCreateSRR
         - event: UpdateSRR(indexed uint256,(bool,address,address))
           handler: handleUpdateSRR
@@ -100,14 +100,24 @@ dataSources:
           handler: handleSRRCommitmentWithCustomHistory
         - event: SRRCommitmentCancelled(indexed uint256)
           handler: handleSRRCommitmentCancelled
-        - event: UpdateSRRMetadataDigest(indexed uint256,bytes32)
+        - event: UpdateSRRMetadataDigest(indexed uint256,string)
           handler: handleUpdateSRRMetadataDigest
         - event: CreateCustomHistoryType(indexed uint256,string)
           handler: handleCustomHistoryType
-        - event: CreateCustomHistory(indexed uint256,string,uint256,bytes32)
+        - event: CreateCustomHistory(indexed uint256,string,uint256,string)
           handler: handleCreateCustomHistory
         - event: History(uint256[],uint256[])
           handler: handleSRRHistory
+
+        #
+        # Legacy Events - emitted in previous versions of the contracts
+        #
+        - event: CreateSRR(indexed uint256,(bool,address,address),bytes32)
+          handler: handleCreateSRRLegacy
+        - event: UpdateSRRMetadataDigest(indexed uint256,bytes32)
+          handler: handleUpdateSRRMetadataDigestLegacy
+        - event: CreateCustomHistory(indexed uint256,string,uint256,bytes32)
+          handler: handleCreateCustomHistoryLegacy
 
         #
         # Events related to the migration
