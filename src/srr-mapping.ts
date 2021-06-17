@@ -28,10 +28,10 @@ import {
   MigrateSRR as MigrateSRREvent,
   Provenance as SRRProvenanceEvent,
   Provenance1 as SRRProvenanceWithCustomHistoryEvent,
-  ProvenanceFromMigration as SRRProvenanceFromMigrationEvent,
-  ProvenanceFromMigration1 as SRRProvenanceWithCustomHistoryFromMigrationEvent,
   Provenance2 as SRRProvenanceWithIntermediaryEvent,
   Provenance3 as SRRProvenanceWithCustomHistoryAndIntermediaryEvent,
+  ProvenanceFromMigration as SRRProvenanceFromMigrationEvent,
+  ProvenanceFromMigration1 as SRRProvenanceWithCustomHistoryFromMigrationEvent,
   SRRCommitment as SRRCommitmentEvent,
   SRRCommitment1 as SRRCommitmentWithCustomHistoryEvent,
   SRRCommitmentCancelled as SRRCommitmentCancelledEvent,
@@ -141,6 +141,24 @@ export function handleCreateSRR(event: CreateSRREvent): void {
   );
 }
 
+export function handleCreateSRRLegacy(event: CreateSRREvent): void {
+  logInvocation("handleCreateSRR", event);
+
+  let timestampMillis = eventUTCMillis(event);
+  let srrId = event.params.tokenId.toString();
+  let srr = SRR.load(srrId);
+
+  saveCreateSRRInternal(
+    srr as SRR,
+    event.params.registryRecord.isPrimaryIssuer,
+    event.params.registryRecord.artistAddress,
+    event.params.registryRecord.issuer,
+    event.params.metadataDigest,
+    timestampMillis,
+    event
+  );
+}
+
 export function handleCreateSRRFromMigration(
   event: CreateSRRFromMigrationEvent
 ): void {
@@ -228,7 +246,9 @@ export function handleSRRProvenanceWithCustomHistory(
   );
 }
 
-export function handleSRRProvenanceWithIntermediary(event: SRRProvenanceWithIntermediaryEvent): void {
+export function handleSRRProvenanceWithIntermediary(
+  event: SRRProvenanceWithIntermediaryEvent
+): void {
   logInvocation("handleSRRProvenance", event);
   let params = event.params;
   handleSRRProvenanceInternal(
@@ -310,7 +330,7 @@ function handleSRRProvenanceInternal(
     // CustomHistory.load(event.params.customHistoryId)
     provenance.customHistory = customHistoryId.toString();
   }
-  provenance.isIntermediary = isIntermediary
+  provenance.isIntermediary = isIntermediary;
 
   provenance.timestamp = eventTimestampMillis;
   provenance.createdAt = eventTimestampMillis;

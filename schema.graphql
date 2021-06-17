@@ -37,7 +37,7 @@ type SRR @entity {
   artistAddress: Bytes
   issuer: LicensedUserWallet
   ownerAddress: Bytes
-  metadataDigest: Bytes # sha256 hash of metadata JSON file
+  metadataDigest: String # IPFS CID or Arweave TxId of metadata JSON
   transferCommitment: Bytes # keccak256 hash transfer commitment
   provenance: [SRRProvenance!]! @derivedFrom(field: "srr")
   metadataHistory: [SRRMetadataHistory!]! @derivedFrom(field: "srr")
@@ -56,7 +56,7 @@ type CustomHistory @entity {
   id: ID! # event CreateCustomHistory.id
   historyType: CustomHistoryType!
   name: String!
-  metadataDigest: Bytes!
+  metadataDigest: String!
 
   srrHistory: [SRRHistory!]! @derivedFrom(field: "customHistory")
   srrProvenance: [SRRProvenance!] @derivedFrom(field: "customHistory")
@@ -86,7 +86,7 @@ type SRRProvenance @entity {
   srr: SRR! # SRR for event Provenance.tokenId
   from: Bytes! # event Provenance.from - ownership transferred from
   to: Bytes! # event Provenance.to - ownership transferred to
-  metadataDigest: Bytes! # event Provenance.metadataDigest
+  metadataDigest: String! # event Provenance.metadataDigest
   metadataURI: String! # event Provenance.metadataURI
   customHistory: CustomHistory # event Provenance.customHistoryId (in overloaded event only)
   isIntermediary: Boolean # event Provenance.isIntermediary
@@ -106,7 +106,7 @@ type SRRApproval @entity {
 type SRRMetadataHistory @entity {
   id: ID! # keccak256(tokenId,metadataDigest)
   srr: SRR! # SRR for event Provenance.tokenId
-  metadataDigest: Bytes! # event Provenance.metadataDigest
+  metadataDigest: String! # event Provenance.metadataDigest
   createdAt: BigInt! # block.timestamp when entity created
 }
 
