@@ -28,10 +28,10 @@ import {
   MigrateSRR as MigrateSRREvent,
   Provenance as SRRProvenanceEvent,
   Provenance1 as SRRProvenanceWithCustomHistoryEvent,
-  ProvenanceFromMigration as SRRProvenanceFromMigrationEvent,
-  ProvenanceFromMigration1 as SRRProvenanceWithCustomHistoryFromMigrationEvent,
   Provenance2 as SRRProvenanceWithIntermediaryEvent,
   Provenance3 as SRRProvenanceWithCustomHistoryAndIntermediaryEvent,
+  ProvenanceFromMigration as SRRProvenanceFromMigrationEvent,
+  ProvenanceFromMigration1 as SRRProvenanceWithCustomHistoryFromMigrationEvent,
   SRRCommitment as SRRCommitmentEvent,
   SRRCommitment1 as SRRCommitmentWithCustomHistoryEvent,
   SRRCommitmentCancelled as SRRCommitmentCancelledEvent,
@@ -66,7 +66,9 @@ export function handleTransfer(event: TransferEvent): void {
   srr.originChain = currentChainId();
   srr.originTxHash = event.transaction.hash;
 
-  srr.createdAt = timestampMillis;
+  if (event.params.from.toHexString() == ZERO_ADDRESS.toHexString()) {
+    srr.createdAt = timestampMillis;
+  }
   srr.updatedAt = timestampMillis;
 
   checkAndClearCommitOnTransfer(srr, timestampMillis);
@@ -78,7 +80,7 @@ export function handleTransferFromMigration(
   event: TransferFromMigrationEvent
 ): void {
   logInvocation("handleTransferFromMigration", event);
-  let timestampMillis = secondsToMillis(event.params.originTimestamp);
+  let originTimestampMillis = secondsToMillis(event.params.originTimestamp);
 
   let srrId = event.params.tokenId.toString();
   let srr = SRR.load(srrId);
@@ -89,24 +91,17 @@ export function handleTransferFromMigration(
   if (srr == null) {
     srr = new SRR(srrId);
     srr.tokenId = srrId;
-    srr.createdAt = timestampMillis;
+    srr.createdAt = originTimestampMillis;
     srr.originChain = currentChainId();
     srr.originTxHash = event.params.originTxHash;
   }
-  let fromIsZero =
-    event.params.from.toHexString() != ZERO_ADDRESS.toHexString();
 
-  log.info("zero = {} from = {} not equal? = {}", [
-    ZERO_ADDRESS.toHexString(),
-    event.params.from.toHexString(),
-    fromIsZero.toString(),
-  ]);
   if (event.params.from.toHexString() != ZERO_ADDRESS.toHexString()) {
-    checkAndClearCommitOnTransfer(srr as SRR, timestampMillis);
+    checkAndClearCommitOnTransfer(srr as SRR, originTimestampMillis);
   }
 
   srr.ownerAddress = event.params.to;
-  srr.updatedAt = timestampMillis;
+  srr.updatedAt = originTimestampMillis;
 
   srr.save();
 }
@@ -228,7 +223,9 @@ export function handleSRRProvenanceWithCustomHistory(
   );
 }
 
-export function handleSRRProvenanceWithIntermediary(event: SRRProvenanceWithIntermediaryEvent): void {
+export function handleSRRProvenanceWithIntermediary(
+  event: SRRProvenanceWithIntermediaryEvent
+): void {
   logInvocation("handleSRRProvenance", event);
   let params = event.params;
   handleSRRProvenanceInternal(
@@ -310,7 +307,7 @@ function handleSRRProvenanceInternal(
     // CustomHistory.load(event.params.customHistoryId)
     provenance.customHistory = customHistoryId.toString();
   }
-  provenance.isIntermediary = isIntermediary
+  provenance.isIntermediary = isIntermediary;
 
   provenance.timestamp = eventTimestampMillis;
   provenance.createdAt = eventTimestampMillis;
