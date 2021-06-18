@@ -72,7 +72,13 @@ jobs:
       - restore_node_dependencies
       - install_node_dependencies
       - save_node_dependencies
-      - build_sub_graph
+      # Remove this for now as the 'mumbai-develop' it builds gets out of sync
+      # of latest changes in the branch. It would be better to build with a
+      # local version (now 'localhost' deployment is in @startbahn/startrail).
+      #
+      # Fix this when testing is added by STARTRAIL-655.
+      #
+      # - build_sub_graph
   rinkeby-develop:
     executor: default
     steps:

@@ -39,7 +39,7 @@
     "js-yaml": "^3.14.0"
   },
   "dependencies": {
-    "@startbahn/startrail": "1.6.0-beta-2",
+    "@startbahn/startrail": "1.7.0-beta-2",
     "babel-polyfill": "^6.26.0",
     "babel-register": "^6.26.0"
   }

@@ -19,10 +19,12 @@ import {
   SRRTransferCommit,
 } from '../generated/schema'
 import {
-  CreateCustomHistory as CustomHistoryCreatedEvent,
+  CreateCustomHistory as CustomHistoryCreatedEventLegacy,
+  CreateCustomHistory1 as CustomHistoryCreatedEvent,
   CreateCustomHistoryFromMigration as CustomHistoryCreatedFromMigrationEvent,
   CreateCustomHistoryType as CustomHistoryTypeCreatedEvent,
-  CreateSRR as CreateSRREvent,
+  CreateSRR as CreateSRREventLegacy,
+  CreateSRR1 as CreateSRREvent,
   CreateSRRFromMigration as CreateSRRFromMigrationEvent,
   History as SRRHistoryEvent,
   MigrateSRR as MigrateSRREvent,
@@ -42,7 +44,8 @@ import {
   TransferFromMigration as TransferFromMigrationEvent,
   UpdateSRR as UpdateSRREvent,
   UpdateSRRFromMigration as UpdateSRRFromMigrationEvent,
-  UpdateSRRMetadataDigest as UpdateSRRMetadataDigestEvent,
+  UpdateSRRMetadataDigest as UpdateSRRMetadataDigestEventLegacy,
+  UpdateSRRMetadataDigest1 as UpdateSRRMetadataDigestEvent,
   UpdateSRRMetadataDigestFromMigration as UpdateSRRMetadataDigestFromMigrationEvent,
 } from '../generated/StartrailRegistry/StartrailRegistry'
 import {
@@ -141,8 +144,8 @@ export function handleCreateSRR(event: CreateSRREvent): void {
   );
 }
 
-export function handleCreateSRRLegacy(event: CreateSRREvent): void {
-  logInvocation("handleCreateSRR", event);
+export function handleCreateSRRLegacy(event: CreateSRREventLegacy): void {
+  logInvocation("handleCreateSRRLegacy", event);
 
   let timestampMillis = eventUTCMillis(event);
   let srrId = event.params.tokenId.toString();
@@ -153,7 +156,7 @@ export function handleCreateSRRLegacy(event: CreateSRREvent): void {
     event.params.registryRecord.isPrimaryIssuer,
     event.params.registryRecord.artistAddress,
     event.params.registryRecord.issuer,
-    event.params.metadataDigest,
+    event.params.metadataDigest.toHexString(),
     timestampMillis,
     event
   );
@@ -183,7 +186,7 @@ export function handleCreateSRRFromMigration(
     event.params.registryRecord.isPrimaryIssuer,
     event.params.registryRecord.artistAddress,
     event.params.registryRecord.issuer,
-    event.params.metadataDigest,
+    event.params.metadataDigest.toHexString(),
     timestampMillis,
     event
   );
@@ -194,7 +197,7 @@ function saveCreateSRRInternal(
   isPrimaryIssuer: boolean,
   artist: Address,
   issuer: Address,
-  metadataDigest: Bytes,
+  metadataDigest: string,
   updateTimestamp: BigInt,
   event: ethereum.Event
 ): void {
@@ -321,9 +324,7 @@ function handleSRRProvenanceInternal(
   provenance.from = from;
   provenance.to = to;
 
-  provenance.metadataDigest = Bytes.fromHexString(
-    historyMetadataDigest
-  ) as Bytes;
+  provenance.metadataDigest = historyMetadataDigest;
   provenance.metadataURI = historyMetadataURI;
 
   if (customHistoryId) {
@@ -401,6 +402,21 @@ export function handleCreateCustomHistory(
   );
 }
 
+export function handleCreateCustomHistoryLegacy(
+  event: CustomHistoryCreatedEventLegacy
+): void {
+  logInvocation("handleCreateCustomHistoryLegacy", event);
+  handleCreateCustomHistoryInternal(
+    eventUTCMillis(event),
+    event.params.id,
+    event.params.name,
+    event.params.customHistoryTypeId,
+    event.params.metadataDigest.toHexString(),
+    currentChainId(),
+    event.transaction.hash
+  );
+}
+
 export function handleCreateCustomHistoryFromMigration(
   event: CustomHistoryCreatedFromMigrationEvent
 ): void {
@@ -410,7 +426,7 @@ export function handleCreateCustomHistoryFromMigration(
     event.params.id,
     event.params.name,
     event.params.customHistoryTypeId,
-    event.params.metadataDigest,
+    event.params.metadataDigest.toHexString(),
     event.params.originChain,
     event.params.originTxHash
   );
@@ -421,7 +437,7 @@ function handleCreateCustomHistoryInternal(
   id: BigInt,
   name: string,
   customHistoryTypeId: BigInt,
-  metadataDigest: Bytes,
+  metadataDigest: string,
   originChain: string,
   originTxHash: Bytes
 ): void {
@@ -652,6 +668,18 @@ export function handleUpdateSRRMetadataDigest(
   );
 }
 
+export function handleUpdateSRRMetadataDigestLegacy(
+  event: UpdateSRRMetadataDigestEventLegacy
+): void {
+  logInvocation("handleUpdateSRRMetadataDigestLegacy", event);
+  handleUpdateSRRMetadataDigestInternal(
+    eventUTCMillis(event),
+    event.params.tokenId,
+    event.params.metadataDigest.toHexString(),
+    event
+  );
+}
+
 export function handleUpdateSRRMetadataDigestFromMigration(
   event: UpdateSRRMetadataDigestFromMigrationEvent
 ): void {
@@ -659,7 +687,7 @@ export function handleUpdateSRRMetadataDigestFromMigration(
   handleUpdateSRRMetadataDigestInternal(
     secondsToMillis(event.params.originTimestamp),
     event.params.tokenId,
-    event.params.metadataDigest,
+    event.params.metadataDigest.toHexString(),
     event
   );
 }
@@ -667,7 +695,7 @@ export function handleUpdateSRRMetadataDigestFromMigration(
 function handleUpdateSRRMetadataDigestInternal(
   eventTimestampMillis: BigInt,
   tokenId: BigInt,
-  metadataDigest: Bytes,
+  metadataDigest: string,
   event: ethereum.Event
 ): void {
   let srrId = tokenId.toString();
@@ -694,7 +722,7 @@ function saveSRRMetadataHistory(
       ByteArray.fromUTF8(
         event.transaction.hash.toHexString() +
           event.logIndex.toHexString() +
-          srr.metadataDigest.toHexString()
+          srr.metadataDigest
       )
     )
     .toHexString();
@@ -702,9 +730,7 @@ function saveSRRMetadataHistory(
   let srrMetadataHistory = new SRRMetadataHistory(metadataHistoryId); // metadataHistoryId)
   srrMetadataHistory.srr = srr.id;
   srrMetadataHistory.createdAt = eventTimestampMillis;
-  srrMetadataHistory.metadataDigest = Bytes.fromHexString(
-    srr.metadataDigest.toHexString()
-  ) as Bytes;
+  srrMetadataHistory.metadataDigest = srr.metadataDigest;
   srrMetadataHistory.save();
 }
 
