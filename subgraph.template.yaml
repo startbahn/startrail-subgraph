@@ -134,6 +134,9 @@ dataSources:
           handler: handleUpdateSRRMetadataDigestFromMigration
         - event: CreateCustomHistoryFromMigration(indexed uint256,string,uint256,bytes32,string,uint256,bytes32)
           handler: handleCreateCustomHistoryFromMigration
+        - event: ProvenanceDateMigrationFix(indexed uint256,uint256)
+          handler: handleProvenanceDateMigrationFix
+
   - kind: ethereum/contract
     name: BulkIssue
     network: ##AUTOFILL##
