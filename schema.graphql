@@ -37,7 +37,7 @@ type SRR @entity {
   artistAddress: Bytes
   issuer: LicensedUserWallet
   ownerAddress: Bytes
-  metadataDigest: String # IPFS CID or Arweave TxId of metadata JSON
+  metadataDigest: String # Arweave TxId of metadata JSON
   transferCommitment: Bytes # keccak256 hash transfer commitment
   provenance: [SRRProvenance!]! @derivedFrom(field: "srr")
   metadataHistory: [SRRMetadataHistory!]! @derivedFrom(field: "srr")
