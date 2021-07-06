@@ -33,6 +33,23 @@
       "startBlock": 12378987
     }
   },
+  "mumbai-staging": {
+    "StartrailRegistry": {
+      "startBlock": 15984927
+    },
+    "LicensedUserManager": {
+      "startBlock": 15984927
+    },
+    "MetaTxForwarder": {
+      "startBlock": 15984927
+    },
+    "BulkIssue": {
+      "startBlock": 15984927
+    },
+    "BulkTransfer": {
+      "startBlock": 15984927
+    }
+  },
   "polygon": {
     "StartrailRegistry": {
       "startBlock": 13286271
