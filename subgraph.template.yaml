@@ -90,6 +90,10 @@ dataSources:
           handler: handleSRRProvenance
         - event: Provenance(indexed uint256,indexed address,indexed address,uint256,string,string)
           handler: handleSRRProvenanceWithCustomHistory
+        - event: Provenance(indexed uint256,indexed address,indexed address,string,string,bool)
+          handler: handleSRRProvenanceWithIntermediary
+        - event: Provenance(indexed uint256,indexed address,indexed address,uint256,string,string,bool)
+          handler: handleSRRProvenanceWithCustomHistoryAndIntermediary
         - event: SRRCommitment(indexed uint256,address,bytes32)
           handler: handleSRRCommitment
         - event: SRRCommitment(indexed uint256,address,bytes32,uint256)
@@ -102,6 +106,8 @@ dataSources:
           handler: handleCustomHistoryType
         - event: CreateCustomHistory(indexed uint256,string,uint256,bytes32)
           handler: handleCreateCustomHistory
+        - event: History(uint256[],uint256[])
+          handler: handleSRRHistory
 
         #
         # Events related to the migration
