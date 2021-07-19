@@ -19,7 +19,7 @@ services:
       postgres_db: graph-node
       ipfs: "ipfs:5001"
       RUST_LOG: info
-      ethereum: "local:http://startrail-hardhat:8545"
+      ethereum: "local:http://startrail-hardhat:8546"
 
   ipfs:
     container_name: subgraph-ipfs

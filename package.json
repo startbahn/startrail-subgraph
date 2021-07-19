@@ -1,6 +1,6 @@
 {
   "name": "startrail-subgraph",
-  "version": "1.2.0",
+  "version": "1.8.0",
   "scripts": {
     "build": "npm run generate-develop && graph build subgraph.mumbai-develop.yaml",
     "codegen": "npm run generate-develop && graph codegen subgraph.mumbai-develop.yaml",
@@ -42,7 +42,7 @@
     "js-yaml": "^3.14.0"
   },
   "dependencies": {
-    "@startbahn/startrail": "1.6.0-beta-2",
+    "@startbahn/startrail": "1.5.0",
     "babel-polyfill": "^6.26.0",
     "babel-register": "^6.26.0"
   }
