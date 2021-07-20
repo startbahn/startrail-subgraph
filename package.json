@@ -44,6 +44,8 @@
   "dependencies": {
     "@startbahn/startrail": "1.8.0-beta-3",
     "babel-polyfill": "^6.26.0",
-    "babel-register": "^6.26.0"
+    "babel-register": "^6.26.0",
+    "lokka": "^1.7.0",
+    "lokka-transport-http": "^1.6.1"
   }
 }
