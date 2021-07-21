@@ -37,7 +37,7 @@
     "js-yaml": "^3.14.0"
   },
   "dependencies": {
-    "@startbahn/startrail": "1.8.0-beta-3",
+    "@startbahn/startrail": "git+ssh://git@github.com:startbahn/startrail#a9477ce2ef0cd518c5deb1ed2e6785ede97b3679",
     "babel-polyfill": "^6.26.0",
     "babel-register": "^6.26.0"
   }
