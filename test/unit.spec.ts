@@ -360,3 +360,231 @@ test("metaTxExecutions", async () => {
 
   expect(result.metaTxExecutions[0]).toStrictEqual(data)
 })
+
+test("srrprovenances", async () => {
+  const query = `
+  {
+    srrprovenances {
+      id
+      timestamp
+      srr {
+        id
+      }
+      from
+      to
+      metadataDigest
+      metadataURI
+      customHistory {
+        id
+      }
+      isIntermediary
+      createdAt
+    }
+  }
+`
+  const result = await client.query(query)
+
+  const data = [
+    {
+      createdAt: "1627796084000",
+      customHistory: null,
+      from: "0xf1dbd215d72d99422693ca61f7bbecfcd0edb16f",
+      id: "0x24747b9ea314235b1720f423fae488ea20da5423e4f7c268e6c8f1d39f87bb84",
+      isIntermediary: false,
+      metadataDigest:
+        "0xba136728b9ccfc56aa07d354fb7b5b026fa8123ad74f2fdb7a938bdf08c77a70",
+      metadataURI:
+        "https://api.startrail.io/api/v1/metadata/ba136728b9ccfc56aa07d354fb7b5b026fa8123ad74f2fdb7a938bdf08c77a70.json",
+      srr: {
+        id: "43593516"
+      },
+      timestamp: "1627796084000",
+      to: "0xb31f2241cb4d48dcf7825a75b46b4f6b13829a20"
+    },
+    {
+      createdAt: "1627796070000",
+      customHistory: null,
+      from: "0x0324fe78b2068036513b3618e1436d64ca64e136",
+      id: "0xa1186d255cb48845d6b0eac240018cf1a41fe907a01c0cb556ee6c91ae63301e",
+      isIntermediary: false,
+      metadataDigest:
+        "0xba136728b9ccfc56aa07d354fb7b5b026fa8123ad74f2fdb7a938bdf08c77a70",
+      metadataURI:
+        "https://api.startrail.io/api/v1/metadata/ba136728b9ccfc56aa07d354fb7b5b026fa8123ad74f2fdb7a938bdf08c77a70.json",
+      srr: {
+        id: "43593516"
+      },
+      timestamp: "1627796070000",
+      to: "0xf1dbd215d72d99422693ca61f7bbecfcd0edb16f"
+    },
+    {
+      createdAt: "1627796081000",
+      customHistory: null,
+      from: "0x0324fe78b2068036513b3618e1436d64ca64e136",
+      id: "0xeb02d072b7973fd7bda981c5741a72ec5cffe8e0daf6b2f7c69dea562cc9cc86",
+      isIntermediary: true,
+      metadataDigest:
+        "0xba136728b9ccfc56aa07d354fb7b5b026fa8123ad74f2fdb7a938bdf08c77a70",
+      metadataURI:
+        "https://api.startrail.io/api/v1/metadata/ba136728b9ccfc56aa07d354fb7b5b026fa8123ad74f2fdb7a938bdf08c77a70.json",
+      srr: {
+        id: "10255373"
+      },
+      timestamp: "1627796081000",
+      to: "0xf1dbd215d72d99422693ca61f7bbecfcd0edb16f"
+    }
+  ]
+
+  expect(result.srrprovenances).toStrictEqual(data)
+})
+
+test("srrtransferCommits", async () => {
+  const query = `
+  {
+    srrtransferCommits {
+      id
+      commitment
+      lastAction
+      createdAt
+      updatedAt
+    }
+  }
+`
+  const result = await client.query(query)
+
+  const data = [
+    {
+      commitment: null,
+      createdAt: "1627796080000",
+      id: "10255373",
+      lastAction: "transfer",
+      updatedAt: "1627796081000"
+    },
+    {
+      commitment: null,
+      createdAt: "1627796069000",
+      id: "43593516",
+      lastAction: "transfer",
+      updatedAt: "1627796084000"
+    }
+  ]
+
+  expect(result.srrtransferCommits).toStrictEqual(data)
+})
+
+test("bulkIssues", async () => {
+  const query = `
+  {
+    bulkIssues {
+      id
+      merkleRoot
+      srrs
+      issuer
+      tokenId
+      createdAt
+      updatedAt
+    }
+  }
+`
+  const result = await client.query(query)
+
+  const data = [
+    {
+      createdAt: "1627796072000",
+      id: "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251",
+      issuer: "0x0324fe78b2068036513b3618e1436d64ca64e136",
+      merkleRoot:
+        "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251",
+      srrs: [],
+      tokenId: null,
+      updatedAt: "1627796072000"
+    }
+  ]
+
+  expect(result.bulkIssues).toStrictEqual(data)
+})
+
+test("customHistories", async () => {
+  const query = `
+  {
+    customHistories {
+      id
+      historyType {
+        id
+        name
+        createdAt
+      }
+      name
+      metadataDigest
+      srrHistory {
+        id
+        createdAt
+      }
+      originChain
+      originTxHash
+      createdAt
+    }
+  }
+`
+  const result = await client.query(query)
+
+  const data = [
+    {
+      createdAt: "1627796076000",
+      historyType: {
+        createdAt: "1627796022000",
+        id: "2",
+        name: "exhibition"
+      },
+      id: "1",
+      metadataDigest:
+        "0xcc3b6344b207c582bd727005be2a5de5bbca7b46b590d9e9189f3a9a7ea8283e",
+      name: "GOMA Australia",
+      originChain: "eip155:31337",
+      originTxHash:
+        "0x8458b24d24765dd041fd522ce99f7a8cec7ba0dbc1185183ec8fbcc6df85015f",
+      srrHistory: [
+        {
+          createdAt: "1627796077000",
+          id:
+            "0xe816ba014d36a530fa00332e555613d1678221f17419b1bc9216e9af7ed98578"
+        }
+      ]
+    }
+  ]
+
+  expect(result.customHistories).toStrictEqual(data)
+})
+
+test("srrHistories", async () => {
+  const query = `
+  {
+    srrhistories {
+      id
+      srr {
+        id
+      }
+      customHistory {
+        id
+      }
+      createdAt
+    }
+  }
+`
+  const result = await client.query(query)
+
+  const data = [
+    {
+      createdAt: "1627796077000",
+      customHistory: {
+        id: "1"
+      },
+      id: "0xe816ba014d36a530fa00332e555613d1678221f17419b1bc9216e9af7ed98578",
+      srr: {
+        id: "43593516"
+      }
+    }
+  ]
+
+  expect(result.srrhistories).toStrictEqual(data)
+})
