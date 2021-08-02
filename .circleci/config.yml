@@ -72,7 +72,7 @@ jobs:
       - restore_node_dependencies
       - install_node_dependencies
       - save_node_dependencies
-      - build_sub_graph
+      # - build_sub_graph
   rinkeby-develop:
     executor: default
     steps:
