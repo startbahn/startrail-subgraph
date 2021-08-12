@@ -30,8 +30,8 @@ commands:
       - run:
           name: Build sub-graph source and generate code
           command: |
-            yarn run codegen
-            yarn run build
+            yarn run codegen-develop
+            yarn run build-develop
   deploy_develop:
     steps:
       - run:
@@ -72,7 +72,7 @@ jobs:
       - restore_node_dependencies
       - install_node_dependencies
       - save_node_dependencies
-      - build_sub_graph
+      # - build_sub_graph
   rinkeby-develop:
     executor: default
     steps:
