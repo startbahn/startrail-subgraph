@@ -35,12 +35,12 @@ commands:
   deploy_develop:
     steps:
       - run:
-          name: deploy rinkeby develop subgraph into public node
+          name: deploy mumbai develop subgraph into public node
           command: yarn run deploy-develop
   deploy_release:
     steps:
       - run:
-          name: deploy rinkeby release subgraph into public node
+          name: deploy mumbai release subgraph into public node
           command: yarn run deploy-release
 
   deploy_master:
@@ -51,17 +51,17 @@ commands:
   deploy_gke_develop:
     steps:
       - run:
-          name: deploy rinkeby develop subgraph into startbahn GKE node
+          name: deploy mumbai develop subgraph into startbahn GKE node
           command: yarn run deploy-gke-develop
   deploy_gke_release:
     steps:
       - run:
-          name: deploy rinkeby release subgraph into startbahn GKE node
+          name: deploy mumbai release subgraph into startbahn GKE node
           command: yarn run deploy-gke-release
   deploy_gke_master:
     steps:
       - run:
-          name: deploy rinkeby master subgraph into startbahn GKE node
+          name: deploy mumbai master subgraph into startbahn GKE node
           command: yarn run deploy-gke-master
 
 jobs:
@@ -73,7 +73,7 @@ jobs:
       - install_node_dependencies
       - save_node_dependencies
       # - build_sub_graph
-  rinkeby-develop:
+  mumbai-develop:
     executor: default
     steps:
       - checkout
@@ -82,7 +82,7 @@ jobs:
       - build_sub_graph
       - deploy_develop
       - deploy_gke_develop
-  rinkeby-release:
+  mumbai-release:
     executor: default
     steps:
       - checkout
@@ -106,13 +106,13 @@ workflows:
   pull-request:
     jobs:
       - build
-      # - rinkeby-develop:
+      # - mumbai-develop:
       #     requires:
       #       - build
       #     filters:
       #       branches:
       #         only: develop
-      # - rinkeby-release:
+      # - mumbai-release:
       #     requires:
       #       - build
       #     filters:
