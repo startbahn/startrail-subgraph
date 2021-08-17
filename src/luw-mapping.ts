@@ -101,9 +101,10 @@ export function handleRemovedOwner(event: RemovedOwnerEvent): void {
 
   // assign to separate variable is required when updating array, see here:
   // (see https://thegraph.com/docs/assemblyscript-api#api-reference):
+  let owners = luw.owners;
+  owners.splice(ownerIdx, 1);
+  luw.owners = owners;
 
-  // TODO: does this work? or need to assign to a separate array first ...?
-  luw.owners = luw.owners.splice(ownerIdx, 1);
   luw.updatedAt = eventUTCMillis(event);
   luw.save();
 }
