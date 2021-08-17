@@ -28,10 +28,11 @@ import {
   MigrateSRR as MigrateSRREvent,
   Provenance as SRRProvenanceEvent,
   Provenance1 as SRRProvenanceWithCustomHistoryEvent,
-  ProvenanceFromMigration as SRRProvenanceFromMigrationEvent,
-  ProvenanceFromMigration1 as SRRProvenanceWithCustomHistoryFromMigrationEvent,
   Provenance2 as SRRProvenanceWithIntermediaryEvent,
   Provenance3 as SRRProvenanceWithCustomHistoryAndIntermediaryEvent,
+  ProvenanceDateMigrationFix as ProvenanceDateMigrationFixEvent,
+  ProvenanceFromMigration as SRRProvenanceFromMigrationEvent,
+  ProvenanceFromMigration1 as SRRProvenanceWithCustomHistoryFromMigrationEvent,
   SRRCommitment as SRRCommitmentEvent,
   SRRCommitment1 as SRRCommitmentWithCustomHistoryEvent,
   SRRCommitmentCancelled as SRRCommitmentCancelledEvent,
@@ -228,7 +229,9 @@ export function handleSRRProvenanceWithCustomHistory(
   );
 }
 
-export function handleSRRProvenanceWithIntermediary(event: SRRProvenanceWithIntermediaryEvent): void {
+export function handleSRRProvenanceWithIntermediary(
+  event: SRRProvenanceWithIntermediaryEvent
+): void {
   logInvocation("handleSRRProvenance", event);
   let params = event.params;
   handleSRRProvenanceInternal(
@@ -310,7 +313,7 @@ function handleSRRProvenanceInternal(
     // CustomHistory.load(event.params.customHistoryId)
     provenance.customHistory = customHistoryId.toString();
   }
-  provenance.isIntermediary = isIntermediary
+  provenance.isIntermediary = isIntermediary;
 
   provenance.timestamp = eventTimestampMillis;
   provenance.createdAt = eventTimestampMillis;
@@ -694,4 +697,22 @@ export function handleMigrateSRR(event: MigrateSRREvent): void {
   let srr = SRR.load(srrId);
   srr.originChain = event.params.originChain;
   srr.save();
+}
+
+export function handleProvenanceDateMigrationFix(
+  event: ProvenanceDateMigrationFixEvent
+): void {
+  logInvocation("handleProvenanceDateMigrationFix", event);
+  let provenanceId = crypto
+    .keccak256(ByteArray.fromUTF8(event.params.tokenId.toString() + "66000"))
+    .toHexString();
+  let prov = SRRProvenance.load(provenanceId);
+  if (prov == null) {
+    log.error("received fix event but provenance not found: {}", [
+      provenanceId,
+    ]);
+    return;
+  }
+  prov.createdAt = event.params.originTimestamp;
+  prov.save();
 }
