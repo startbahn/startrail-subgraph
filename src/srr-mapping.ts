@@ -30,6 +30,7 @@ import {
   Provenance1 as SRRProvenanceWithCustomHistoryEvent,
   Provenance2 as SRRProvenanceWithIntermediaryEvent,
   Provenance3 as SRRProvenanceWithCustomHistoryAndIntermediaryEvent,
+  ProvenanceDateMigrationFix as ProvenanceDateMigrationFixEvent,
   ProvenanceFromMigration as SRRProvenanceFromMigrationEvent,
   ProvenanceFromMigration1 as SRRProvenanceWithCustomHistoryFromMigrationEvent,
   SRRCommitment as SRRCommitmentEvent,
@@ -691,4 +692,22 @@ export function handleMigrateSRR(event: MigrateSRREvent): void {
   let srr = SRR.load(srrId);
   srr.originChain = event.params.originChain;
   srr.save();
+}
+
+export function handleProvenanceDateMigrationFix(
+  event: ProvenanceDateMigrationFixEvent
+): void {
+  logInvocation("handleProvenanceDateMigrationFix", event);
+  let provenanceId = crypto
+    .keccak256(ByteArray.fromUTF8(event.params.tokenId.toString() + "66000"))
+    .toHexString();
+  let prov = SRRProvenance.load(provenanceId);
+  if (prov == null) {
+    log.error("received fix event but provenance not found: {}", [
+      provenanceId,
+    ]);
+    return;
+  }
+  prov.createdAt = event.params.originTimestamp;
+  prov.save();
 }
