@@ -424,7 +424,7 @@ test("metaTxExecutions", async () => {
 test("srrprovenances", async () => {
   const query = `
   {
-    srrprovenances {
+    srrprovenances(orderBy:createdAt, orderDirection:asc) {
       srr {
         id
       }

@@ -594,6 +594,10 @@
   integrity sha512-K2waXdXBi2302XUdcHcR1jCeU0LL4TD9HRs/gk0N2Xvrht+G/BfJa4QObBQZfhMdxiCpV3COl5Nfq4uKTeTnJA==
   dependencies:
     "@babel/types" "^7.3.0"
+"@startbahn/startrail@1.7.0-rc2":
+  version "1.7.0-rc2"
+  resolved "https://registry.yarnpkg.com/@startbahn/startrail/-/startrail-1.7.0-rc2.tgz#d5349255b9e3931e1b384d9a7162f03409d4f3fa"
+  integrity sha512-Es14e2lK2W4zf9jOj/9QSyVLfZul4tfGC2q17MdmAIVIDeiAW+FfGBXoxFZtLjEWv6mjK6mgAOyigIljNH8Wpw==
 
 "@types/connect@^3.4.33":
   version "3.4.35"
