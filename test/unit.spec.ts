@@ -11,63 +11,47 @@ beforeAll(() => {
   })
 })
 
-// ignoring createdAt and updatedAt since it's timestamp
+// ignoring createdAt and updatedAt since it's timestamp, and issuer, metadataHistory, provenance with id, originTxHash
 test("srrs", async () => {
   const query = `
   {
     srrs {
       id
       tokenId
-      isPrimaryIssuer
-      artistAddress
-      issuer {
-        id
-      }
-      ownerAddress
       metadataDigest
       transferCommitment
-      provenance {
-        id
-      }
-      metadataHistory {
-        id
-      }
       history {
         id
       }
       originChain
-      originTxHash
     }
   }
 `
+
+  const query2 = `
+  {
+    srrs {
+      provenance {
+        id
+      }
+    }
+  }
+`
+
   const result = await client.query(query)
+  const result2 = await client.query(query2)
 
   const data = [
     expect.objectContaining({
-      artistAddress: "0xa6e6a9e20a541680a1d6e1412f5088aefbf58a22",
       history: [],
       id: "10255373",
-      isPrimaryIssuer: false,
-      issuer: {
-        id: "0x0324fe78b2068036513b3618e1436d64ca64e136"
-      },
       metadataDigest:
         "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727252",
-      metadataHistory: [
-        {
-          id:
-            "0x9c58c6bd0d771821795389c8f5f0e36ec83f816c43935c33a835a51c509ea21f"
-        }
-      ],
       originChain: "eip155:31337",
-      originTxHash:
-        "0x848b92ee142f7fe62d5c3f11132830ce6c0f0f8ac438842f3b3224de10c8e184",
-      ownerAddress: "0xf1dbd215d72d99422693ca61f7bbecfcd0edb16f",
       tokenId: "10255373",
       transferCommitment: null
     }),
     expect.objectContaining({
-      artistAddress: "0xa6e6a9e20a541680a1d6e1412f5088aefbf58a22",
       history: [
         {
           id:
@@ -75,45 +59,18 @@ test("srrs", async () => {
         }
       ],
       id: "43593516",
-      isPrimaryIssuer: false,
-      issuer: {
-        id: "0x0324fe78b2068036513b3618e1436d64ca64e136"
-      },
       metadataDigest:
         "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251",
-      metadataHistory: [
-        {
-          id:
-            "0x1b5e7e25773284f3c86045f60c0de7bc84677d276da21fa5753a5c21c41d1d38"
-        }
-      ],
       originChain: "eip155:31337",
-      originTxHash:
-        "0xe2bac7d9ffa534b02b3581813faa6e7c3108bb56c51978935bfc5b68088dda60",
-      ownerAddress: "0xb31f2241cb4d48dcf7825a75b46b4f6b13829a20",
       tokenId: "43593516",
       transferCommitment: null
     }),
     expect.objectContaining({
-      artistAddress: "0x8be37f7589943efb19c0484ca00748dcd6a3cf1a",
       history: [],
       id: "80626184",
-      isPrimaryIssuer: true,
-      issuer: {
-        id: "0x8b3975ea1fabd1fe60f45a5768a0ee4c4d24c170"
-      },
       metadataDigest:
         "0x4c8f18581c0167eb90a761b4a304e009b924f03b619a0c0e8ea3adfce20aee64",
-      metadataHistory: [
-        {
-          id:
-            "0xa9d166e3c5bf32432832205fef068c3b797fd91ae75600d61db63467b42fd7ac"
-        }
-      ],
       originChain: "eip155:31337",
-      originTxHash:
-        "0x9a6cd7a5c3495b37613418d7c62ff01637e683a7077a19a7c3d34633b044e189",
-      ownerAddress: "0x8b3975ea1fabd1fe60f45a5768a0ee4c4d24c170",
       tokenId: "80626184",
       transferCommitment: null
     })
@@ -121,7 +78,7 @@ test("srrs", async () => {
 
   expect(result.srrs).toEqual(data)
 
-  const ids = result.srrs
+  const ids = result2.srrs
     .flatMap((x: any) => x.provenance)
     .map((x: any) => x.id)
 
@@ -130,13 +87,11 @@ test("srrs", async () => {
   }
 })
 
-// ignoring createdAt and updatedAt field since it's timestamp
+// ignoring walletAddress, createdAt, updatedAt, and  field since it's timestamp
 test("licensedUserWallets ", async () => {
   const query = `
   {
-    licensedUserWallets(orderBy: id) {
-      id
-      walletAddress
+    licensedUserWallets {
       threshold
       englishName
       originalName
@@ -146,12 +101,6 @@ test("licensedUserWallets ", async () => {
       issuedSRRs {
         id
         tokenId
-        isPrimaryIssuer
-        artistAddress
-        issuer {
-          id
-        }
-        ownerAddress
         metadataDigest
         transferCommitment
       }
@@ -163,63 +112,12 @@ test("licensedUserWallets ", async () => {
 
   const data = [
     {
-      englishName: "New English Name",
-      id: "0x0324fe78b2068036513b3618e1436d64ca64e136",
-      issuedSRRs: [
-        {
-          artistAddress: "0xa6e6a9e20a541680a1d6e1412f5088aefbf58a22",
-          id: "10255373",
-          isPrimaryIssuer: false,
-          issuer: {
-            id: "0x0324fe78b2068036513b3618e1436d64ca64e136"
-          },
-          metadataDigest:
-            "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727252",
-          ownerAddress: "0xf1dbd215d72d99422693ca61f7bbecfcd0edb16f",
-          tokenId: "10255373",
-          transferCommitment: null
-        },
-        {
-          artistAddress: "0xa6e6a9e20a541680a1d6e1412f5088aefbf58a22",
-          id: "43593516",
-          isPrimaryIssuer: false,
-          issuer: {
-            id: "0x0324fe78b2068036513b3618e1436d64ca64e136"
-          },
-          metadataDigest:
-            "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251",
-          ownerAddress: "0xb31f2241cb4d48dcf7825a75b46b4f6b13829a20",
-          tokenId: "43593516",
-          transferCommitment: null
-        }
-      ],
-      originChain: null,
-      originalName: "New Original Name",
-      owners: [
-        "0x853f2251666f9d8c45cc760ae10ab0278533d28c",
-        "0x171ea52e619b7fdde870b328ccfb70217a3e32ae",
-        "0xad87f0b51a8788192edd0640ab5ed58e48145c82"
-      ],
-      salt:
-        "0x64e604787cbf194841e7b68d7cd28786f6c9a0a3ab9f8b0a0e87cb4387ab0002",
-      threshold: 1,
-      userType: "handler",
-      walletAddress: "0x0324fe78b2068036513b3618e1436d64ca64e136"
-    },
-    {
       englishName: "Artist English",
-      id: "0x8b3975ea1fabd1fe60f45a5768a0ee4c4d24c170",
       issuedSRRs: [
         {
-          artistAddress: "0x8be37f7589943efb19c0484ca00748dcd6a3cf1a",
           id: "80626184",
-          isPrimaryIssuer: true,
-          issuer: {
-            id: "0x8b3975ea1fabd1fe60f45a5768a0ee4c4d24c170"
-          },
           metadataDigest:
             "0x4c8f18581c0167eb90a761b4a304e009b924f03b619a0c0e8ea3adfce20aee64",
-          ownerAddress: "0x8b3975ea1fabd1fe60f45a5768a0ee4c4d24c170",
           tokenId: "80626184",
           transferCommitment: null
         }
@@ -234,8 +132,37 @@ test("licensedUserWallets ", async () => {
       salt:
         "0x64e604787cbf194841e7b68d7cd28786f6c9a0a3ab9f8b0a0e87cb4387ab0001",
       threshold: 1,
-      userType: "artist",
-      walletAddress: "0x8b3975ea1fabd1fe60f45a5768a0ee4c4d24c170"
+      userType: "artist"
+    },
+    {
+      englishName: "New English Name",
+      issuedSRRs: [
+        {
+          id: "10255373",
+          metadataDigest:
+            "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727252",
+          tokenId: "10255373",
+          transferCommitment: null
+        },
+        {
+          id: "43593516",
+          metadataDigest:
+            "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251",
+          tokenId: "43593516",
+          transferCommitment: null
+        }
+      ],
+      originChain: null,
+      originalName: "New Original Name",
+      owners: [
+        "0x853f2251666f9d8c45cc760ae10ab0278533d28c",
+        "0x171ea52e619b7fdde870b328ccfb70217a3e32ae",
+        "0xad87f0b51a8788192edd0640ab5ed58e48145c82"
+      ],
+      salt:
+        "0x64e604787cbf194841e7b68d7cd28786f6c9a0a3ab9f8b0a0e87cb4387ab0002",
+      threshold: 1,
+      userType: "handler"
     }
   ]
   expect(result.licensedUserWallets).toStrictEqual(data)
@@ -266,32 +193,21 @@ test("customHistoryType", async () => {
   expect(result.customHistoryTypes).toStrictEqual(data)
 })
 
-// ignoring createdAt and updatedAt fields since it's timestamp
+// ignoring id, createdAt and updatedAt fields since it's timestamp, originTxHash
 test("srrmetadataHistories", async () => {
   const query = `
   {
-    srrmetadataHistories(orderBy: id) {
-      id
+    srrmetadataHistories {
       srr {
-        id
-        tokenId
-        isPrimaryIssuer
-        artistAddress
-        ownerAddress
         metadataDigest
         transferCommitment
         metadataHistory {
-          id
           srr {
-            id
-            isPrimaryIssuer
-            artistAddress
             metadataDigest
           }
           metadataDigest
         }
         originChain
-        originTxHash
       }
       metadataDigest
     }
@@ -301,101 +217,62 @@ test("srrmetadataHistories", async () => {
 
   const data = [
     {
-      id: "0x1b5e7e25773284f3c86045f60c0de7bc84677d276da21fa5753a5c21c41d1d38",
-      metadataDigest:
-        "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251",
-      srr: {
-        artistAddress: "0xa6e6a9e20a541680a1d6e1412f5088aefbf58a22",
-        id: "43593516",
-        isPrimaryIssuer: false,
-        metadataDigest:
-          "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251",
-        metadataHistory: [
-          {
-            id:
-              "0x1b5e7e25773284f3c86045f60c0de7bc84677d276da21fa5753a5c21c41d1d38",
-            metadataDigest:
-              "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251",
-            srr: {
-              artistAddress: "0xa6e6a9e20a541680a1d6e1412f5088aefbf58a22",
-              id: "43593516",
-              isPrimaryIssuer: false,
-              metadataDigest:
-                "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251"
-            }
-          }
-        ],
-        originChain: "eip155:31337",
-        originTxHash:
-          "0xe2bac7d9ffa534b02b3581813faa6e7c3108bb56c51978935bfc5b68088dda60",
-        ownerAddress: "0xb31f2241cb4d48dcf7825a75b46b4f6b13829a20",
-        tokenId: "43593516",
-        transferCommitment: null
-      }
-    },
-    {
-      id: "0x9c58c6bd0d771821795389c8f5f0e36ec83f816c43935c33a835a51c509ea21f",
       metadataDigest:
         "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727252",
       srr: {
-        artistAddress: "0xa6e6a9e20a541680a1d6e1412f5088aefbf58a22",
-        id: "10255373",
-        isPrimaryIssuer: false,
         metadataDigest:
           "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727252",
         metadataHistory: [
           {
-            id:
-              "0x9c58c6bd0d771821795389c8f5f0e36ec83f816c43935c33a835a51c509ea21f",
             metadataDigest:
               "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727252",
             srr: {
-              artistAddress: "0xa6e6a9e20a541680a1d6e1412f5088aefbf58a22",
-              id: "10255373",
-              isPrimaryIssuer: false,
               metadataDigest:
                 "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727252"
             }
           }
         ],
         originChain: "eip155:31337",
-        originTxHash:
-          "0x848b92ee142f7fe62d5c3f11132830ce6c0f0f8ac438842f3b3224de10c8e184",
-        ownerAddress: "0xf1dbd215d72d99422693ca61f7bbecfcd0edb16f",
-        tokenId: "10255373",
         transferCommitment: null
       }
     },
     {
-      id: "0xa9d166e3c5bf32432832205fef068c3b797fd91ae75600d61db63467b42fd7ac",
       metadataDigest:
         "0x4c8f18581c0167eb90a761b4a304e009b924f03b619a0c0e8ea3adfce20aee64",
       srr: {
-        artistAddress: "0x8be37f7589943efb19c0484ca00748dcd6a3cf1a",
-        id: "80626184",
-        isPrimaryIssuer: true,
         metadataDigest:
           "0x4c8f18581c0167eb90a761b4a304e009b924f03b619a0c0e8ea3adfce20aee64",
         metadataHistory: [
           {
-            id:
-              "0xa9d166e3c5bf32432832205fef068c3b797fd91ae75600d61db63467b42fd7ac",
             metadataDigest:
               "0x4c8f18581c0167eb90a761b4a304e009b924f03b619a0c0e8ea3adfce20aee64",
             srr: {
-              artistAddress: "0x8be37f7589943efb19c0484ca00748dcd6a3cf1a",
-              id: "80626184",
-              isPrimaryIssuer: true,
               metadataDigest:
                 "0x4c8f18581c0167eb90a761b4a304e009b924f03b619a0c0e8ea3adfce20aee64"
             }
           }
         ],
         originChain: "eip155:31337",
-        originTxHash:
-          "0x9a6cd7a5c3495b37613418d7c62ff01637e683a7077a19a7c3d34633b044e189",
-        ownerAddress: "0x8b3975ea1fabd1fe60f45a5768a0ee4c4d24c170",
-        tokenId: "80626184",
+        transferCommitment: null
+      }
+    },
+    {
+      metadataDigest:
+        "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251",
+      srr: {
+        metadataDigest:
+          "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251",
+        metadataHistory: [
+          {
+            metadataDigest:
+              "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251",
+            srr: {
+              metadataDigest:
+                "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251"
+            }
+          }
+        ],
+        originChain: "eip155:31337",
         transferCommitment: null
       }
     }
@@ -537,53 +414,20 @@ test("metaTxExecutions", async () => {
 `
   const result = await client.query(query)
 
-  const data = [
-    {
-      id: "0x29ceb9c066b39b6a785995241185df9ec02f056a91ebfff158abd83c3fce7018"
-    },
-    {
-      id: "0x4514c3f9a7a0c4c7b644262bbfd284569b6d470d02d5dec89c443ddeb66f3f45"
-    },
-    {
-      id: "0x471acc504acb4f53ba77761d8375d0561975ddbfeb23636e4c9d30c2af8eba2a"
-    },
-    {
-      id: "0x7581cb842e565b3e27a43a7ff9ff28f8876c50938e93ef45c9ac972d7ed9be30"
-    },
-    {
-      id: "0xc695a64693cf85d2d2b0166e14561e5d68778d55fa66ee5c3b41426b28362b52"
-    },
-    {
-      id: "0xcbbfb106bc1c9680e57ca68be46ed2afd7833383bc951978df2d5aedbf4767ac"
-    },
-    {
-      id: "0xdd485a8f6167a1598efc2019c3c79adf83b73b4292b078c6885bb843fde167ae"
-    },
-    {
-      id: "0xe5ccfd266b6b47420abdbf4d6f60a9e48187f04813a9c43e89d82e01d59e3235"
-    },
-    {
-      id: "0xe675ecbcbed8315e222b19e49c406b9027811cfdc2066a4a28018ede5e547870"
-    },
-    {
-      id: "0xf5bdbadc379a8d91a1bc4545f728ef8b5b54414bc9fb80f2e84304e60e14672a"
-    }
-  ]
-
-  expect(result.metaTxExecutions).toStrictEqual(data)
+  const ids = result.metaTxExecutions.map((x: any) => x.id)
+  for (const id of ids) {
+    expect(id).toHaveLength(66)
+  }
 })
 
-// ignoring createdAt and timestamp field since it's timestamp
+// ignoring createdAt, id, from, to, and timestamp field
 test("srrprovenances", async () => {
   const query = `
   {
-    srrprovenances {
-      id
-      srr {
+    srrprovenances(orderBy:createdAt, orderDirection:asc) {
+			srr {
         id
       }
-      from
-      to
       metadataDigest
       metadataURI
       customHistory {
@@ -595,10 +439,9 @@ test("srrprovenances", async () => {
 `
   const result = await client.query(query)
 
-  const data = expect.arrayContaining([
-    expect.objectContaining({
+  const data = [
+    {
       customHistory: null,
-      from: "0x0324fe78b2068036513b3618e1436d64ca64e136",
       isIntermediary: false,
       metadataDigest:
         "0xba136728b9ccfc56aa07d354fb7b5b026fa8123ad74f2fdb7a938bdf08c77a70",
@@ -606,12 +449,10 @@ test("srrprovenances", async () => {
         "https://api.startrail.io/api/v1/metadata/ba136728b9ccfc56aa07d354fb7b5b026fa8123ad74f2fdb7a938bdf08c77a70.json",
       srr: {
         id: "43593516"
-      },
-      to: "0xf1dbd215d72d99422693ca61f7bbecfcd0edb16f"
-    }),
-    expect.objectContaining({
+      }
+    },
+    {
       customHistory: null,
-      from: "0x0324fe78b2068036513b3618e1436d64ca64e136",
       isIntermediary: true,
       metadataDigest:
         "0xba136728b9ccfc56aa07d354fb7b5b026fa8123ad74f2fdb7a938bdf08c77a70",
@@ -619,12 +460,10 @@ test("srrprovenances", async () => {
         "https://api.startrail.io/api/v1/metadata/ba136728b9ccfc56aa07d354fb7b5b026fa8123ad74f2fdb7a938bdf08c77a70.json",
       srr: {
         id: "10255373"
-      },
-      to: "0xf1dbd215d72d99422693ca61f7bbecfcd0edb16f"
-    }),
-    expect.objectContaining({
+      }
+    },
+    {
       customHistory: null,
-      from: "0xf1dbd215d72d99422693ca61f7bbecfcd0edb16f",
       isIntermediary: false,
       metadataDigest:
         "0xba136728b9ccfc56aa07d354fb7b5b026fa8123ad74f2fdb7a938bdf08c77a70",
@@ -632,17 +471,11 @@ test("srrprovenances", async () => {
         "https://api.startrail.io/api/v1/metadata/ba136728b9ccfc56aa07d354fb7b5b026fa8123ad74f2fdb7a938bdf08c77a70.json",
       srr: {
         id: "43593516"
-      },
-      to: "0xb31f2241cb4d48dcf7825a75b46b4f6b13829a20"
-    })
-  ])
+      }
+    }
+  ]
 
   expect(result.srrprovenances).toEqual(data)
-
-  const ids = result.srrprovenances.map((x: any) => x.id)
-  for (const id of ids) {
-    expect(id).toHaveLength(66)
-  }
 })
 
 // ignoring createdAt field since it's timestamp
@@ -682,7 +515,6 @@ test("bulkIssues", async () => {
       id
       merkleRoot
       srrs
-      issuer
       tokenId
     }
   }
@@ -692,7 +524,6 @@ test("bulkIssues", async () => {
   const data = [
     {
       id: "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251",
-      issuer: "0x0324fe78b2068036513b3618e1436d64ca64e136",
       merkleRoot:
         "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251",
       srrs: [],
@@ -703,6 +534,7 @@ test("bulkIssues", async () => {
   expect(result.bulkIssues).toStrictEqual(data)
 })
 
+//ignore originTxHash
 test("customHistories", async () => {
   const query = `
   {
@@ -718,7 +550,6 @@ test("customHistories", async () => {
         id
       }
       originChain
-      originTxHash
     }
   }
 `
@@ -735,8 +566,6 @@ test("customHistories", async () => {
         "0xcc3b6344b207c582bd727005be2a5de5bbca7b46b590d9e9189f3a9a7ea8283e",
       name: "GOMA Australia",
       originChain: "eip155:31337",
-      originTxHash:
-        "0x8458b24d24765dd041fd522ce99f7a8cec7ba0dbc1185183ec8fbcc6df85015f",
       srrHistory: [
         {
           id:
