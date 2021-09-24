@@ -59,6 +59,7 @@ export function handleTransfer(event: TransferEvent): void {
 
   let timestampMillis = eventUTCMillis(event);
   let srrId = event.params.tokenId.toString();
+  let srrIdBigInt = event.params.tokenId;
 
   let srr = new SRR(srrId);
   srr.tokenId = srrId;
@@ -69,6 +70,17 @@ export function handleTransfer(event: TransferEvent): void {
 
   srr.createdAt = timestampMillis;
   srr.updatedAt = timestampMillis;
+
+  handleSRRProvenanceInternal(
+    eventUTCMillis(event),
+    srrIdBigInt,
+    event.params.from,
+    event.params.to,
+    null,
+    null,
+    null,
+    false
+  );
 
   checkAndClearCommitOnTransfer(srr, timestampMillis);
 
@@ -275,8 +287,8 @@ function handleSRRProvenanceInternal(
   from: Address,
   to: Address,
   customHistoryId: BigInt | null,
-  historyMetadataDigest: string,
-  historyMetadataURI: string,
+  historyMetadataDigest: string | null,
+  historyMetadataURI: string | null,
   isIntermediary: boolean
 ): void {
   let srrId = tokenId.toString();
@@ -291,34 +303,46 @@ function handleSRRProvenanceInternal(
   srr.updatedAt = eventTimestampMillis;
   srr.save();
 
-  // Create new Provenance
+  // Create new Provenance if we can't find srrProvenance with provenanceId.
+  // This is because we need to create a provenance entity even if the transfer event is emitted to be compatible with opensea.
   let provenanceId = crypto
     .keccak256(
       ByteArray.fromUTF8(tokenId.toString() + eventTimestampMillis.toString())
     )
     .toHexString();
+  let provenance = SRRProvenance.load(provenanceId);
+  if (!provenance) {
+    provenance = new SRRProvenance(provenanceId);
 
-  let provenance = new SRRProvenance(provenanceId);
+    provenance.srr = srr.id;
+    provenance.from = from;
+    provenance.to = to;
+  
+    if (historyMetadataDigest) {
+      provenance.metadataDigest = Bytes.fromHexString(
+        historyMetadataDigest
+      ) as Bytes;  
+    } else {
+      provenance.metadataDigest = new Bytes(0)
+    }
 
-  provenance.srr = srr.id;
-  provenance.from = from;
-  provenance.to = to;
-
-  provenance.metadataDigest = Bytes.fromHexString(
-    historyMetadataDigest
-  ) as Bytes;
-  provenance.metadataURI = historyMetadataURI;
-
-  if (customHistoryId) {
-    // CustomHistory.load(event.params.customHistoryId)
-    provenance.customHistory = customHistoryId.toString();
+    if (historyMetadataURI) {
+      provenance.metadataURI = historyMetadataURI;
+    } else {
+      provenance.metadataURI = ""
+    }
+  
+    if (customHistoryId) {
+      // CustomHistory.load(event.params.customHistoryId)
+      provenance.customHistory = customHistoryId.toString();
+    }
+    provenance.isIntermediary = isIntermediary;
+  
+    provenance.timestamp = eventTimestampMillis;
+    provenance.createdAt = eventTimestampMillis;
+  
+    provenance.save();  
   }
-  provenance.isIntermediary = isIntermediary;
-
-  provenance.timestamp = eventTimestampMillis;
-  provenance.createdAt = eventTimestampMillis;
-
-  provenance.save();
 }
 
 export function handleSRRProvenanceFromMigration(
