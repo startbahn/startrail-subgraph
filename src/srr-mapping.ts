@@ -113,8 +113,8 @@ export function handleTransferFromMigration(
 }
 
 function checkAndClearCommitOnTransfer(srr: SRR, eventTime: BigInt): void {
-  log.info("clearing transferCommitment on token = {}", [srr.tokenId]);
-  let srrCommit = SRRTransferCommit.load(srr.tokenId);
+  log.info("clearing transferCommitment on token = {}", [srr.tokenId as string]);
+  let srrCommit = SRRTransferCommit.load(srr.tokenId as string);
   if (srrCommit != null) {
     srrCommit.commitment = null;
     srrCommit.lastAction = "transfer";
@@ -274,7 +274,7 @@ function handleSRRProvenanceInternal(
   tokenId: BigInt,
   from: Address,
   to: Address,
-  customHistoryId: BigInt,
+  customHistoryId: BigInt | null,
   historyMetadataDigest: string,
   historyMetadataURI: string,
   isIntermediary: boolean
@@ -473,7 +473,7 @@ function handleSRRCommitmentInternal(
   eventTimestampMillis: BigInt,
   commitment: Bytes,
   tokenId: BigInt,
-  customHistoryId: BigInt
+  customHistoryId: BigInt | null
 ): void {
   let srrId = tokenId.toString();
   let srr = SRR.load(srrId);
@@ -677,7 +677,7 @@ function saveSRRMetadataHistory(
       ByteArray.fromUTF8(
         event.transaction.hash.toHexString() +
           event.logIndex.toHexString() +
-          srr.metadataDigest.toHexString()
+          (srr.metadataDigest as Bytes).toHexString()
       )
     )
     .toHexString();
@@ -686,7 +686,7 @@ function saveSRRMetadataHistory(
   srrMetadataHistory.srr = srr.id;
   srrMetadataHistory.createdAt = eventTimestampMillis;
   srrMetadataHistory.metadataDigest = Bytes.fromHexString(
-    srr.metadataDigest.toHexString()
+    (srr.metadataDigest as Bytes).toHexString()
   ) as Bytes;
   srrMetadataHistory.save();
 }
@@ -695,8 +695,10 @@ export function handleMigrateSRR(event: MigrateSRREvent): void {
   logInvocation("handleMigrateSRR", event);
   let srrId = event.params.tokenId.toString();
   let srr = SRR.load(srrId);
-  srr.originChain = event.params.originChain;
-  srr.save();
+  if (srr) {
+    srr.originChain = event.params.originChain;
+    srr.save();  
+  }
 }
 
 export function handleProvenanceDateMigrationFix(
