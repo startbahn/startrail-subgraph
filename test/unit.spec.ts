@@ -43,15 +43,6 @@ test("srrs", async () => {
 
   const data = [
     expect.objectContaining({
-      history: [],
-      id: "10255373",
-      metadataDigest:
-        "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727252",
-      originChain: "eip155:31337",
-      tokenId: "10255373",
-      transferCommitment: null
-    }),
-    expect.objectContaining({
       history: [
         {
           id:
@@ -67,11 +58,11 @@ test("srrs", async () => {
     }),
     expect.objectContaining({
       history: [],
-      id: "80626184",
+      id: "55806818",
       metadataDigest:
         "0x4c8f18581c0167eb90a761b4a304e009b924f03b619a0c0e8ea3adfce20aee64",
       originChain: "eip155:31337",
-      tokenId: "80626184",
+      tokenId: "55806818",
       transferCommitment: null
     })
   ]
@@ -113,15 +104,7 @@ test("licensedUserWallets ", async () => {
   const data = [
     {
       englishName: "Artist English",
-      issuedSRRs: [
-        {
-          id: "80626184",
-          metadataDigest:
-            "0x4c8f18581c0167eb90a761b4a304e009b924f03b619a0c0e8ea3adfce20aee64",
-          tokenId: "80626184",
-          transferCommitment: null
-        }
-      ],
+      issuedSRRs: [],
       originChain: null,
       originalName: "Artist Original",
       owners: [
@@ -138,17 +121,17 @@ test("licensedUserWallets ", async () => {
       englishName: "New English Name",
       issuedSRRs: [
         {
-          id: "10255373",
-          metadataDigest:
-            "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727252",
-          tokenId: "10255373",
-          transferCommitment: null
-        },
-        {
           id: "43593516",
           metadataDigest:
             "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251",
           tokenId: "43593516",
+          transferCommitment: null
+        },
+        {
+          id: "55806818",
+          metadataDigest:
+            "0x4c8f18581c0167eb90a761b4a304e009b924f03b619a0c0e8ea3adfce20aee64",
+          tokenId: "55806818",
           transferCommitment: null
         }
       ],
@@ -218,17 +201,17 @@ test("srrmetadataHistories", async () => {
   const data = [
     {
       metadataDigest:
-        "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727252",
+        "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251",
       srr: {
         metadataDigest:
-          "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727252",
+          "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251",
         metadataHistory: [
           {
             metadataDigest:
-              "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727252",
+              "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251",
             srr: {
               metadataDigest:
-                "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727252"
+                "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251"
             }
           }
         ],
@@ -249,26 +232,6 @@ test("srrmetadataHistories", async () => {
             srr: {
               metadataDigest:
                 "0x4c8f18581c0167eb90a761b4a304e009b924f03b619a0c0e8ea3adfce20aee64"
-            }
-          }
-        ],
-        originChain: "eip155:31337",
-        transferCommitment: null
-      }
-    },
-    {
-      metadataDigest:
-        "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251",
-      srr: {
-        metadataDigest:
-          "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251",
-        metadataHistory: [
-          {
-            metadataDigest:
-              "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251",
-            srr: {
-              metadataDigest:
-                "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251"
             }
           }
         ],
@@ -351,6 +314,13 @@ test("metaTxRequestTypes", async () => {
         "StartrailRegistryCreateSRR(address from,uint256 nonce,bool isPrimaryIssuer,address artistAddress,bytes32 metadataDigest)"
     },
     {
+      id: "0xa5772716d883ea9d1e653c127fc4b5f193148ae32c6699efdcdba6fa2a242f4f",
+      typeHash: 
+        "0xa5772716d883ea9d1e653c127fc4b5f193148ae32c6699efdcdba6fa2a242f4f",
+      typeString: 
+        "StartrailRegistryUpdateSRRMetadataV2(address from,uint256 nonce,bytes data,uint256 tokenId,string metadataDigest)",
+    },
+    {
       id: "0xb4d22bf06a762d0a27f1c25c8a258e0982dbc92abe4d6d72fdbec60d49464daa",
       typeHash:
         "0xb4d22bf06a762d0a27f1c25c8a258e0982dbc92abe4d6d72fdbec60d49464daa",
@@ -363,6 +333,13 @@ test("metaTxRequestTypes", async () => {
         "0xd111846f191cf3c32ce6aedccf704a641a50381f22729d5a6cd5f13a0554ef80",
       typeString:
         "StartrailRegistryUpdateSRRMetadata(address from,uint256 nonce,uint256 tokenId,bytes32 metadataDigest)"
+    },
+    {
+      id: "0xe0ff2c72dcc273eb61555bd35aa1b25a97a14163d68e843f798a5763111780be",
+      typeHash: 
+        "0xe0ff2c72dcc273eb61555bd35aa1b25a97a14163d68e843f798a5763111780be",
+      typeString: 
+        "StartrailRegistryCreateSRRV2(address from,uint256 nonce,bytes data,bool isPrimaryIssuer,address artistAddress,string metadataDigest)",
     },
     {
       id: "0xe40b02b26d5443f4479036538f991a995624f5cc199ecab72a0dde126115a16c",
@@ -459,7 +436,7 @@ test("srrprovenances", async () => {
       metadataURI:
         "https://api.startrail.io/api/v1/metadata/ba136728b9ccfc56aa07d354fb7b5b026fa8123ad74f2fdb7a938bdf08c77a70.json",
       srr: {
-        id: "10255373"
+        id: "55806818"
       }
     },
     {
@@ -472,6 +449,15 @@ test("srrprovenances", async () => {
       srr: {
         id: "43593516"
       }
+    },
+    {
+      customHistory: null,
+      isIntermediary: false,
+      metadataDigest: "0x",
+      metadataURI: "",
+      srr: {
+        id: "55806818",
+      },
     }
   ]
 
@@ -494,12 +480,12 @@ test("srrtransferCommits", async () => {
   const data = [
     {
       commitment: null,
-      id: "10255373",
+      id: "43593516",
       lastAction: "transfer"
     },
     {
       commitment: null,
-      id: "43593516",
+      id: "55806818",
       lastAction: "transfer"
     }
   ]
