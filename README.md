@@ -11,3 +11,7 @@ Example queries can be selected in the GraphQL playground here:
 ![Subgraph examples dropdown](./subgraph.png)
 
 See also the Startrail API startrail-graph-client module which has predefined queries used by the API.
+
+# Subgraph unit test
+
+When testing subgraphs, you should run seed-extended instead of seed-minimal. See ./bin/hardhat-and-graph-up.sh in startrail-metarepo.
