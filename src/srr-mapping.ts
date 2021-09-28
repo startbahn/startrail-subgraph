@@ -719,10 +719,8 @@ export function handleMigrateSRR(event: MigrateSRREvent): void {
   logInvocation("handleMigrateSRR", event);
   let srrId = event.params.tokenId.toString();
   let srr = SRR.load(srrId);
-  if (srr) {
-    srr.originChain = event.params.originChain;
-    srr.save();  
-  }
+  srr.originChain = event.params.originChain;
+  srr.save();
 }
 
 export function handleProvenanceDateMigrationFix(
