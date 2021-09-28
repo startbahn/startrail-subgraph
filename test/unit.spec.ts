@@ -196,7 +196,7 @@ test("customHistoryType", async () => {
 test("srrmetadataHistories", async () => {
   const query = `
   {
-    srrmetadataHistories {
+    srrmetadataHistories(orderBy: createdAt, orderDirection: desc) {
       srr {
         metadataDigest
         transferCommitment
@@ -237,26 +237,6 @@ test("srrmetadataHistories", async () => {
     },
     {
       metadataDigest:
-        "0x4c8f18581c0167eb90a761b4a304e009b924f03b619a0c0e8ea3adfce20aee64",
-      srr: {
-        metadataDigest:
-          "0x4c8f18581c0167eb90a761b4a304e009b924f03b619a0c0e8ea3adfce20aee64",
-        metadataHistory: [
-          {
-            metadataDigest:
-              "0x4c8f18581c0167eb90a761b4a304e009b924f03b619a0c0e8ea3adfce20aee64",
-            srr: {
-              metadataDigest:
-                "0x4c8f18581c0167eb90a761b4a304e009b924f03b619a0c0e8ea3adfce20aee64"
-            }
-          }
-        ],
-        originChain: "eip155:31337",
-        transferCommitment: null
-      }
-    },
-    {
-      metadataDigest:
         "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251",
       srr: {
         metadataDigest:
@@ -268,6 +248,26 @@ test("srrmetadataHistories", async () => {
             srr: {
               metadataDigest:
                 "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251"
+            }
+          }
+        ],
+        originChain: "eip155:31337",
+        transferCommitment: null
+      }
+    },
+    {
+      metadataDigest:
+        "0x4c8f18581c0167eb90a761b4a304e009b924f03b619a0c0e8ea3adfce20aee64",
+      srr: {
+        metadataDigest:
+          "0x4c8f18581c0167eb90a761b4a304e009b924f03b619a0c0e8ea3adfce20aee64",
+        metadataHistory: [
+          {
+            metadataDigest:
+              "0x4c8f18581c0167eb90a761b4a304e009b924f03b619a0c0e8ea3adfce20aee64",
+            srr: {
+              metadataDigest:
+                "0x4c8f18581c0167eb90a761b4a304e009b924f03b619a0c0e8ea3adfce20aee64"
             }
           }
         ],
@@ -398,6 +398,7 @@ test("metaTxRequestTypes", async () => {
       typeString:
         "WalletChangeThreshold(address from,uint256 nonce,address wallet,uint256 threshold)"
     }
+    // for decentalized storage
     // {
     //   id: "0xa5772716d883ea9d1e653c127fc4b5f193148ae32c6699efdcdba6fa2a242f4f",
     //   typeHash: 
