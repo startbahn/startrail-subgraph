@@ -59,6 +59,7 @@ export function handleTransfer(event: TransferEvent): void {
 
   let timestampMillis = eventUTCMillis(event);
   let srrId = event.params.tokenId.toString();
+  let srrIdBigInt = event.params.tokenId;
 
   let srr = new SRR(srrId);
   srr.tokenId = srrId;
@@ -69,6 +70,17 @@ export function handleTransfer(event: TransferEvent): void {
 
   srr.createdAt = timestampMillis;
   srr.updatedAt = timestampMillis;
+
+  handleSRRProvenanceInternal(
+    eventUTCMillis(event),
+    srrIdBigInt,
+    event.params.from,
+    event.params.to,
+    null,
+    null,
+    null,
+    false
+  );
 
   checkAndClearCommitOnTransfer(srr, timestampMillis);
 
@@ -113,8 +125,8 @@ export function handleTransferFromMigration(
 }
 
 function checkAndClearCommitOnTransfer(srr: SRR, eventTime: BigInt): void {
-  log.info("clearing transferCommitment on token = {}", [srr.tokenId]);
-  let srrCommit = SRRTransferCommit.load(srr.tokenId);
+  log.info("clearing transferCommitment on token = {}", [srr.tokenId as string]);
+  let srrCommit = SRRTransferCommit.load(srr.tokenId as string);
   if (srrCommit != null) {
     srrCommit.commitment = null;
     srrCommit.lastAction = "transfer";
@@ -274,9 +286,9 @@ function handleSRRProvenanceInternal(
   tokenId: BigInt,
   from: Address,
   to: Address,
-  customHistoryId: BigInt,
-  historyMetadataDigest: string,
-  historyMetadataURI: string,
+  customHistoryId: BigInt | null,
+  historyMetadataDigest: string | null,
+  historyMetadataURI: string | null,
   isIntermediary: boolean
 ): void {
   let srrId = tokenId.toString();
@@ -291,34 +303,46 @@ function handleSRRProvenanceInternal(
   srr.updatedAt = eventTimestampMillis;
   srr.save();
 
-  // Create new Provenance
+  // Create new Provenance if we can't find srrProvenance with provenanceId.
+  // This is because we need to create a provenance entity even if the transfer event is emitted to be compatible with opensea.
   let provenanceId = crypto
     .keccak256(
       ByteArray.fromUTF8(tokenId.toString() + eventTimestampMillis.toString())
     )
     .toHexString();
+  let provenance = SRRProvenance.load(provenanceId);
+  if (!provenance) {
+    provenance = new SRRProvenance(provenanceId);
 
-  let provenance = new SRRProvenance(provenanceId);
+    provenance.srr = srr.id;
+    provenance.from = from;
+    provenance.to = to;
+  
+    if (historyMetadataDigest) {
+      provenance.metadataDigest = Bytes.fromHexString(
+        historyMetadataDigest
+      ) as Bytes;  
+    } else {
+      provenance.metadataDigest = new Bytes(0)
+    }
 
-  provenance.srr = srr.id;
-  provenance.from = from;
-  provenance.to = to;
-
-  provenance.metadataDigest = Bytes.fromHexString(
-    historyMetadataDigest
-  ) as Bytes;
-  provenance.metadataURI = historyMetadataURI;
-
-  if (customHistoryId) {
-    // CustomHistory.load(event.params.customHistoryId)
-    provenance.customHistory = customHistoryId.toString();
+    if (historyMetadataURI) {
+      provenance.metadataURI = historyMetadataURI;
+    } else {
+      provenance.metadataURI = ""
+    }
+  
+    if (customHistoryId) {
+      // CustomHistory.load(event.params.customHistoryId)
+      provenance.customHistory = customHistoryId.toString();
+    }
+    provenance.isIntermediary = isIntermediary;
+  
+    provenance.timestamp = eventTimestampMillis;
+    provenance.createdAt = eventTimestampMillis;
+  
+    provenance.save();  
   }
-  provenance.isIntermediary = isIntermediary;
-
-  provenance.timestamp = eventTimestampMillis;
-  provenance.createdAt = eventTimestampMillis;
-
-  provenance.save();
 }
 
 export function handleSRRProvenanceFromMigration(
@@ -473,7 +497,7 @@ function handleSRRCommitmentInternal(
   eventTimestampMillis: BigInt,
   commitment: Bytes,
   tokenId: BigInt,
-  customHistoryId: BigInt
+  customHistoryId: BigInt | null
 ): void {
   let srrId = tokenId.toString();
   let srr = SRR.load(srrId);
@@ -677,7 +701,7 @@ function saveSRRMetadataHistory(
       ByteArray.fromUTF8(
         event.transaction.hash.toHexString() +
           event.logIndex.toHexString() +
-          srr.metadataDigest.toHexString()
+          (srr.metadataDigest as Bytes).toHexString()
       )
     )
     .toHexString();
@@ -686,7 +710,7 @@ function saveSRRMetadataHistory(
   srrMetadataHistory.srr = srr.id;
   srrMetadataHistory.createdAt = eventTimestampMillis;
   srrMetadataHistory.metadataDigest = Bytes.fromHexString(
-    srr.metadataDigest.toHexString()
+    (srr.metadataDigest as Bytes).toHexString()
   ) as Bytes;
   srrMetadataHistory.save();
 }
