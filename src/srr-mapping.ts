@@ -709,5 +709,6 @@ export function handleProvenanceDateMigrationFix(
     return;
   }
   prov.createdAt = event.params.originTimestamp;
+  prov.timestamp = event.params.originTimestamp;
   prov.save();
 }
