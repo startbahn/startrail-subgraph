@@ -77,7 +77,7 @@ export function handleTransfer(event: TransferEvent): void {
     srr.updatedAt = timestampMillis;
     srr.save();
   }
-
+  
   handleSRRProvenanceInternal(
     eventUTCMillis(event),
     srrIdBigInt,
@@ -89,7 +89,7 @@ export function handleTransfer(event: TransferEvent): void {
     false
   );
 
-  checkAndClearCommitOnTransfer(srr, timestampMillis);
+  checkAndClearCommitOnTransfer(srr as SRR, timestampMillis);
 }
 
 export function handleTransferFromMigration(
