@@ -69,6 +69,8 @@ export function handleTransfer(event: TransferEvent): void {
   srr.originChain = currentChainId();
   srr.originTxHash = event.transaction.hash;
 
+  srr.lockExternalTransfer = false;
+  
   srr.createdAt = timestampMillis;
   srr.updatedAt = timestampMillis;
 
