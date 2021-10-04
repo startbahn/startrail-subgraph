@@ -74,8 +74,7 @@ export function handleTransfer(event: TransferEvent): void {
     srr.lockExternalTransfer = false;
   
     srr.createdAt = timestampMillis;
-    srr.updatedAt = timestampMillis;
-    srr.save();
+    srr.updatedAt = timestampMillis;   
   }
   
   handleSRRProvenanceInternal(
@@ -90,6 +89,8 @@ export function handleTransfer(event: TransferEvent): void {
   );
 
   checkAndClearCommitOnTransfer(srr as SRR, timestampMillis);
+
+  srr.save();
 }
 
 export function handleTransferFromMigration(
