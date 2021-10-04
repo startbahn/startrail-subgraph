@@ -62,17 +62,21 @@ export function handleTransfer(event: TransferEvent): void {
   let srrId = event.params.tokenId.toString();
   let srrIdBigInt = event.params.tokenId;
 
-  let srr = new SRR(srrId);
-  srr.tokenId = srrId;
-  srr.ownerAddress = event.params.to;
-
-  srr.originChain = currentChainId();
-  srr.originTxHash = event.transaction.hash;
-
-  srr.lockExternalTransfer = false;
+  let srr = SRR.load(srrId);
+  if (srr == null) {
+    srr = new SRR(srrId);
+    srr.tokenId = srrId;
+    srr.ownerAddress = event.params.to;
   
-  srr.createdAt = timestampMillis;
-  srr.updatedAt = timestampMillis;
+    srr.originChain = currentChainId();
+    srr.originTxHash = event.transaction.hash;
+  
+    srr.lockExternalTransfer = false;
+  
+    srr.createdAt = timestampMillis;
+    srr.updatedAt = timestampMillis;
+    srr.save();
+  }
 
   handleSRRProvenanceInternal(
     eventUTCMillis(event),
@@ -86,8 +90,6 @@ export function handleTransfer(event: TransferEvent): void {
   );
 
   checkAndClearCommitOnTransfer(srr, timestampMillis);
-
-  srr.save();
 }
 
 export function handleTransferFromMigration(
