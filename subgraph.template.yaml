@@ -108,6 +108,8 @@ dataSources:
           handler: handleCreateCustomHistory
         - event: History(uint256[],uint256[])
           handler: handleSRRHistory
+        - event: LockExternalTransfer(indexed uint256,bool)
+          handler: handleLockExternalTransfer
 
         #
         # Events related to the migration

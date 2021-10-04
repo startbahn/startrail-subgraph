@@ -45,6 +45,7 @@ import {
   UpdateSRRFromMigration as UpdateSRRFromMigrationEvent,
   UpdateSRRMetadataDigest as UpdateSRRMetadataDigestEvent,
   UpdateSRRMetadataDigestFromMigration as UpdateSRRMetadataDigestFromMigrationEvent,
+  LockExternalTransfer as LockExternalTransferEvent,
 } from '../generated/StartrailRegistry/StartrailRegistry'
 import {
   currentChainId,
@@ -739,4 +740,18 @@ export function handleProvenanceDateMigrationFix(
   }
   prov.createdAt = event.params.originTimestamp;
   prov.save();
+}
+
+export function handleLockExternalTransfer(event: LockExternalTransferEvent): void {
+  logInvocation("handleLockExternalTransfer", event);
+  let srrId = event.params.tokenId.toString();
+  let srr = SRR.load(srrId);
+  if(srr == null){
+    log.error("received lock external transfer event but srr not found: {}", [
+      srrId,
+    ]);
+    return;
+  }
+  srr.lockExternalTransfer = event.params.flag;
+  srr.save();
 }
