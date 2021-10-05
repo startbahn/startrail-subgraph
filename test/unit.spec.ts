@@ -287,7 +287,7 @@ test("srrmetadataHistories", async () => {
 test("metaTxRequestTypes", async () => {
   const query = `
   {
-    metaTxRequestTypes {
+    metaTxRequestTypes(orderBy: createdAt, orderDirection: asc) {
       id
       typeHash
       typeString
@@ -297,20 +297,6 @@ test("metaTxRequestTypes", async () => {
   const result = await client.query(query)
 
   const data = [
-    {
-      id: "0x052d8d1acdbf73c1b466436c3bc062709a28af704363f8b326314d7ab01ce47b",
-      typeHash:
-        "0x052d8d1acdbf73c1b466436c3bc062709a28af704363f8b326314d7ab01ce47b",
-      typeString:
-        "BulkTransferSendBatch(address from,uint256 nonce,bytes32 merkleRoot)"
-    },
-    {
-      id: "0x1f6bcc34496ca1b52d584f9a76e6a39b27989a9c186f8bcac08b53d1b03bb293",
-      typeHash:
-        "0x1f6bcc34496ca1b52d584f9a76e6a39b27989a9c186f8bcac08b53d1b03bb293",
-      typeString:
-        "StartrailRegistryAddHistory(address from,uint256 nonce,bytes data,uint256[] tokenIds,uint256[] customHistoryIds)"
-    },
     {
       id: "0x425002ddfe8a5210fcf678ff38ca336c9b3babbf2f10efa5fdeaace5951e2b48",
       typeHash:
@@ -401,7 +387,28 @@ test("metaTxRequestTypes", async () => {
         "0xff1b6ae7ba3b6fcaf8441b4b7ebbebb22444db035e8eb25feb17296a6c00b54b",
       typeString:
         "WalletChangeThreshold(address from,uint256 nonce,address wallet,uint256 threshold)"
-    }
+    },
+    {
+      id: "0x052d8d1acdbf73c1b466436c3bc062709a28af704363f8b326314d7ab01ce47b",
+      typeHash:
+        "0x052d8d1acdbf73c1b466436c3bc062709a28af704363f8b326314d7ab01ce47b",
+      typeString:
+        "BulkTransferSendBatch(address from,uint256 nonce,bytes32 merkleRoot)"
+    },
+    {
+      id: "0x1f6bcc34496ca1b52d584f9a76e6a39b27989a9c186f8bcac08b53d1b03bb293",
+      typeHash:
+        "0x1f6bcc34496ca1b52d584f9a76e6a39b27989a9c186f8bcac08b53d1b03bb293",
+      typeString:
+        "StartrailRegistryAddHistory(address from,uint256 nonce,bytes data,uint256[] tokenIds,uint256[] customHistoryIds)"
+    },
+    {
+      id: "0x43b411a61269fac54b60a3a5c04241addcc8c4e9e4844916999593fd135aa9f6",
+      typeHash:
+        "0x43b411a61269fac54b60a3a5c04241addcc8c4e9e4844916999593fd135aa9f6",
+      typeString:
+        "StartrailRegistrySetLockExternalTransfer(address from,uint256 nonce,uint256 tokenId,bool flag)"
+    },
     // for decentalized storage
     // {
     //   id: "0xa5772716d883ea9d1e653c127fc4b5f193148ae32c6699efdcdba6fa2a242f4f",
