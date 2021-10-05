@@ -23,6 +23,7 @@ import {
   CreateCustomHistoryFromMigration as CustomHistoryCreatedFromMigrationEvent,
   CreateCustomHistoryType as CustomHistoryTypeCreatedEvent,
   CreateSRR as CreateSRREvent,
+  CreateSRR1 as CreateSRRWithLockExternalTransferEvent,
   CreateSRRFromMigration as CreateSRRFromMigrationEvent,
   History as SRRHistoryEvent,
   MigrateSRR as MigrateSRREvent,
@@ -155,6 +156,26 @@ export function handleCreateSRR(event: CreateSRREvent): void {
     event.params.registryRecord.artistAddress,
     event.params.registryRecord.issuer,
     event.params.metadataDigest,
+    false,
+    timestampMillis,
+    event
+  );
+}
+
+export function handleCreateSRRWithLockExternalTransfer(event: CreateSRRWithLockExternalTransferEvent): void {
+  logInvocation("handleCreateSRRWithLockExternalTransfer", event);
+
+  let timestampMillis = eventUTCMillis(event);
+  let srrId = event.params.tokenId.toString();
+  let srr = SRR.load(srrId);
+
+  saveCreateSRRInternal(
+    srr as SRR,
+    event.params.registryRecord.isPrimaryIssuer,
+    event.params.registryRecord.artistAddress,
+    event.params.registryRecord.issuer,
+    event.params.metadataDigest,
+    event.params.lockExternalTransfer,
     timestampMillis,
     event
   );
@@ -185,6 +206,7 @@ export function handleCreateSRRFromMigration(
     event.params.registryRecord.artistAddress,
     event.params.registryRecord.issuer,
     event.params.metadataDigest,
+    false,
     timestampMillis,
     event
   );
@@ -196,19 +218,21 @@ function saveCreateSRRInternal(
   artist: Address,
   issuer: Address,
   metadataDigest: Bytes,
+  lockExternalTransfer: boolean,
   updateTimestamp: BigInt,
   event: ethereum.Event
 ): void {
   srr.artistAddress = artist;
   srr.isPrimaryIssuer = isPrimaryIssuer;
   srr.metadataDigest = metadataDigest;
+  srr.lockExternalTransfer = lockExternalTransfer;
 
   let issuerId = issuer.toHexString();
   let luw = LicensedUserWallet.load(issuerId);
   if (luw != null) {
     srr.issuer = luw.id;
   }
-
+  
   srr.updatedAt = updateTimestamp;
   srr.save();
 
