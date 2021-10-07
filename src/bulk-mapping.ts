@@ -5,7 +5,7 @@ import {
   CreateSRRWithProof as CreateSRRWithProofEvent,
   MigrateBatch as MigrateBatchEvent,
 } from '../generated/BulkIssue/BulkIssue'
-import { BulkIssue } from '../generated/schema'
+import { BulkIssue, BulkIssueSRR } from '../generated/schema'
 import { eventUTCMillis, logInvocation, secondsToMillis } from './utils'
 
 export function handleBatchPrepared(event: BatchPreparedEvent): void {
@@ -21,7 +21,6 @@ export function handleBatchPrepared(event: BatchPreparedEvent): void {
   }
 
   batch = new BulkIssue(merkleRoot);
-  batch.srrs = [];
   batch.merkleRoot = event.params.merkleRoot;
   batch.issuer = event.params.sender;
 
@@ -42,14 +41,24 @@ export function handleCreateSRRWithProof(event: CreateSRRWithProofEvent): void {
     return;
   }
 
-  log.info("adding srrHash {}", [event.params.srrHash.toHex()]);
-  // this 3 step assign, push, reassign is necessary here:
-  // (see https://thegraph.com/docs/assemblyscript-api#api-reference):
-  let srrs = batch.srrs;
-  srrs.push(event.params.srrHash);
-  batch.srrs = srrs;
-  batch.tokenId = event.params.tokenId.toString();
-  batch.updatedAt = eventUTCMillis(event);
+  let tokenIdStr = event.params.tokenId.toString();
+  let srrHash = event.params.srrHash;
+
+  log.info("adding BulkIssueSRR for token {} and hash {}", [
+    tokenIdStr,
+    srrHash.toHex(),
+  ]);
+
+  let timestampMillis = eventUTCMillis(event);
+
+  let bulkIssueSRR = new BulkIssueSRR(srrHash.toHex());
+  bulkIssueSRR.bulkIssue = merkleRoot;
+  bulkIssueSRR.hash = srrHash;
+  bulkIssueSRR.tokenId = tokenIdStr;
+  bulkIssueSRR.createdAt = timestampMillis;
+  bulkIssueSRR.save();
+
+  batch.updatedAt = timestampMillis;
   batch.save();
 }
 
@@ -57,15 +66,24 @@ export function handleMigrateBatch(event: MigrateBatchEvent): void {
   logInvocation("handleMigrateBatch", event);
 
   let merkleRoot = event.params.merkleRoot.toHexString();
+  let timestampUpdated = secondsToMillis(event.params.originTimestampUpdated);
 
   let batch = new BulkIssue(merkleRoot);
-
   batch.merkleRoot = event.params.merkleRoot;
   batch.issuer = event.params.issuer;
-  batch.srrs = event.params.processedLeaves;
-
   batch.createdAt = secondsToMillis(event.params.originTimestampCreated);
-  batch.updatedAt = secondsToMillis(event.params.originTimestampUpdated);
-
+  batch.updatedAt = timestampUpdated;
   batch.save();
+
+  let leaves = event.params.processedLeaves;
+  for (let leafIdx = 0; leafIdx < leaves.length; leafIdx++) {
+    let leafHash = leaves[leafIdx];
+    let bulkIssueSRR = new BulkIssueSRR(leafHash.toHex());
+    bulkIssueSRR.bulkIssue = merkleRoot;
+    bulkIssueSRR.hash = leafHash;
+    // We don't have the exact original date for this so use updated timestamp
+    // from the batch event as a closest approximation
+    bulkIssueSRR.createdAt = timestampUpdated;
+    bulkIssueSRR.save();
+  }
 }

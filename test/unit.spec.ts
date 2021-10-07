@@ -44,34 +44,34 @@ test("srrs", async () => {
   const data = [
     expect.objectContaining({
       history: [],
-      id: "10255373",
+      id: "161110255373",
       metadataDigest:
         "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727252",
       originChain: "eip155:31337",
-      tokenId: "10255373",
+      tokenId: "161110255373",
       transferCommitment: null
     }),
     expect.objectContaining({
       history: [
         {
           id:
-            "0xe816ba014d36a530fa00332e555613d1678221f17419b1bc9216e9af7ed98578"
+            "0xcd1727f3df288c49c5c86dac117370eb7714fb3bb39f266d78b135e73450ee65"
         }
       ],
-      id: "43593516",
+      id: "311443593516",
       metadataDigest:
         "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251",
       originChain: "eip155:31337",
-      tokenId: "43593516",
+      tokenId: "311443593516",
       transferCommitment: null
     }),
     expect.objectContaining({
       history: [],
-      id: "80626184",
+      id: "174880626184",
       metadataDigest:
         "0x4c8f18581c0167eb90a761b4a304e009b924f03b619a0c0e8ea3adfce20aee64",
       originChain: "eip155:31337",
-      tokenId: "80626184",
+      tokenId: "174880626184",
       transferCommitment: null
     })
   ]
@@ -115,10 +115,11 @@ test("licensedUserWallets ", async () => {
       englishName: "Artist English",
       issuedSRRs: [
         {
-          id: "80626184",
-          metadataDigest: "0x4c8f18581c0167eb90a761b4a304e009b924f03b619a0c0e8ea3adfce20aee64",
-          tokenId: "80626184",
-          transferCommitment: null,
+          id: "174880626184",
+          metadataDigest:
+            "0x4c8f18581c0167eb90a761b4a304e009b924f03b619a0c0e8ea3adfce20aee64",
+          tokenId: "174880626184",
+          transferCommitment: null
         }
       ],
       originChain: null,
@@ -137,17 +138,17 @@ test("licensedUserWallets ", async () => {
       englishName: "New English Name",
       issuedSRRs: [
         {
-          id: "10255373",
+          id: "161110255373",
           metadataDigest:
             "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727252",
-          tokenId: "10255373",
+          tokenId: "161110255373",
           transferCommitment: null
         },
         {
-          id: "43593516",
+          id: "311443593516",
           metadataDigest:
             "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251",
-          tokenId: "43593516",
+          tokenId: "311443593516",
           transferCommitment: null
         }
       ],
@@ -401,16 +402,16 @@ test("metaTxRequestTypes", async () => {
     // for decentalized storage
     // {
     //   id: "0xa5772716d883ea9d1e653c127fc4b5f193148ae32c6699efdcdba6fa2a242f4f",
-    //   typeHash: 
+    //   typeHash:
     //     "0xa5772716d883ea9d1e653c127fc4b5f193148ae32c6699efdcdba6fa2a242f4f",
-    //   typeString: 
+    //   typeString:
     //     "StartrailRegistryUpdateSRRMetadataV2(address from,uint256 nonce,bytes data,uint256 tokenId,string metadataDigest)",
     // },
     // {
     //   id: "0xe0ff2c72dcc273eb61555bd35aa1b25a97a14163d68e843f798a5763111780be",
-    //   typeHash: 
+    //   typeHash:
     //     "0xe0ff2c72dcc273eb61555bd35aa1b25a97a14163d68e843f798a5763111780be",
-    //   typeString: 
+    //   typeString:
     //     "StartrailRegistryCreateSRRV2(address from,uint256 nonce,bytes data,bool isPrimaryIssuer,address artistAddress,string metadataDigest)",
     // },
   ]
@@ -462,7 +463,7 @@ test("srrprovenances", async () => {
       metadataURI:
         "https://api.startrail.io/api/v1/metadata/ba136728b9ccfc56aa07d354fb7b5b026fa8123ad74f2fdb7a938bdf08c77a70.json",
       srr: {
-        id: "43593516"
+        id: "311443593516"
       }
     },
     {
@@ -473,7 +474,7 @@ test("srrprovenances", async () => {
       metadataURI:
         "https://api.startrail.io/api/v1/metadata/ba136728b9ccfc56aa07d354fb7b5b026fa8123ad74f2fdb7a938bdf08c77a70.json",
       srr: {
-        id: "10255373"
+        id: "161110255373"
       }
     },
     {
@@ -484,7 +485,7 @@ test("srrprovenances", async () => {
       metadataURI:
         "https://api.startrail.io/api/v1/metadata/ba136728b9ccfc56aa07d354fb7b5b026fa8123ad74f2fdb7a938bdf08c77a70.json",
       srr: {
-        id: "43593516"
+        id: "311443593516"
       }
     },
     {
@@ -493,8 +494,8 @@ test("srrprovenances", async () => {
       metadataDigest: "0x",
       metadataURI: "",
       srr: {
-        id: "10255373",
-      },
+        id: "161110255373"
+      }
     }
   ]
 
@@ -517,12 +518,12 @@ test("srrtransferCommits", async () => {
   const data = [
     {
       commitment: null,
-      id: "10255373",
+      id: "161110255373",
       lastAction: "transfer"
     },
     {
       commitment: null,
-      id: "43593516",
+      id: "311443593516",
       lastAction: "transfer"
     }
   ]
@@ -537,8 +538,8 @@ test("bulkIssues", async () => {
     bulkIssues {
       id
       merkleRoot
+      issuer
       srrs
-      tokenId
     }
   }
 `
@@ -547,10 +548,10 @@ test("bulkIssues", async () => {
   const data = [
     {
       id: "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251",
+      issuer: "0xf157e8b5d7a4b3fda8c2f7c19b4a57be32ec0392",
       merkleRoot:
         "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251",
-      srrs: [],
-      tokenId: null
+      srrs: []
     }
   ]
 
@@ -592,7 +593,7 @@ test("customHistories", async () => {
       srrHistory: [
         {
           id:
-            "0xe816ba014d36a530fa00332e555613d1678221f17419b1bc9216e9af7ed98578"
+            "0xcd1727f3df288c49c5c86dac117370eb7714fb3bb39f266d78b135e73450ee65"
         }
       ]
     }
@@ -623,9 +624,9 @@ test("srrHistories", async () => {
       customHistory: {
         id: "1"
       },
-      id: "0xe816ba014d36a530fa00332e555613d1678221f17419b1bc9216e9af7ed98578",
+      id: "0xcd1727f3df288c49c5c86dac117370eb7714fb3bb39f266d78b135e73450ee65",
       srr: {
-        id: "43593516"
+        id: "311443593516"
       }
     }
   ]
