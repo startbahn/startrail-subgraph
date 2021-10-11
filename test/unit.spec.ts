@@ -11,13 +11,18 @@ beforeAll(() => {
   })
 })
 
-// ignoring createdAt and updatedAt since it's timestamp, and issuer, metadataHistory, provenance with id, originTxHash
+// ignoring createdAt and updatedAt since it's timestamp, metadataHistory, provenance with id, originTxHash
 test("srrs", async () => {
   const query = `
   {
     srrs {
       id
       tokenId
+      artistAddress
+      issuer {
+        id
+        englishName
+      }
       metadataDigest
       transferCommitment
       history {
@@ -49,6 +54,11 @@ test("srrs", async () => {
         "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727252",
       originChain: "eip155:31337",
       tokenId: "10255373",
+      artistAddress: "0xa6e6a9e20a541680a1d6e1412f5088aefbf58a22",
+      issuer: {
+        id: "0xf157e8b5d7a4b3fda8c2f7c19b4a57be32ec0392",
+        englishName: "New English Name"
+      },
       transferCommitment: null
     }),
     expect.objectContaining({
@@ -63,6 +73,11 @@ test("srrs", async () => {
         "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251",
       originChain: "eip155:31337",
       tokenId: "43593516",
+      artistAddress: "0xa6e6a9e20a541680a1d6e1412f5088aefbf58a22",
+      issuer: {
+        id: "0xf157e8b5d7a4b3fda8c2f7c19b4a57be32ec0392",
+        englishName: "New English Name"
+      },
       transferCommitment: null
     }),
     expect.objectContaining({
@@ -72,6 +87,11 @@ test("srrs", async () => {
         "0x4c8f18581c0167eb90a761b4a304e009b924f03b619a0c0e8ea3adfce20aee64",
       originChain: "eip155:31337",
       tokenId: "80626184",
+      artistAddress: "0x66c0d9152209b51977047b9dc3b0b5bf2339b67c",
+      issuer: {
+        id: "0x864d38b2989553080dbe893f7366b2dc675cac1f",
+        englishName: "Artist English"
+      },
       transferCommitment: null
     })
   ]
@@ -92,6 +112,7 @@ test("licensedUserWallets ", async () => {
   const query = `
   {
     licensedUserWallets {
+      id
       threshold
       englishName
       originalName
@@ -112,6 +133,7 @@ test("licensedUserWallets ", async () => {
 
   const data = [
     {
+      id: "0x864d38b2989553080dbe893f7366b2dc675cac1f",
       englishName: "Artist English",
       issuedSRRs: [
         {
@@ -134,6 +156,7 @@ test("licensedUserWallets ", async () => {
       userType: "artist"
     },
     {
+      id: "0xf157e8b5d7a4b3fda8c2f7c19b4a57be32ec0392",
       englishName: "New English Name",
       issuedSRRs: [
         {
