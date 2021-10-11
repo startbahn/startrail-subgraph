@@ -193,20 +193,23 @@ function saveCreateSRRInternal(
   updateTimestamp: BigInt,
   event: ethereum.Event
 ): void {
-  srr.artistAddress = artist;
   srr.isPrimaryIssuer = isPrimaryIssuer;
   srr.metadataDigest = metadataDigest;
 
-  let issuerId = issuer.toHexString();
-  let luw = LicensedUserWallet.load(issuerId);
-  if (luw != null) {
-    srr.issuer = luw.id;
-  }
-
+  srr.artistAddress = artist;
+  srr.artist = getLicensedUserIdFromAddress(artist);
+  srr.issuer = getLicensedUserIdFromAddress(issuer);
+  
   srr.updatedAt = updateTimestamp;
   srr.save();
 
   saveSRRMetadataHistory(srr as SRR, updateTimestamp, event);
+}
+
+function getLicensedUserIdFromAddress(address: Address): string | null {
+  let id = address.toHexString();
+  let luw = LicensedUserWallet.load(id);
+  return luw == null ? null : luw.id;
 }
 
 export function handleSRRProvenance(event: SRRProvenanceEvent): void {
