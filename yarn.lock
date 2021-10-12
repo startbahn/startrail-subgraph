@@ -552,10 +552,10 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@startbahn/startrail@1.7.0-rc2":
-  version "1.7.0-rc2"
-  resolved "https://registry.yarnpkg.com/@startbahn/startrail/-/startrail-1.7.0-rc2.tgz#d5349255b9e3931e1b384d9a7162f03409d4f3fa"
-  integrity sha512-Es14e2lK2W4zf9jOj/9QSyVLfZul4tfGC2q17MdmAIVIDeiAW+FfGBXoxFZtLjEWv6mjK6mgAOyigIljNH8Wpw==
+"@startbahn/startrail@1.8.0-beta-6":
+  version "1.8.0-beta-6"
+  resolved "https://registry.yarnpkg.com/@startbahn/startrail/-/startrail-1.8.0-beta-6.tgz#1487a3a98ebeafb1763244ba78694b4b207e71c0"
+  integrity sha512-nG4h6PZml6m1PHTI+da6xDUu/RYjUkoQLfA5AAGfXXp/3aMNbAZVTFUFik0EP4FaXvwp1fvrWqimpaAWiRpG8A==
 
 "@tootallnate/once@1":
   version "1.1.2"

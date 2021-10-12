@@ -24,6 +24,7 @@ test("srrs", async () => {
         id
       }
       originChain
+      lockExternalTransfer
     }
   }
 `
@@ -49,7 +50,8 @@ test("srrs", async () => {
         "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727252",
       originChain: "eip155:31337",
       tokenId: "10255373",
-      transferCommitment: null
+      transferCommitment: null,
+      lockExternalTransfer: true
     }),
     expect.objectContaining({
       history: [
@@ -63,7 +65,8 @@ test("srrs", async () => {
         "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251",
       originChain: "eip155:31337",
       tokenId: "43593516",
-      transferCommitment: null
+      transferCommitment: null,
+      lockExternalTransfer: false
     }),
     expect.objectContaining({
       history: [],
@@ -72,7 +75,8 @@ test("srrs", async () => {
         "0x4c8f18581c0167eb90a761b4a304e009b924f03b619a0c0e8ea3adfce20aee64",
       originChain: "eip155:31337",
       tokenId: "80626184",
-      transferCommitment: null
+      transferCommitment: null,
+      lockExternalTransfer: false
     })
   ]
 
@@ -91,7 +95,7 @@ test("srrs", async () => {
 test("licensedUserWallets ", async () => {
   const query = `
   {
-    licensedUserWallets {
+    licensedUserWallets(orderBy: createdAt, orderDirection: desc) {
       threshold
       englishName
       originalName
@@ -111,28 +115,6 @@ test("licensedUserWallets ", async () => {
   const result = await client.query(query)
 
   const data = [
-    {
-      englishName: "Artist English",
-      issuedSRRs: [
-        {
-          id: "80626184",
-          metadataDigest: "0x4c8f18581c0167eb90a761b4a304e009b924f03b619a0c0e8ea3adfce20aee64",
-          tokenId: "80626184",
-          transferCommitment: null,
-        }
-      ],
-      originChain: null,
-      originalName: "Artist Original",
-      owners: [
-        "0x853f2251666f9d8c45cc760ae10ab0278533d28c",
-        "0x171ea52e619b7fdde870b328ccfb70217a3e32ae",
-        "0xad87f0b51a8788192edd0640ab5ed58e48145c82"
-      ],
-      salt:
-        "0x64e604787cbf194841e7b68d7cd28786f6c9a0a3ab9f8b0a0e87cb4387ab0001",
-      threshold: 1,
-      userType: "artist"
-    },
     {
       englishName: "New English Name",
       issuedSRRs: [
@@ -162,7 +144,29 @@ test("licensedUserWallets ", async () => {
         "0x64e604787cbf194841e7b68d7cd28786f6c9a0a3ab9f8b0a0e87cb4387ab0002",
       threshold: 1,
       userType: "handler"
-    }
+    },
+    {
+      englishName: "Artist English",
+      issuedSRRs: [
+        {
+          id: "80626184",
+          metadataDigest: "0x4c8f18581c0167eb90a761b4a304e009b924f03b619a0c0e8ea3adfce20aee64",
+          tokenId: "80626184",
+          transferCommitment: null,
+        }
+      ],
+      originChain: null,
+      originalName: "Artist Original",
+      owners: [
+        "0x853f2251666f9d8c45cc760ae10ab0278533d28c",
+        "0x171ea52e619b7fdde870b328ccfb70217a3e32ae",
+        "0xad87f0b51a8788192edd0640ab5ed58e48145c82"
+      ],
+      salt:
+        "0x64e604787cbf194841e7b68d7cd28786f6c9a0a3ab9f8b0a0e87cb4387ab0001",
+      threshold: 1,
+      userType: "artist"
+    },
   ]
   expect(result.licensedUserWallets).toStrictEqual(data)
 })
@@ -283,7 +287,7 @@ test("srrmetadataHistories", async () => {
 test("metaTxRequestTypes", async () => {
   const query = `
   {
-    metaTxRequestTypes {
+    metaTxRequestTypes(orderBy: createdAt, orderDirection: asc) {
       id
       typeHash
       typeString
@@ -293,20 +297,6 @@ test("metaTxRequestTypes", async () => {
   const result = await client.query(query)
 
   const data = [
-    {
-      id: "0x052d8d1acdbf73c1b466436c3bc062709a28af704363f8b326314d7ab01ce47b",
-      typeHash:
-        "0x052d8d1acdbf73c1b466436c3bc062709a28af704363f8b326314d7ab01ce47b",
-      typeString:
-        "BulkTransferSendBatch(address from,uint256 nonce,bytes32 merkleRoot)"
-    },
-    {
-      id: "0x1f6bcc34496ca1b52d584f9a76e6a39b27989a9c186f8bcac08b53d1b03bb293",
-      typeHash:
-        "0x1f6bcc34496ca1b52d584f9a76e6a39b27989a9c186f8bcac08b53d1b03bb293",
-      typeString:
-        "StartrailRegistryAddHistory(address from,uint256 nonce,bytes data,uint256[] tokenIds,uint256[] customHistoryIds)"
-    },
     {
       id: "0x425002ddfe8a5210fcf678ff38ca336c9b3babbf2f10efa5fdeaace5951e2b48",
       typeHash:
@@ -397,7 +387,28 @@ test("metaTxRequestTypes", async () => {
         "0xff1b6ae7ba3b6fcaf8441b4b7ebbebb22444db035e8eb25feb17296a6c00b54b",
       typeString:
         "WalletChangeThreshold(address from,uint256 nonce,address wallet,uint256 threshold)"
-    }
+    },
+    {
+      id: "0x052d8d1acdbf73c1b466436c3bc062709a28af704363f8b326314d7ab01ce47b",
+      typeHash:
+        "0x052d8d1acdbf73c1b466436c3bc062709a28af704363f8b326314d7ab01ce47b",
+      typeString:
+        "BulkTransferSendBatch(address from,uint256 nonce,bytes32 merkleRoot)"
+    },
+    {
+      id: "0x1f6bcc34496ca1b52d584f9a76e6a39b27989a9c186f8bcac08b53d1b03bb293",
+      typeHash:
+        "0x1f6bcc34496ca1b52d584f9a76e6a39b27989a9c186f8bcac08b53d1b03bb293",
+      typeString:
+        "StartrailRegistryAddHistory(address from,uint256 nonce,bytes data,uint256[] tokenIds,uint256[] customHistoryIds)"
+    },
+    {
+      id: "0x43b411a61269fac54b60a3a5c04241addcc8c4e9e4844916999593fd135aa9f6",
+      typeHash:
+        "0x43b411a61269fac54b60a3a5c04241addcc8c4e9e4844916999593fd135aa9f6",
+      typeString:
+        "StartrailRegistrySetLockExternalTransfer(address from,uint256 nonce,uint256 tokenId,bool flag)"
+    },
     // for decentalized storage
     // {
     //   id: "0xa5772716d883ea9d1e653c127fc4b5f193148ae32c6699efdcdba6fa2a242f4f",
@@ -486,6 +497,15 @@ test("srrprovenances", async () => {
       srr: {
         id: "43593516"
       }
+    },
+    {
+      customHistory: null,
+      isIntermediary: false,
+      metadataDigest: "0x",
+      metadataURI: "",
+      srr: {
+        id: "10255373",
+      },
     },
     {
       customHistory: null,
