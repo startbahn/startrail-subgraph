@@ -1,6 +1,6 @@
 {
   "name": "startrail-subgraph",
-  "version": "1.9.0",
+  "version": "1.10.0",
   "scripts": {
     "test": "jest",
     "build": "npm run generate-local && graph build subgraph.local.yaml",
