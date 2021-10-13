@@ -84,6 +84,8 @@ dataSources:
           handler: handleTransfer
         - event: CreateSRR(indexed uint256,(bool,address,address),bytes32)
           handler: handleCreateSRR
+        - event: CreateSRR(indexed uint256,(bool,address,address),bytes32,bool)
+          handler: handleCreateSRRWithLockExternalTransfer
         - event: UpdateSRR(indexed uint256,(bool,address,address))
           handler: handleUpdateSRR
         - event: Provenance(indexed uint256,indexed address,indexed address,string,string)
@@ -108,6 +110,8 @@ dataSources:
           handler: handleCreateCustomHistory
         - event: History(uint256[],uint256[])
           handler: handleSRRHistory
+        - event: LockExternalTransfer(indexed uint256,bool)
+          handler: handleLockExternalTransfer
 
         #
         # Events related to the migration
