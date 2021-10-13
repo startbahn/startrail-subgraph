@@ -98,7 +98,7 @@ export function handleTransferFromMigration(
   event: TransferFromMigrationEvent
 ): void {
   logInvocation("handleTransferFromMigration", event);
-  let timestampMillis = secondsToMillis(event.params.originTimestamp);
+  let originTimestampMillis = secondsToMillis(event.params.originTimestamp);
 
   let srrId = event.params.tokenId.toString();
   let srr = SRR.load(srrId);
@@ -109,24 +109,17 @@ export function handleTransferFromMigration(
   if (srr == null) {
     srr = new SRR(srrId);
     srr.tokenId = srrId;
-    srr.createdAt = timestampMillis;
+    srr.createdAt = originTimestampMillis;
     srr.originChain = currentChainId();
     srr.originTxHash = event.params.originTxHash;
   }
-  let fromIsZero =
-    event.params.from.toHexString() != ZERO_ADDRESS.toHexString();
 
-  log.info("zero = {} from = {} not equal? = {}", [
-    ZERO_ADDRESS.toHexString(),
-    event.params.from.toHexString(),
-    fromIsZero.toString(),
-  ]);
   if (event.params.from.toHexString() != ZERO_ADDRESS.toHexString()) {
-    checkAndClearCommitOnTransfer(srr as SRR, timestampMillis);
+    checkAndClearCommitOnTransfer(srr as SRR, originTimestampMillis);
   }
 
   srr.ownerAddress = event.params.to;
-  srr.updatedAt = timestampMillis;
+  srr.updatedAt = originTimestampMillis;
 
   srr.save();
 }
