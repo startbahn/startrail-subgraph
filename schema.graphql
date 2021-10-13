@@ -48,6 +48,9 @@ type SRR @entity {
   originChain: String
   originTxHash: Bytes
 
+  # lockExternalTransfer # default is false
+  lockExternalTransfer: Boolean
+
   createdAt: BigInt! # block.timestamp when entity created
   updatedAt: BigInt! # block.timestamp when entity last updated
 }

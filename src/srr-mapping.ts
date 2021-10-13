@@ -23,6 +23,7 @@ import {
   CreateCustomHistoryFromMigration as CustomHistoryCreatedFromMigrationEvent,
   CreateCustomHistoryType as CustomHistoryTypeCreatedEvent,
   CreateSRR as CreateSRREvent,
+  CreateSRR1 as CreateSRRWithLockExternalTransferEvent,
   CreateSRRFromMigration as CreateSRRFromMigrationEvent,
   History as SRRHistoryEvent,
   MigrateSRR as MigrateSRREvent,
@@ -45,6 +46,7 @@ import {
   UpdateSRRFromMigration as UpdateSRRFromMigrationEvent,
   UpdateSRRMetadataDigest as UpdateSRRMetadataDigestEvent,
   UpdateSRRMetadataDigestFromMigration as UpdateSRRMetadataDigestFromMigrationEvent,
+  LockExternalTransfer as LockExternalTransferEvent,
 } from '../generated/StartrailRegistry/StartrailRegistry'
 import {
   currentChainId,
@@ -59,20 +61,35 @@ export function handleTransfer(event: TransferEvent): void {
 
   let timestampMillis = eventUTCMillis(event);
   let srrId = event.params.tokenId.toString();
+  let srrIdBigInt = event.params.tokenId;
 
-  let srr = new SRR(srrId);
-  srr.tokenId = srrId;
-  srr.ownerAddress = event.params.to;
-
-  srr.originChain = currentChainId();
-  srr.originTxHash = event.transaction.hash;
-
-  if (event.params.from.toHexString() == ZERO_ADDRESS.toHexString()) {
+  let srr = SRR.load(srrId);
+  if (srr == null) {
+    srr = new SRR(srrId);
+    srr.tokenId = srrId;
+    srr.ownerAddress = event.params.to;
+  
+    srr.originChain = currentChainId();
+    srr.originTxHash = event.transaction.hash;
+  
+    srr.lockExternalTransfer = false;
+  
     srr.createdAt = timestampMillis;
+    srr.updatedAt = timestampMillis;   
   }
-  srr.updatedAt = timestampMillis;
+  
+  handleSRRProvenanceInternal(
+    eventUTCMillis(event),
+    srrIdBigInt,
+    event.params.from,
+    event.params.to,
+    null,
+    null,
+    null,
+    false
+  );
 
-  checkAndClearCommitOnTransfer(srr, timestampMillis);
+  checkAndClearCommitOnTransfer(srr as SRR, timestampMillis);
 
   srr.save();
 }
@@ -108,8 +125,8 @@ export function handleTransferFromMigration(
 }
 
 function checkAndClearCommitOnTransfer(srr: SRR, eventTime: BigInt): void {
-  log.info("clearing transferCommitment on token = {}", [srr.tokenId]);
-  let srrCommit = SRRTransferCommit.load(srr.tokenId);
+  log.info("clearing transferCommitment on token = {}", [srr.tokenId as string]);
+  let srrCommit = SRRTransferCommit.load(srr.tokenId as string);
   if (srrCommit != null) {
     srrCommit.commitment = null;
     srrCommit.lastAction = "transfer";
@@ -132,6 +149,26 @@ export function handleCreateSRR(event: CreateSRREvent): void {
     event.params.registryRecord.artistAddress,
     event.params.registryRecord.issuer,
     event.params.metadataDigest,
+    false,
+    timestampMillis,
+    event
+  );
+}
+
+export function handleCreateSRRWithLockExternalTransfer(event: CreateSRRWithLockExternalTransferEvent): void {
+  logInvocation("handleCreateSRRWithLockExternalTransfer", event);
+
+  let timestampMillis = eventUTCMillis(event);
+  let srrId = event.params.tokenId.toString();
+  let srr = SRR.load(srrId);
+
+  saveCreateSRRInternal(
+    srr as SRR,
+    event.params.registryRecord.isPrimaryIssuer,
+    event.params.registryRecord.artistAddress,
+    event.params.registryRecord.issuer,
+    event.params.metadataDigest,
+    event.params.lockExternalTransfer,
     timestampMillis,
     event
   );
@@ -162,6 +199,7 @@ export function handleCreateSRRFromMigration(
     event.params.registryRecord.artistAddress,
     event.params.registryRecord.issuer,
     event.params.metadataDigest,
+    false,
     timestampMillis,
     event
   );
@@ -173,19 +211,21 @@ function saveCreateSRRInternal(
   artist: Address,
   issuer: Address,
   metadataDigest: Bytes,
+  lockExternalTransfer: boolean,
   updateTimestamp: BigInt,
   event: ethereum.Event
 ): void {
   srr.artistAddress = artist;
   srr.isPrimaryIssuer = isPrimaryIssuer;
   srr.metadataDigest = metadataDigest;
+  srr.lockExternalTransfer = lockExternalTransfer;
 
   let issuerId = issuer.toHexString();
   let luw = LicensedUserWallet.load(issuerId);
   if (luw != null) {
     srr.issuer = luw.id;
   }
-
+  
   srr.updatedAt = updateTimestamp;
   srr.save();
 
@@ -269,9 +309,9 @@ function handleSRRProvenanceInternal(
   tokenId: BigInt,
   from: Address,
   to: Address,
-  customHistoryId: BigInt,
-  historyMetadataDigest: string,
-  historyMetadataURI: string,
+  customHistoryId: BigInt | null,
+  historyMetadataDigest: string | null,
+  historyMetadataURI: string | null,
   isIntermediary: boolean
 ): void {
   let srrId = tokenId.toString();
@@ -286,34 +326,46 @@ function handleSRRProvenanceInternal(
   srr.updatedAt = eventTimestampMillis;
   srr.save();
 
-  // Create new Provenance
+  // Create new Provenance if we can't find srrProvenance with provenanceId.
+  // This is because we need to create a provenance entity even if the transfer event is emitted to be compatible with opensea.
   let provenanceId = crypto
     .keccak256(
       ByteArray.fromUTF8(tokenId.toString() + eventTimestampMillis.toString())
     )
     .toHexString();
+  let provenance = SRRProvenance.load(provenanceId);
+  if (!provenance) {
+    provenance = new SRRProvenance(provenanceId);
 
-  let provenance = new SRRProvenance(provenanceId);
+    provenance.srr = srr.id;
+    provenance.from = from;
+    provenance.to = to;
+  
+    if (historyMetadataDigest) {
+      provenance.metadataDigest = Bytes.fromHexString(
+        historyMetadataDigest
+      ) as Bytes;  
+    } else {
+      provenance.metadataDigest = new Bytes(0)
+    }
 
-  provenance.srr = srr.id;
-  provenance.from = from;
-  provenance.to = to;
-
-  provenance.metadataDigest = Bytes.fromHexString(
-    historyMetadataDigest
-  ) as Bytes;
-  provenance.metadataURI = historyMetadataURI;
-
-  if (customHistoryId) {
-    // CustomHistory.load(event.params.customHistoryId)
-    provenance.customHistory = customHistoryId.toString();
+    if (historyMetadataURI) {
+      provenance.metadataURI = historyMetadataURI;
+    } else {
+      provenance.metadataURI = ""
+    }
+  
+    if (customHistoryId) {
+      // CustomHistory.load(event.params.customHistoryId)
+      provenance.customHistory = customHistoryId.toString();
+    }
+    provenance.isIntermediary = isIntermediary;
+  
+    provenance.timestamp = eventTimestampMillis;
+    provenance.createdAt = eventTimestampMillis;
+  
+    provenance.save();  
   }
-  provenance.isIntermediary = isIntermediary;
-
-  provenance.timestamp = eventTimestampMillis;
-  provenance.createdAt = eventTimestampMillis;
-
-  provenance.save();
 }
 
 export function handleSRRProvenanceFromMigration(
@@ -468,7 +520,7 @@ function handleSRRCommitmentInternal(
   eventTimestampMillis: BigInt,
   commitment: Bytes,
   tokenId: BigInt,
-  customHistoryId: BigInt
+  customHistoryId: BigInt | null
 ): void {
   let srrId = tokenId.toString();
   let srr = SRR.load(srrId);
@@ -672,7 +724,7 @@ function saveSRRMetadataHistory(
       ByteArray.fromUTF8(
         event.transaction.hash.toHexString() +
           event.logIndex.toHexString() +
-          srr.metadataDigest.toHexString()
+          (srr.metadataDigest as Bytes).toHexString()
       )
     )
     .toHexString();
@@ -681,7 +733,7 @@ function saveSRRMetadataHistory(
   srrMetadataHistory.srr = srr.id;
   srrMetadataHistory.createdAt = eventTimestampMillis;
   srrMetadataHistory.metadataDigest = Bytes.fromHexString(
-    srr.metadataDigest.toHexString()
+    (srr.metadataDigest as Bytes).toHexString()
   ) as Bytes;
   srrMetadataHistory.save();
 }
@@ -710,4 +762,18 @@ export function handleProvenanceDateMigrationFix(
   }
   prov.createdAt = event.params.originTimestamp;
   prov.save();
+}
+
+export function handleLockExternalTransfer(event: LockExternalTransferEvent): void {
+  logInvocation("handleLockExternalTransfer", event);
+  let srrId = event.params.tokenId.toString();
+  let srr = SRR.load(srrId);
+  if(srr == null){
+    log.error("received lock external transfer event but srr not found: {}", [
+      srrId,
+    ]);
+    return;
+  }
+  srr.lockExternalTransfer = event.params.flag;
+  srr.save();
 }
