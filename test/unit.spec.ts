@@ -11,19 +11,31 @@ beforeAll(() => {
   })
 })
 
-// ignoring createdAt and updatedAt since it's timestamp, and issuer, metadataHistory, provenance with id, originTxHash
+// ignoring createdAt and updatedAt since it's timestamp, metadataHistory, provenance with id, originTxHash
 test("srrs", async () => {
   const query = `
   {
-    srrs {
+    srrs(orderBy: id) {
       id
       tokenId
+      artistAddress
+      artist {
+        id
+        englishName
+      }
+      issuer {
+        id
+        englishName
+      }
       metadataDigest
       transferCommitment
       history {
-        id
+        customHistory {
+          metadataDigest
+        }
       }
       originChain
+      lockExternalTransfer
     }
   }
 `
@@ -46,33 +58,65 @@ test("srrs", async () => {
       history: [],
       id: "161110255373",
       metadataDigest:
-        "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727252",
+        "0x4c8f18581c0167eb90a761b4a304e009b924f03b619a0c0e8ea3adfce20aee64",
       originChain: "eip155:31337",
-      tokenId: "161110255373",
-      transferCommitment: null
+      tokenId: "57470167",
+      artistAddress: "0x864d38b2989553080dbe893f7366b2dc675cac1f",
+      artist: {
+        id: "0x864d38b2989553080dbe893f7366b2dc675cac1f",
+        englishName: "Artist English"
+      },
+      issuer: {
+        id: "0x864d38b2989553080dbe893f7366b2dc675cac1f",
+        englishName: "Artist English"
+      },
+      transferCommitment: null,
+      lockExternalTransfer: false
     }),
     expect.objectContaining({
       history: [
         {
-          id:
-            "0xcd1727f3df288c49c5c86dac117370eb7714fb3bb39f266d78b135e73450ee65"
+          customHistory: {
+            metadataDigest:
+              "0xcc3b6344b207c582bd727005be2a5de5bbca7b46b590d9e9189f3a9a7ea8283e"
+          }
         }
       ],
-      id: "311443593516",
+      id: "60438356",
       metadataDigest:
         "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251",
       originChain: "eip155:31337",
-      tokenId: "311443593516",
-      transferCommitment: null
+      tokenId: "60438356",
+      artistAddress: "0x864d38b2989553080dbe893f7366b2dc675cac1f",
+      artist: {
+        id: "0x864d38b2989553080dbe893f7366b2dc675cac1f",
+        englishName: "Artist English"
+      },
+      issuer: {
+        id: "0xf157e8b5d7a4b3fda8c2f7c19b4a57be32ec0392",
+        englishName: "New English Name"
+      },
+      transferCommitment: null,
+      lockExternalTransfer: false
     }),
     expect.objectContaining({
       history: [],
-      id: "174880626184",
+      id: "67251424",
       metadataDigest:
-        "0x4c8f18581c0167eb90a761b4a304e009b924f03b619a0c0e8ea3adfce20aee64",
+        "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727252",
       originChain: "eip155:31337",
-      tokenId: "174880626184",
-      transferCommitment: null
+      tokenId: "67251424",
+      artistAddress: "0x864d38b2989553080dbe893f7366b2dc675cac1f",
+      artist: {
+        id: "0x864d38b2989553080dbe893f7366b2dc675cac1f",
+        englishName: "Artist English"
+      },
+      issuer: {
+        id: "0xf157e8b5d7a4b3fda8c2f7c19b4a57be32ec0392",
+        englishName: "New English Name"
+      },
+      transferCommitment: null,
+      lockExternalTransfer: true
     })
   ]
 
@@ -91,14 +135,15 @@ test("srrs", async () => {
 test("licensedUserWallets ", async () => {
   const query = `
   {
-    licensedUserWallets {
+    licensedUserWallets(orderBy: salt) {
+      walletAddress
       threshold
       englishName
       originalName
       userType
       owners
       salt
-      issuedSRRs {
+      issuedSRRs(orderBy: tokenId) {
         id
         tokenId
         metadataDigest
@@ -112,13 +157,14 @@ test("licensedUserWallets ", async () => {
 
   const data = [
     {
+      walletAddress: "0x864d38b2989553080dbe893f7366b2dc675cac1f",
       englishName: "Artist English",
       issuedSRRs: [
         {
-          id: "174880626184",
+          id: "57470167",
           metadataDigest:
             "0x4c8f18581c0167eb90a761b4a304e009b924f03b619a0c0e8ea3adfce20aee64",
-          tokenId: "174880626184",
+          tokenId: "57470167",
           transferCommitment: null
         }
       ],
@@ -135,6 +181,7 @@ test("licensedUserWallets ", async () => {
       userType: "artist"
     },
     {
+      walletAddress: "0xf157e8b5d7a4b3fda8c2f7c19b4a57be32ec0392",
       englishName: "New English Name",
       issuedSRRs: [
         {
@@ -284,7 +331,7 @@ test("srrmetadataHistories", async () => {
 test("metaTxRequestTypes", async () => {
   const query = `
   {
-    metaTxRequestTypes {
+    metaTxRequestTypes(orderBy: createdAt, orderDirection: asc) {
       id
       typeHash
       typeString
@@ -294,20 +341,6 @@ test("metaTxRequestTypes", async () => {
   const result = await client.query(query)
 
   const data = [
-    {
-      id: "0x052d8d1acdbf73c1b466436c3bc062709a28af704363f8b326314d7ab01ce47b",
-      typeHash:
-        "0x052d8d1acdbf73c1b466436c3bc062709a28af704363f8b326314d7ab01ce47b",
-      typeString:
-        "BulkTransferSendBatch(address from,uint256 nonce,bytes32 merkleRoot)"
-    },
-    {
-      id: "0x1f6bcc34496ca1b52d584f9a76e6a39b27989a9c186f8bcac08b53d1b03bb293",
-      typeHash:
-        "0x1f6bcc34496ca1b52d584f9a76e6a39b27989a9c186f8bcac08b53d1b03bb293",
-      typeString:
-        "StartrailRegistryAddHistory(address from,uint256 nonce,bytes data,uint256[] tokenIds,uint256[] customHistoryIds)"
-    },
     {
       id: "0x425002ddfe8a5210fcf678ff38ca336c9b3babbf2f10efa5fdeaace5951e2b48",
       typeHash:
@@ -398,6 +431,34 @@ test("metaTxRequestTypes", async () => {
         "0xff1b6ae7ba3b6fcaf8441b4b7ebbebb22444db035e8eb25feb17296a6c00b54b",
       typeString:
         "WalletChangeThreshold(address from,uint256 nonce,address wallet,uint256 threshold)"
+    },
+    {
+      id: "0x052d8d1acdbf73c1b466436c3bc062709a28af704363f8b326314d7ab01ce47b",
+      typeHash:
+        "0x052d8d1acdbf73c1b466436c3bc062709a28af704363f8b326314d7ab01ce47b",
+      typeString:
+        "BulkTransferSendBatch(address from,uint256 nonce,bytes32 merkleRoot)"
+    },
+    {
+      id: "0x1f6bcc34496ca1b52d584f9a76e6a39b27989a9c186f8bcac08b53d1b03bb293",
+      typeHash:
+        "0x1f6bcc34496ca1b52d584f9a76e6a39b27989a9c186f8bcac08b53d1b03bb293",
+      typeString:
+        "StartrailRegistryAddHistory(address from,uint256 nonce,bytes data,uint256[] tokenIds,uint256[] customHistoryIds)"
+    },
+    {
+      id: "0x43b411a61269fac54b60a3a5c04241addcc8c4e9e4844916999593fd135aa9f6",
+      typeHash:
+        "0x43b411a61269fac54b60a3a5c04241addcc8c4e9e4844916999593fd135aa9f6",
+      typeString:
+        "StartrailRegistrySetLockExternalTransfer(address from,uint256 nonce,uint256 tokenId,bool flag)"
+    },
+    {
+      id: "0x98ce74b76cbcc5f7fc9d14949a70627b5dc8b6d1ff04fc70f34c4839ccdabf11",
+      typeHash:
+        "0x98ce74b76cbcc5f7fc9d14949a70627b5dc8b6d1ff04fc70f34c4839ccdabf11",
+      typeString:
+        "StartrailRegistryCreateSRRWithLockExternalTransfer(address from,uint256 nonce,bool isPrimaryIssuer,address artistAddress,bytes32 metadataDigest,bool lockExternalTransfer)"
     }
     // for decentalized storage
     // {
@@ -494,7 +555,16 @@ test("srrprovenances", async () => {
       metadataDigest: "0x",
       metadataURI: "",
       srr: {
-        id: "161110255373"
+        id: "67251424"
+      }
+    },
+    {
+      customHistory: null,
+      isIntermediary: false,
+      metadataDigest: "0x",
+      metadataURI: "",
+      srr: {
+        id: "67251424"
       }
     }
   ]
@@ -571,7 +641,9 @@ test("customHistories", async () => {
       name
       metadataDigest
       srrHistory {
-        id
+        srr {
+          id
+        }
       }
       originChain
     }
@@ -592,8 +664,9 @@ test("customHistories", async () => {
       originChain: "eip155:31337",
       srrHistory: [
         {
-          id:
-            "0xcd1727f3df288c49c5c86dac117370eb7714fb3bb39f266d78b135e73450ee65"
+          srr: {
+            id: "60438356"
+          }
         }
       ]
     }
@@ -607,7 +680,6 @@ test("srrHistories", async () => {
   const query = `
   {
     srrhistories {
-      id
       srr {
         id
       }
@@ -624,9 +696,8 @@ test("srrHistories", async () => {
       customHistory: {
         id: "1"
       },
-      id: "0xcd1727f3df288c49c5c86dac117370eb7714fb3bb39f266d78b135e73450ee65",
       srr: {
-        id: "311443593516"
+        id: "60438356"
       }
     }
   ]
