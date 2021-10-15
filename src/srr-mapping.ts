@@ -76,8 +76,8 @@ export function handleTransfer(event: TransferEvent): void {
     if (event.params.from.toHexString() == ZERO_ADDRESS.toHexString()) {
       srr.createdAt = timestampMillis;
     }
-    srr.updatedAt = timestampMillis;   
   }
+  srr.updatedAt = timestampMillis;
   
   handleSRRProvenanceInternal(
     eventUTCMillis(event),
