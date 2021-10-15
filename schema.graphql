@@ -34,6 +34,7 @@ type SRR @entity {
   id: ID! # tokenId.toString()
   tokenId: String # ERC721 token id
   isPrimaryIssuer: Boolean
+  artist: LicensedUserWallet
   artistAddress: Bytes
   issuer: LicensedUserWallet
   ownerAddress: Bytes
@@ -47,6 +48,9 @@ type SRR @entity {
   # a number of SRRs were issued on Ethereum mainnet then moved to Polygon
   originChain: String
   originTxHash: Bytes
+
+  # lockExternalTransfer # default is false
+  lockExternalTransfer: Boolean
 
   createdAt: BigInt! # block.timestamp when entity created
   updatedAt: BigInt! # block.timestamp when entity last updated
