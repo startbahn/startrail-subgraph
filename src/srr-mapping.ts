@@ -22,15 +22,16 @@ import {
   CreateCustomHistory as CustomHistoryCreatedEvent,
   CreateCustomHistoryFromMigration as CustomHistoryCreatedFromMigrationEvent,
   CreateCustomHistoryType as CustomHistoryTypeCreatedEvent,
-  CreateSRR as CreateSRREvent,
-  CreateSRR1 as CreateSRRWithLockExternalTransferEvent,
+  CreateSRR as CreateSRRWithLockExternalTransferEvent,
+  CreateSRR1 as CreateSRREventLegacy,
   CreateSRRFromMigration as CreateSRRFromMigrationEvent,
   History as SRRHistoryEvent,
+  LockExternalTransfer as LockExternalTransferEvent,
   MigrateSRR as MigrateSRREvent,
-  Provenance as SRRProvenanceEvent,
-  Provenance1 as SRRProvenanceWithCustomHistoryEvent,
-  Provenance2 as SRRProvenanceWithIntermediaryEvent,
-  Provenance3 as SRRProvenanceWithCustomHistoryAndIntermediaryEvent,
+  Provenance as SRRProvenanceWithIntermediaryEvent,
+  Provenance1 as SRRProvenanceWithCustomHistoryAndIntermediaryEvent,
+  Provenance2 as SRRProvenanceEventLegacy,
+  Provenance3 as SRRProvenanceWithCustomHistoryEventLegacy,
   ProvenanceDateMigrationFix as ProvenanceDateMigrationFixEvent,
   ProvenanceFromMigration as SRRProvenanceFromMigrationEvent,
   ProvenanceFromMigration1 as SRRProvenanceWithCustomHistoryFromMigrationEvent,
@@ -46,7 +47,6 @@ import {
   UpdateSRRFromMigration as UpdateSRRFromMigrationEvent,
   UpdateSRRMetadataDigest as UpdateSRRMetadataDigestEvent,
   UpdateSRRMetadataDigestFromMigration as UpdateSRRMetadataDigestFromMigrationEvent,
-  LockExternalTransfer as LockExternalTransferEvent,
 } from '../generated/StartrailRegistry/StartrailRegistry'
 import {
   currentChainId,
@@ -69,16 +69,16 @@ export function handleTransfer(event: TransferEvent): void {
     srr.tokenId = srrId;
     srr.ownerAddress = event.params.to;
     srr.lockExternalTransfer = false;
-  
+
     srr.originChain = currentChainId();
     srr.originTxHash = event.transaction.hash;
-  
+
     if (event.params.from.toHexString() == ZERO_ADDRESS.toHexString()) {
       srr.createdAt = timestampMillis;
     }
   }
   srr.updatedAt = timestampMillis;
-  
+
   handleSRRProvenanceInternal(
     eventUTCMillis(event),
     srrIdBigInt,
@@ -126,7 +126,9 @@ export function handleTransferFromMigration(
 }
 
 function checkAndClearCommitOnTransfer(srr: SRR, eventTime: BigInt): void {
-  log.info("clearing transferCommitment on token = {}", [srr.tokenId as string]);
+  log.info("clearing transferCommitment on token = {}", [
+    srr.tokenId as string
+  ]);
   let srrCommit = SRRTransferCommit.load(srr.tokenId as string);
   if (srrCommit != null) {
     srrCommit.commitment = null;
@@ -137,7 +139,7 @@ function checkAndClearCommitOnTransfer(srr: SRR, eventTime: BigInt): void {
   srr.transferCommitment = null;
 }
 
-export function handleCreateSRR(event: CreateSRREvent): void {
+export function handleCreateSRR(event: CreateSRREventLegacy): void {
   logInvocation("handleCreateSRR", event);
 
   let timestampMillis = eventUTCMillis(event);
@@ -156,7 +158,9 @@ export function handleCreateSRR(event: CreateSRREvent): void {
   );
 }
 
-export function handleCreateSRRWithLockExternalTransfer(event: CreateSRRWithLockExternalTransferEvent): void {
+export function handleCreateSRRWithLockExternalTransfer(
+  event: CreateSRRWithLockExternalTransferEvent
+): void {
   logInvocation("handleCreateSRRWithLockExternalTransfer", event);
 
   let timestampMillis = eventUTCMillis(event);
@@ -223,7 +227,7 @@ function saveCreateSRRInternal(
   srr.artistAddress = artist;
   srr.artist = getLicensedUserIdFromAddress(artist);
   srr.issuer = getLicensedUserIdFromAddress(issuer);
-  
+
   srr.updatedAt = updateTimestamp;
   srr.save();
 
@@ -236,7 +240,7 @@ function getLicensedUserIdFromAddress(address: Address): string | null {
   return luw == null ? null : luw.id;
 }
 
-export function handleSRRProvenance(event: SRRProvenanceEvent): void {
+export function handleSRRProvenance(event: SRRProvenanceEventLegacy): void {
   logInvocation("handleSRRProvenance", event);
   let params = event.params;
   handleSRRProvenanceInternal(
@@ -252,7 +256,7 @@ export function handleSRRProvenance(event: SRRProvenanceEvent): void {
 }
 
 export function handleSRRProvenanceWithCustomHistory(
-  event: SRRProvenanceWithCustomHistoryEvent
+  event: SRRProvenanceWithCustomHistoryEventLegacy
 ): void {
   logInvocation("handleSRRProvenanceWithCustomHistory", event);
   let params = event.params;
@@ -344,31 +348,31 @@ function handleSRRProvenanceInternal(
     provenance.srr = srr.id;
     provenance.from = from;
     provenance.to = to;
-  
+
     if (historyMetadataDigest) {
       provenance.metadataDigest = Bytes.fromHexString(
         historyMetadataDigest
-      ) as Bytes;  
+      ) as Bytes;
     } else {
-      provenance.metadataDigest = new Bytes(0)
+      provenance.metadataDigest = new Bytes(0);
     }
 
     if (historyMetadataURI) {
       provenance.metadataURI = historyMetadataURI;
     } else {
-      provenance.metadataURI = ""
+      provenance.metadataURI = "";
     }
-  
+
     if (customHistoryId) {
       // CustomHistory.load(event.params.customHistoryId)
       provenance.customHistory = customHistoryId.toString();
     }
     provenance.isIntermediary = isIntermediary;
-  
+
     provenance.timestamp = eventTimestampMillis;
     provenance.createdAt = eventTimestampMillis;
-  
-    provenance.save();  
+
+    provenance.save();
   }
 }
 
@@ -746,8 +750,10 @@ export function handleMigrateSRR(event: MigrateSRREvent): void {
   logInvocation("handleMigrateSRR", event);
   let srrId = event.params.tokenId.toString();
   let srr = SRR.load(srrId);
-  srr.originChain = event.params.originChain;
-  srr.save();
+  if (srr) {
+    srr.originChain = event.params.originChain;
+    srr.save();
+  }
 }
 
 export function handleProvenanceDateMigrationFix(
@@ -760,7 +766,7 @@ export function handleProvenanceDateMigrationFix(
   let prov = SRRProvenance.load(provenanceId);
   if (prov == null) {
     log.error("received fix event but provenance not found: {}", [
-      provenanceId,
+      provenanceId
     ]);
     return;
   }
@@ -769,13 +775,15 @@ export function handleProvenanceDateMigrationFix(
   prov.save();
 }
 
-export function handleLockExternalTransfer(event: LockExternalTransferEvent): void {
+export function handleLockExternalTransfer(
+  event: LockExternalTransferEvent
+): void {
   logInvocation("handleLockExternalTransfer", event);
   let srrId = event.params.tokenId.toString();
   let srr = SRR.load(srrId);
-  if(srr == null){
+  if (srr == null) {
     log.error("received lock external transfer event but srr not found: {}", [
-      srrId,
+      srrId
     ]);
     return;
   }
