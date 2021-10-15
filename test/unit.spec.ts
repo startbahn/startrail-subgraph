@@ -1,15 +1,15 @@
-const Lokka = require("lokka").Lokka
-const Transport = require("lokka-transport-http").Transport
+const Lokka = require("lokka").Lokka;
+const Transport = require("lokka-transport-http").Transport;
 
-let client: any
+let client: any;
 
 beforeAll(() => {
   client = new Lokka({
     transport: new Transport(
       "http://127.0.0.1:8000/subgraphs/name/startbahn/startrail-local"
     )
-  })
-})
+  });
+});
 
 // ignoring createdAt and updatedAt since it's timestamp, metadataHistory, provenance with id, originTxHash
 test("srrs", async () => {
@@ -38,8 +38,8 @@ test("srrs", async () => {
       lockExternalTransfer
     }
   }
-`
-  const result = await client.query(query)
+`;
+  const result = await client.query(query);
   expect(result.srrs).toMatchInlineSnapshot(`
 Array [
   Object {
@@ -102,8 +102,23 @@ Array [
     "tokenId": "628560438356",
     "transferCommitment": null,
   },
+  Object {
+    "artist": null,
+    "artistAddress": "0x212ffb315a6adb0b1f106aec74aade67a6f3799f",
+    "history": Array [],
+    "id": "986417474240",
+    "issuer": Object {
+      "englishName": "New English Name",
+      "id": "0xf157e8b5d7a4b3fda8c2f7c19b4a57be32ec0392",
+    },
+    "lockExternalTransfer": false,
+    "metadataDigest": "0x0f34e2f4762d796ab3eb29a60a39104de18e3589a9af573fc38f56753a21022f",
+    "originChain": "eip155:31337",
+    "tokenId": "986417474240",
+    "transferCommitment": null,
+  },
 ]
-`)
+`);
 
   const query2 = `
 {
@@ -113,18 +128,18 @@ Array [
     }
   }
 }
-`
+`;
 
-  const result2 = await client.query(query2)
+  const result2 = await client.query(query2);
 
   const ids = result2.srrs
     .flatMap((x: any) => x.provenance)
-    .map((x: any) => x.id)
+    .map((x: any) => x.id);
 
   for (const id of ids) {
-    expect(id).toHaveLength(66)
+    expect(id).toHaveLength(66);
   }
-})
+});
 
 // ignoring walletAddress, createdAt, updatedAt, and  field since it's timestamp
 test("licensedUserWallets ", async () => {
@@ -147,8 +162,8 @@ test("licensedUserWallets ", async () => {
       originChain
     }
   }
-  `
-  const result = await client.query(query)
+  `;
+  const result = await client.query(query);
 
   const data = [
     {
@@ -192,6 +207,13 @@ test("licensedUserWallets ", async () => {
             "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251",
           tokenId: "628560438356",
           transferCommitment: null
+        },
+        {
+          id: "986417474240",
+          metadataDigest:
+            "0x0f34e2f4762d796ab3eb29a60a39104de18e3589a9af573fc38f56753a21022f",
+          tokenId: "986417474240",
+          transferCommitment: null
         }
       ],
       originChain: null,
@@ -206,9 +228,9 @@ test("licensedUserWallets ", async () => {
       threshold: 1,
       userType: "handler"
     }
-  ]
-  expect(result.licensedUserWallets).toStrictEqual(data)
-})
+  ];
+  expect(result.licensedUserWallets).toStrictEqual(data);
+});
 
 // ignoring createdAt field since it's timestamp
 test("customHistoryType", async () => {
@@ -219,8 +241,8 @@ test("customHistoryType", async () => {
       name
     }
   }
-`
-  const result = await client.query(query)
+`;
+  const result = await client.query(query);
 
   const data = [
     {
@@ -231,15 +253,15 @@ test("customHistoryType", async () => {
       id: "2",
       name: "exhibition"
     }
-  ]
-  expect(result.customHistoryTypes).toStrictEqual(data)
-})
+  ];
+  expect(result.customHistoryTypes).toStrictEqual(data);
+});
 
 // ignoring id, createdAt and updatedAt fields since it's timestamp, originTxHash
 test("srrmetadataHistories", async () => {
   const query = `
   {
-    srrmetadataHistories(orderBy: createdAt, orderDirection: desc) {
+    srrmetadataHistories(orderBy: metadataDigest, orderDirection: desc) {
       srr {
         metadataDigest
         transferCommitment
@@ -254,8 +276,8 @@ test("srrmetadataHistories", async () => {
       metadataDigest
     }
   }
-`
-  const result = await client.query(query)
+`;
+  const result = await client.query(query);
 
   const data = [
     {
@@ -317,10 +339,30 @@ test("srrmetadataHistories", async () => {
         originChain: "eip155:31337",
         transferCommitment: null
       }
+    },
+    {
+      metadataDigest:
+        "0x0f34e2f4762d796ab3eb29a60a39104de18e3589a9af573fc38f56753a21022f",
+      srr: {
+        metadataDigest:
+          "0x0f34e2f4762d796ab3eb29a60a39104de18e3589a9af573fc38f56753a21022f",
+        metadataHistory: [
+          {
+            metadataDigest:
+              "0x0f34e2f4762d796ab3eb29a60a39104de18e3589a9af573fc38f56753a21022f",
+            srr: {
+              metadataDigest:
+                "0x0f34e2f4762d796ab3eb29a60a39104de18e3589a9af573fc38f56753a21022f"
+            }
+          }
+        ],
+        originChain: "eip155:31337",
+        transferCommitment: null
+      }
     }
-  ]
-  expect(result.srrmetadataHistories).toStrictEqual(data)
-})
+  ];
+  expect(result.srrmetadataHistories).toStrictEqual(data);
+});
 
 // ignoring createdAt field since it's timestamp
 test("metaTxRequestTypes", async () => {
@@ -332,8 +374,8 @@ test("metaTxRequestTypes", async () => {
       typeString
     }
   }
-`
-  const result = await client.query(query)
+`;
+  const result = await client.query(query);
 
   const data = [
     {
@@ -470,9 +512,9 @@ test("metaTxRequestTypes", async () => {
     //   typeString:
     //     "StartrailRegistryCreateSRRV2(address from,uint256 nonce,bytes data,bool isPrimaryIssuer,address artistAddress,string metadataDigest)",
     // },
-  ]
-  expect(result.metaTxRequestTypes).toStrictEqual(data)
-})
+  ];
+  expect(result.metaTxRequestTypes).toStrictEqual(data);
+});
 
 // ignoring createdAt field since it's timestamp, and txHash since it's same as
 test("metaTxExecutions", async () => {
@@ -482,14 +524,14 @@ test("metaTxExecutions", async () => {
       id
     }
   }
-`
-  const result = await client.query(query)
+`;
+  const result = await client.query(query);
 
-  const ids = result.metaTxExecutions.map((x: any) => x.id)
+  const ids = result.metaTxExecutions.map((x: any) => x.id);
   for (const id of ids) {
-    expect(id).toHaveLength(66)
+    expect(id).toHaveLength(66);
   }
-})
+});
 
 // ignoring createdAt, id, from, to, and timestamp field
 test("srrprovenances", async () => {
@@ -507,8 +549,8 @@ test("srrprovenances", async () => {
       isIntermediary
     }
   }
-`
-  const result = await client.query(query)
+`;
+  const result = await client.query(query);
 
   const data = [
     {
@@ -562,10 +604,10 @@ test("srrprovenances", async () => {
         id: "151267251424"
       }
     }
-  ]
+  ];
 
-  expect(result.srrprovenances).toEqual(data)
-})
+  expect(result.srrprovenances).toEqual(data);
+});
 
 // ignoring createdAt field since it's timestamp
 test("srrtransferCommits", async () => {
@@ -577,8 +619,8 @@ test("srrtransferCommits", async () => {
       lastAction
     }
   }
-`
-  const result = await client.query(query)
+`;
+  const result = await client.query(query);
 
   const data = [
     {
@@ -591,10 +633,10 @@ test("srrtransferCommits", async () => {
       id: "628560438356",
       lastAction: "transfer"
     }
-  ]
+  ];
 
-  expect(result.srrtransferCommits).toStrictEqual(data)
-})
+  expect(result.srrtransferCommits).toStrictEqual(data);
+});
 
 // ignoring createdAt and updatedAt field
 test("bulkIssues", async () => {
@@ -604,24 +646,33 @@ test("bulkIssues", async () => {
       id
       merkleRoot
       issuer
-      srrs
+      srrs {
+        tokenId
+        hash
+      }
     }
   }
-`
-  const result = await client.query(query)
+`;
+  const result = await client.query(query);
 
   const data = [
     {
-      id: "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251",
+      id: "0x04d4f6f30251d9af5f7a888dc57abbb28dd3ef6e337d93d05ac766b4d6c56a02",
       issuer: "0xf157e8b5d7a4b3fda8c2f7c19b4a57be32ec0392",
       merkleRoot:
-        "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251",
-      srrs: []
+        "0x04d4f6f30251d9af5f7a888dc57abbb28dd3ef6e337d93d05ac766b4d6c56a02",
+      srrs: [
+        {
+          hash:
+            "0xf453e08dfbaf7d3d602726d6e88436f96e7f959ad49bdd108a20d03535c815b9",
+          tokenId: "986417474240"
+        }
+      ]
     }
-  ]
+  ];
 
-  expect(result.bulkIssues).toStrictEqual(data)
-})
+  expect(result.bulkIssues).toStrictEqual(data);
+});
 
 //ignore originTxHash
 test("customHistories", async () => {
@@ -643,8 +694,8 @@ test("customHistories", async () => {
       originChain
     }
   }
-`
-  const result = await client.query(query)
+`;
+  const result = await client.query(query);
 
   const data = [
     {
@@ -665,10 +716,10 @@ test("customHistories", async () => {
         }
       ]
     }
-  ]
+  ];
 
-  expect(result.customHistories).toStrictEqual(data)
-})
+  expect(result.customHistories).toStrictEqual(data);
+});
 
 // ignoring createdAt field since it's timestamp
 test("srrHistories", async () => {
@@ -683,8 +734,8 @@ test("srrHistories", async () => {
       }
     }
   }
-`
-  const result = await client.query(query)
+`;
+  const result = await client.query(query);
 
   const data = [
     {
@@ -695,7 +746,7 @@ test("srrHistories", async () => {
         id: "628560438356"
       }
     }
-  ]
+  ];
 
-  expect(result.srrhistories).toStrictEqual(data)
-})
+  expect(result.srrhistories).toStrictEqual(data);
+});
