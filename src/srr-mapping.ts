@@ -68,15 +68,16 @@ export function handleTransfer(event: TransferEvent): void {
     srr = new SRR(srrId);
     srr.tokenId = srrId;
     srr.ownerAddress = event.params.to;
+    srr.lockExternalTransfer = false;
   
     srr.originChain = currentChainId();
     srr.originTxHash = event.transaction.hash;
   
-    srr.lockExternalTransfer = false;
-  
-    srr.createdAt = timestampMillis;
-    srr.updatedAt = timestampMillis;   
+    if (event.params.from.toHexString() == ZERO_ADDRESS.toHexString()) {
+      srr.createdAt = timestampMillis;
+    }
   }
+  srr.updatedAt = timestampMillis;
   
   handleSRRProvenanceInternal(
     eventUTCMillis(event),
@@ -215,21 +216,24 @@ function saveCreateSRRInternal(
   updateTimestamp: BigInt,
   event: ethereum.Event
 ): void {
-  srr.artistAddress = artist;
   srr.isPrimaryIssuer = isPrimaryIssuer;
   srr.metadataDigest = metadataDigest;
   srr.lockExternalTransfer = lockExternalTransfer;
 
-  let issuerId = issuer.toHexString();
-  let luw = LicensedUserWallet.load(issuerId);
-  if (luw != null) {
-    srr.issuer = luw.id;
-  }
+  srr.artistAddress = artist;
+  srr.artist = getLicensedUserIdFromAddress(artist);
+  srr.issuer = getLicensedUserIdFromAddress(issuer);
   
   srr.updatedAt = updateTimestamp;
   srr.save();
 
   saveSRRMetadataHistory(srr as SRR, updateTimestamp, event);
+}
+
+function getLicensedUserIdFromAddress(address: Address): string | null {
+  let id = address.toHexString();
+  let luw = LicensedUserWallet.load(id);
+  return luw == null ? null : luw.id;
 }
 
 export function handleSRRProvenance(event: SRRProvenanceEvent): void {
@@ -761,6 +765,7 @@ export function handleProvenanceDateMigrationFix(
     return;
   }
   prov.createdAt = event.params.originTimestamp;
+  prov.timestamp = event.params.originTimestamp;
   prov.save();
 }
 

@@ -14,5 +14,5 @@ See also the Startrail API startrail-graph-client module which has predefined qu
 
 # Subgraph unit test
 
-When testing subgraphs, you should run seed-extended instead of seed-minimal. See ./bin/hardhat-and-graph-up.sh in startrail-metarepo.  
+When testing subgraphs, you should run seed-extended in addition to seed-minimal. See ./bin/hardhat-and-graph-up.sh in startrail-metarepo.  
 (Sorry startrail-metarepo repository is private!)

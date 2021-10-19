@@ -34,6 +34,7 @@ type SRR @entity {
   id: ID! # tokenId.toString()
   tokenId: String # ERC721 token id
   isPrimaryIssuer: Boolean
+  artist: LicensedUserWallet
   artistAddress: Bytes
   issuer: LicensedUserWallet
   ownerAddress: Bytes
