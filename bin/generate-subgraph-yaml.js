@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable no-console */
 /**
  * Generates a subgraph.yaml file specificly for a network deployment.
  *
@@ -110,7 +112,6 @@ subgraphYamlTemplate.dataSources.forEach((ds) => {
     )
     process.exit(4)
   }
-
 
   //
   // Get and set startBlock
