@@ -18,6 +18,7 @@ test("srrs", async () => {
     srrs(orderBy: id) {
       id
       tokenId
+      ownerAddress
       artistAddress
       artist {
         id
@@ -61,6 +62,7 @@ test("srrs", async () => {
         "0x4c8f18581c0167eb90a761b4a304e009b924f03b619a0c0e8ea3adfce20aee64",
       originChain: "eip155:31337",
       tokenId: "57470167",
+      ownerAddress: "0x864d38b2989553080dbe893f7366b2dc675cac1f",
       artistAddress: "0x864d38b2989553080dbe893f7366b2dc675cac1f",
       artist: {
         id: "0x864d38b2989553080dbe893f7366b2dc675cac1f",
@@ -78,7 +80,7 @@ test("srrs", async () => {
         {
           customHistory: {
             metadataDigest:
-            "0xcc3b6344b207c582bd727005be2a5de5bbca7b46b590d9e9189f3a9a7ea8283e"
+              "0xcc3b6344b207c582bd727005be2a5de5bbca7b46b590d9e9189f3a9a7ea8283e"
           }
         }
       ],
@@ -87,6 +89,7 @@ test("srrs", async () => {
         "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727251",
       originChain: "eip155:31337",
       tokenId: "60438356",
+      ownerAddress: "0xb31f2241cb4d48dcf7825a75b46b4f6b13829a20",
       artistAddress: "0x864d38b2989553080dbe893f7366b2dc675cac1f",
       artist: {
         id: "0x864d38b2989553080dbe893f7366b2dc675cac1f",
@@ -106,6 +109,7 @@ test("srrs", async () => {
         "0x5b985b5b195a77df122842687feb3fa0136799d0e7a6e7394adf504526727252",
       originChain: "eip155:31337",
       tokenId: "67251424",
+      ownerAddress: "0xfa08ed057457f857e9f1672cd979f5ef0628cd9a",
       artistAddress: "0x864d38b2989553080dbe893f7366b2dc675cac1f",
       artist: {
         id: "0x864d38b2989553080dbe893f7366b2dc675cac1f",
@@ -162,9 +166,10 @@ test("licensedUserWallets ", async () => {
       issuedSRRs: [
         {
           id: "57470167",
-          metadataDigest: "0x4c8f18581c0167eb90a761b4a304e009b924f03b619a0c0e8ea3adfce20aee64",
+          metadataDigest:
+            "0x4c8f18581c0167eb90a761b4a304e009b924f03b619a0c0e8ea3adfce20aee64",
           tokenId: "57470167",
-          transferCommitment: null,
+          transferCommitment: null
         }
       ],
       originChain: null,
@@ -453,23 +458,25 @@ test("metaTxRequestTypes", async () => {
         "StartrailRegistrySetLockExternalTransfer(address from,uint256 nonce,uint256 tokenId,bool flag)"
     },
     {
-      "id": "0x98ce74b76cbcc5f7fc9d14949a70627b5dc8b6d1ff04fc70f34c4839ccdabf11",
-      "typeHash": "0x98ce74b76cbcc5f7fc9d14949a70627b5dc8b6d1ff04fc70f34c4839ccdabf11",
-      "typeString": "StartrailRegistryCreateSRRWithLockExternalTransfer(address from,uint256 nonce,bool isPrimaryIssuer,address artistAddress,bytes32 metadataDigest,bool lockExternalTransfer)",
+      id: "0x98ce74b76cbcc5f7fc9d14949a70627b5dc8b6d1ff04fc70f34c4839ccdabf11",
+      typeHash:
+        "0x98ce74b76cbcc5f7fc9d14949a70627b5dc8b6d1ff04fc70f34c4839ccdabf11",
+      typeString:
+        "StartrailRegistryCreateSRRWithLockExternalTransfer(address from,uint256 nonce,bool isPrimaryIssuer,address artistAddress,bytes32 metadataDigest,bool lockExternalTransfer)"
     }
     // for decentalized storage
     // {
     //   id: "0xa5772716d883ea9d1e653c127fc4b5f193148ae32c6699efdcdba6fa2a242f4f",
-    //   typeHash: 
+    //   typeHash:
     //     "0xa5772716d883ea9d1e653c127fc4b5f193148ae32c6699efdcdba6fa2a242f4f",
-    //   typeString: 
+    //   typeString:
     //     "StartrailRegistryUpdateSRRMetadataV2(address from,uint256 nonce,bytes data,uint256 tokenId,string metadataDigest)",
     // },
     // {
     //   id: "0xe0ff2c72dcc273eb61555bd35aa1b25a97a14163d68e843f798a5763111780be",
-    //   typeHash: 
+    //   typeHash:
     //     "0xe0ff2c72dcc273eb61555bd35aa1b25a97a14163d68e843f798a5763111780be",
-    //   typeString: 
+    //   typeString:
     //     "StartrailRegistryCreateSRRV2(address from,uint256 nonce,bytes data,bool isPrimaryIssuer,address artistAddress,string metadataDigest)",
     // },
   ]
@@ -552,8 +559,8 @@ test("srrprovenances", async () => {
       metadataDigest: "0x",
       metadataURI: "",
       srr: {
-        id: "67251424",
-      },
+        id: "67251424"
+      }
     },
     {
       customHistory: null,
@@ -561,8 +568,8 @@ test("srrprovenances", async () => {
       metadataDigest: "0x",
       metadataURI: "",
       srr: {
-        id: "67251424",
-      },
+        id: "67251424"
+      }
     }
   ]
 
