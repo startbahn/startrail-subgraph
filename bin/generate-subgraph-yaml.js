@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable no-console */
 /**
  * Generates a subgraph.yaml file specificly for a network deployment.
  *
@@ -110,7 +112,6 @@ subgraphYamlTemplate.dataSources.forEach((ds) => {
     process.exit(4)
   }
 
-
   //
   // Get and set startBlock
   //
@@ -137,11 +138,12 @@ subgraphYamlTemplate.dataSources.forEach((ds) => {
     // so here, strip out the ABI for the function using the 2d array.
     // it's not required by the subgraph.
     const bulkIssueABI = JSON.parse(fs.readFileSync(abiFilePath))
-    const bulkissueABIModified = bulkIssueABI.filter(e => e.name !== 'createSRRWithProofMulti')
+    const bulkissueABIModified = bulkIssueABI.filter(
+      (e) => e.name !== 'createSRRWithProofMulti'
+    )
     abiFilePath = path.join(os.tmpdir(), `BulkIssue.json`)
     fs.writeFileSync(abiFilePath, JSON.stringify(bulkissueABIModified, null, 2))
   }
-
 
   //
   // Set dataSource properties
