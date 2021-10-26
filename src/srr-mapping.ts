@@ -26,6 +26,7 @@ import {
   CreateSRR1 as CreateSRRWithLockExternalTransferEvent,
   CreateSRRFromMigration as CreateSRRFromMigrationEvent,
   History as SRRHistoryEvent,
+  LockExternalTransfer as LockExternalTransferEvent,
   MigrateSRR as MigrateSRREvent,
   Provenance as SRRProvenanceEvent,
   Provenance1 as SRRProvenanceWithCustomHistoryEvent,
@@ -46,7 +47,6 @@ import {
   UpdateSRRFromMigration as UpdateSRRFromMigrationEvent,
   UpdateSRRMetadataDigest as UpdateSRRMetadataDigestEvent,
   UpdateSRRMetadataDigestFromMigration as UpdateSRRMetadataDigestFromMigrationEvent,
-  LockExternalTransfer as LockExternalTransferEvent,
 } from '../generated/StartrailRegistry/StartrailRegistry'
 import {
   currentChainId,
@@ -57,92 +57,95 @@ import {
 } from './utils'
 
 export function handleTransfer(event: TransferEvent): void {
-  logInvocation("handleTransfer", event);
+  logInvocation('handleTransfer', event)
 
-  let timestampMillis = eventUTCMillis(event);
-  let srrId = event.params.tokenId.toString();
-  let srrIdBigInt = event.params.tokenId;
+  const timestampMillis = eventUTCMillis(event)
+  const srrId = event.params.tokenId.toString()
+  const srrIdBigInt = event.params.tokenId
 
-  let srr = SRR.load(srrId);
+  const isMint = event.params.from.toHexString() == ZERO_ADDRESS.toHexString()
+
+  let srr = SRR.load(srrId)
   if (srr == null) {
-    srr = new SRR(srrId);
-    srr.tokenId = srrId;
-    srr.ownerAddress = event.params.to;
-    srr.lockExternalTransfer = false;
-  
-    srr.originChain = currentChainId();
-    srr.originTxHash = event.transaction.hash;
-  
-    if (event.params.from.toHexString() == ZERO_ADDRESS.toHexString()) {
-      srr.createdAt = timestampMillis;
+    srr = new SRR(srrId)
+    srr.tokenId = srrId
+    srr.lockExternalTransfer = false
+
+    srr.originChain = currentChainId()
+    srr.originTxHash = event.transaction.hash
+
+    if (isMint == true) {
+      srr.createdAt = timestampMillis
     }
   }
-  srr.updatedAt = timestampMillis;
-  
-  handleSRRProvenanceInternal(
-    eventUTCMillis(event),
-    srrIdBigInt,
-    event.params.from,
-    event.params.to,
-    null,
-    null,
-    null,
-    false
-  );
+  srr.ownerAddress = event.params.to
+  srr.updatedAt = timestampMillis
+  srr.save()
 
-  checkAndClearCommitOnTransfer(srr as SRR, timestampMillis);
-
-  srr.save();
+  if (isMint == false) {
+    handleSRRProvenanceInternal(
+      timestampMillis,
+      srrIdBigInt,
+      event.params.from,
+      event.params.to,
+      null,
+      null,
+      null,
+      false
+    )
+    checkAndClearCommitOnTransfer(srr as SRR, timestampMillis)
+    srr.save()
+  }
 }
 
 export function handleTransferFromMigration(
   event: TransferFromMigrationEvent
 ): void {
-  logInvocation("handleTransferFromMigration", event);
-  let originTimestampMillis = secondsToMillis(event.params.originTimestamp);
+  logInvocation('handleTransferFromMigration', event)
+  const originTimestampMillis = secondsToMillis(event.params.originTimestamp)
 
-  let srrId = event.params.tokenId.toString();
-  let srr = SRR.load(srrId);
+  const srrId = event.params.tokenId.toString()
+  let srr = SRR.load(srrId)
 
   // In the normal case where a Transfer is emitted before a CreateSRR.
   // However due to a Mainnet migration in Oct 2020 sometimes this order is
   // flipped. So we handle this case here by creating the entity.
   if (srr == null) {
-    srr = new SRR(srrId);
-    srr.tokenId = srrId;
-    srr.createdAt = originTimestampMillis;
-    srr.originChain = currentChainId();
-    srr.originTxHash = event.params.originTxHash;
+    srr = new SRR(srrId)
+    srr.tokenId = srrId
+    srr.createdAt = originTimestampMillis
+    srr.originChain = currentChainId()
+    srr.originTxHash = event.params.originTxHash
   }
 
   if (event.params.from.toHexString() != ZERO_ADDRESS.toHexString()) {
-    checkAndClearCommitOnTransfer(srr as SRR, originTimestampMillis);
+    checkAndClearCommitOnTransfer(srr as SRR, originTimestampMillis)
   }
 
-  srr.ownerAddress = event.params.to;
-  srr.updatedAt = originTimestampMillis;
+  srr.ownerAddress = event.params.to
+  srr.updatedAt = originTimestampMillis
 
-  srr.save();
+  srr.save()
 }
 
 function checkAndClearCommitOnTransfer(srr: SRR, eventTime: BigInt): void {
-  log.info("clearing transferCommitment on token = {}", [srr.tokenId as string]);
-  let srrCommit = SRRTransferCommit.load(srr.tokenId as string);
+  log.info('clearing transferCommitment on token = {}', [srr.tokenId as string])
+  const srrCommit = SRRTransferCommit.load(srr.tokenId as string)
   if (srrCommit != null) {
-    srrCommit.commitment = null;
-    srrCommit.lastAction = "transfer";
-    srrCommit.updatedAt = eventTime;
-    srrCommit.save();
+    srrCommit.commitment = null
+    srrCommit.lastAction = 'transfer'
+    srrCommit.updatedAt = eventTime
+    srrCommit.save()
   }
-  srr.transferCommitment = null;
+  srr.transferCommitment = null
 }
 
 export function handleCreateSRR(event: CreateSRREvent): void {
-  logInvocation("handleCreateSRR", event);
+  logInvocation('handleCreateSRR', event)
 
-  let timestampMillis = eventUTCMillis(event);
-  let srrId = event.params.tokenId.toString();
-  let srr = SRR.load(srrId);
+  const timestampMillis = eventUTCMillis(event)
+  const srrId = event.params.tokenId.toString()
+  const srr = SRR.load(srrId)
 
   saveCreateSRRInternal(
     srr as SRR,
@@ -153,15 +156,17 @@ export function handleCreateSRR(event: CreateSRREvent): void {
     false,
     timestampMillis,
     event
-  );
+  )
 }
 
-export function handleCreateSRRWithLockExternalTransfer(event: CreateSRRWithLockExternalTransferEvent): void {
-  logInvocation("handleCreateSRRWithLockExternalTransfer", event);
+export function handleCreateSRRWithLockExternalTransfer(
+  event: CreateSRRWithLockExternalTransferEvent
+): void {
+  logInvocation('handleCreateSRRWithLockExternalTransfer', event)
 
-  let timestampMillis = eventUTCMillis(event);
-  let srrId = event.params.tokenId.toString();
-  let srr = SRR.load(srrId);
+  const timestampMillis = eventUTCMillis(event)
+  const srrId = event.params.tokenId.toString()
+  const srr = SRR.load(srrId)
 
   saveCreateSRRInternal(
     srr as SRR,
@@ -172,26 +177,26 @@ export function handleCreateSRRWithLockExternalTransfer(event: CreateSRRWithLock
     event.params.lockExternalTransfer,
     timestampMillis,
     event
-  );
+  )
 }
 
 export function handleCreateSRRFromMigration(
   event: CreateSRRFromMigrationEvent
 ): void {
-  logInvocation("handleCreateSRRFromMigration", event);
+  logInvocation('handleCreateSRRFromMigration', event)
 
-  let timestampMillis = secondsToMillis(event.params.originTimestamp);
-  let srrId = event.params.tokenId.toString();
-  let srr = SRR.load(srrId);
+  const timestampMillis = secondsToMillis(event.params.originTimestamp)
+  const srrId = event.params.tokenId.toString()
+  let srr = SRR.load(srrId)
 
   // In the normal case where a Transfer is emitted before a CreateSRR.
   // However due to a Mainnet migration in Oct 2020 sometimes this order is
   // flipped. So we handle this case here by creating the entity.
   if (srr == null) {
-    srr = new SRR(srrId);
-    srr.tokenId = srrId;
-    srr.createdAt = timestampMillis;
-    srr.originTxHash = event.params.originTxHash;
+    srr = new SRR(srrId)
+    srr.tokenId = srrId
+    srr.createdAt = timestampMillis
+    srr.originTxHash = event.params.originTxHash
   }
 
   saveCreateSRRInternal(
@@ -203,7 +208,7 @@ export function handleCreateSRRFromMigration(
     false,
     timestampMillis,
     event
-  );
+  )
 }
 
 function saveCreateSRRInternal(
@@ -216,29 +221,29 @@ function saveCreateSRRInternal(
   updateTimestamp: BigInt,
   event: ethereum.Event
 ): void {
-  srr.isPrimaryIssuer = isPrimaryIssuer;
-  srr.metadataDigest = metadataDigest;
-  srr.lockExternalTransfer = lockExternalTransfer;
+  srr.isPrimaryIssuer = isPrimaryIssuer
+  srr.metadataDigest = metadataDigest
+  srr.lockExternalTransfer = lockExternalTransfer
 
-  srr.artistAddress = artist;
-  srr.artist = getLicensedUserIdFromAddress(artist);
-  srr.issuer = getLicensedUserIdFromAddress(issuer);
-  
-  srr.updatedAt = updateTimestamp;
-  srr.save();
+  srr.artistAddress = artist
+  srr.artist = getLicensedUserIdFromAddress(artist)
+  srr.issuer = getLicensedUserIdFromAddress(issuer)
 
-  saveSRRMetadataHistory(srr as SRR, updateTimestamp, event);
+  srr.updatedAt = updateTimestamp
+  srr.save()
+
+  saveSRRMetadataHistory(srr as SRR, updateTimestamp, event)
 }
 
 function getLicensedUserIdFromAddress(address: Address): string | null {
-  let id = address.toHexString();
-  let luw = LicensedUserWallet.load(id);
-  return luw == null ? null : luw.id;
+  const id = address.toHexString()
+  const luw = LicensedUserWallet.load(id)
+  return luw == null ? null : luw.id
 }
 
 export function handleSRRProvenance(event: SRRProvenanceEvent): void {
-  logInvocation("handleSRRProvenance", event);
-  let params = event.params;
+  logInvocation('handleSRRProvenance', event)
+  const params = event.params
   handleSRRProvenanceInternal(
     eventUTCMillis(event),
     params.tokenId,
@@ -248,14 +253,14 @@ export function handleSRRProvenance(event: SRRProvenanceEvent): void {
     params.historyMetadataDigest,
     params.historyMetadataURI,
     false
-  );
+  )
 }
 
 export function handleSRRProvenanceWithCustomHistory(
   event: SRRProvenanceWithCustomHistoryEvent
 ): void {
-  logInvocation("handleSRRProvenanceWithCustomHistory", event);
-  let params = event.params;
+  logInvocation('handleSRRProvenanceWithCustomHistory', event)
+  const params = event.params
   handleSRRProvenanceInternal(
     eventUTCMillis(event),
     params.tokenId,
@@ -265,14 +270,14 @@ export function handleSRRProvenanceWithCustomHistory(
     params.historyMetadataDigest,
     params.historyMetadataURI,
     false
-  );
+  )
 }
 
 export function handleSRRProvenanceWithIntermediary(
   event: SRRProvenanceWithIntermediaryEvent
 ): void {
-  logInvocation("handleSRRProvenance", event);
-  let params = event.params;
+  logInvocation('handleSRRProvenance', event)
+  const params = event.params
   handleSRRProvenanceInternal(
     eventUTCMillis(event),
     params.tokenId,
@@ -282,14 +287,14 @@ export function handleSRRProvenanceWithIntermediary(
     params.historyMetadataDigest,
     params.historyMetadataURI,
     params.isIntermediary
-  );
+  )
 }
 
 export function handleSRRProvenanceWithCustomHistoryAndIntermediary(
   event: SRRProvenanceWithCustomHistoryAndIntermediaryEvent
 ): void {
-  logInvocation("handleSRRProvenanceWithCustomHistory", event);
-  let params = event.params;
+  logInvocation('handleSRRProvenanceWithCustomHistory', event)
+  const params = event.params
   handleSRRProvenanceInternal(
     eventUTCMillis(event),
     params.tokenId,
@@ -299,7 +304,7 @@ export function handleSRRProvenanceWithCustomHistoryAndIntermediary(
     params.historyMetadataDigest,
     params.historyMetadataURI,
     params.isIntermediary
-  );
+  )
 }
 
 /**
@@ -318,65 +323,65 @@ function handleSRRProvenanceInternal(
   historyMetadataURI: string | null,
   isIntermediary: boolean
 ): void {
-  let srrId = tokenId.toString();
-  let srr = SRR.load(srrId);
+  const srrId = tokenId.toString()
+  const srr = SRR.load(srrId)
   if (srr == null) {
-    log.error("received event for unknown SRR: {}", [srrId]);
-    return;
+    log.error('received event for unknown SRR: {}', [srrId])
+    return
   }
 
   // Update existing SRR
-  srr.ownerAddress = to;
-  srr.updatedAt = eventTimestampMillis;
-  srr.save();
+  srr.ownerAddress = to
+  srr.updatedAt = eventTimestampMillis
+  srr.save()
 
   // Create new Provenance if we can't find srrProvenance with provenanceId.
   // This is because we need to create a provenance entity even if the transfer event is emitted to be compatible with opensea.
-  let provenanceId = crypto
+  const provenanceId = crypto
     .keccak256(
       ByteArray.fromUTF8(tokenId.toString() + eventTimestampMillis.toString())
     )
-    .toHexString();
-  let provenance = SRRProvenance.load(provenanceId);
+    .toHexString()
+  let provenance = SRRProvenance.load(provenanceId)
   if (!provenance) {
-    provenance = new SRRProvenance(provenanceId);
+    provenance = new SRRProvenance(provenanceId)
 
-    provenance.srr = srr.id;
-    provenance.from = from;
-    provenance.to = to;
-  
+    provenance.srr = srr.id
+    provenance.from = from
+    provenance.to = to
+
     if (historyMetadataDigest) {
       provenance.metadataDigest = Bytes.fromHexString(
         historyMetadataDigest
-      ) as Bytes;  
+      ) as Bytes
     } else {
       provenance.metadataDigest = new Bytes(0)
     }
 
     if (historyMetadataURI) {
-      provenance.metadataURI = historyMetadataURI;
+      provenance.metadataURI = historyMetadataURI
     } else {
-      provenance.metadataURI = ""
+      provenance.metadataURI = ''
     }
-  
+
     if (customHistoryId) {
       // CustomHistory.load(event.params.customHistoryId)
-      provenance.customHistory = customHistoryId.toString();
+      provenance.customHistory = customHistoryId.toString()
     }
-    provenance.isIntermediary = isIntermediary;
-  
-    provenance.timestamp = eventTimestampMillis;
-    provenance.createdAt = eventTimestampMillis;
-  
-    provenance.save();  
+    provenance.isIntermediary = isIntermediary
+
+    provenance.timestamp = eventTimestampMillis
+    provenance.createdAt = eventTimestampMillis
+
+    provenance.save()
   }
 }
 
 export function handleSRRProvenanceFromMigration(
   event: SRRProvenanceFromMigrationEvent
 ): void {
-  logInvocation("handleSRRProvenanceFromMigration", event);
-  let params = event.params;
+  logInvocation('handleSRRProvenanceFromMigration', event)
+  const params = event.params
   handleSRRProvenanceInternal(
     secondsToMillis(event.params.originTimestamp),
     params.tokenId,
@@ -386,14 +391,14 @@ export function handleSRRProvenanceFromMigration(
     params.historyMetadataDigest,
     params.historyMetadataURI,
     false
-  );
+  )
 }
 
 export function handleSRRProvenanceWithCustomHistoryFromMigration(
   event: SRRProvenanceWithCustomHistoryFromMigrationEvent
 ): void {
-  logInvocation("handleSRRProvenanceWithCustomHistoryFromMigration", event);
-  let params = event.params;
+  logInvocation('handleSRRProvenanceWithCustomHistoryFromMigration', event)
+  const params = event.params
   handleSRRProvenanceInternal(
     secondsToMillis(event.params.originTimestamp),
     params.tokenId,
@@ -403,27 +408,27 @@ export function handleSRRProvenanceWithCustomHistoryFromMigration(
     params.historyMetadataDigest,
     params.historyMetadataURI,
     false
-  );
+  )
 }
 
 export function handleCustomHistoryType(
   event: CustomHistoryTypeCreatedEvent
 ): void {
-  logInvocation("handleCustomHistoryType", event);
+  logInvocation('handleCustomHistoryType', event)
 
-  let id = event.params.id.toString();
+  const id = event.params.id.toString()
 
-  let cht = new CustomHistoryType(id);
-  cht.name = event.params.historyType;
-  cht.createdAt = eventUTCMillis(event);
+  const cht = new CustomHistoryType(id)
+  cht.name = event.params.historyType
+  cht.createdAt = eventUTCMillis(event)
 
-  cht.save();
+  cht.save()
 }
 
 export function handleCreateCustomHistory(
   event: CustomHistoryCreatedEvent
 ): void {
-  logInvocation("handleCreateCustomHistory", event);
+  logInvocation('handleCreateCustomHistory', event)
   handleCreateCustomHistoryInternal(
     eventUTCMillis(event),
     event.params.id,
@@ -432,13 +437,13 @@ export function handleCreateCustomHistory(
     event.params.metadataDigest,
     currentChainId(),
     event.transaction.hash
-  );
+  )
 }
 
 export function handleCreateCustomHistoryFromMigration(
   event: CustomHistoryCreatedFromMigrationEvent
 ): void {
-  logInvocation("handleCreateCustomHistoryFromMigration", event);
+  logInvocation('handleCreateCustomHistoryFromMigration', event)
   handleCreateCustomHistoryInternal(
     secondsToMillis(event.params.originTimestamp),
     event.params.id,
@@ -447,7 +452,7 @@ export function handleCreateCustomHistoryFromMigration(
     event.params.metadataDigest,
     event.params.originChain,
     event.params.originTxHash
-  );
+  )
 }
 
 function handleCreateCustomHistoryInternal(
@@ -459,65 +464,65 @@ function handleCreateCustomHistoryInternal(
   originChain: string,
   originTxHash: Bytes
 ): void {
-  let ch = new CustomHistory(id.toString());
-  ch.name = name;
-  ch.historyType = customHistoryTypeId.toString();
-  ch.metadataDigest = metadataDigest;
-  ch.originChain = originChain;
-  ch.originTxHash = originTxHash;
-  ch.createdAt = eventTimestampMillis;
-  ch.save();
+  const ch = new CustomHistory(id.toString())
+  ch.name = name
+  ch.historyType = customHistoryTypeId.toString()
+  ch.metadataDigest = metadataDigest
+  ch.originChain = originChain
+  ch.originTxHash = originTxHash
+  ch.createdAt = eventTimestampMillis
+  ch.save()
 }
 
 export function handleSRRHistory(event: SRRHistoryEvent): void {
-  logInvocation("handleSRRHistory", event);
+  logInvocation('handleSRRHistory', event)
 
-  let tokenIds = event.params.tokenIds;
-  let customHistoryIds = event.params.customHistoryIds;
+  const tokenIds = event.params.tokenIds
+  const customHistoryIds = event.params.customHistoryIds
 
   for (let tokenIdsIdx = 0; tokenIdsIdx < tokenIds.length; tokenIdsIdx++) {
-    let tokenId = tokenIds[tokenIdsIdx].toString();
+    const tokenId = tokenIds[tokenIdsIdx].toString()
     for (
       let customHistoryIdsIdx = 0;
       customHistoryIdsIdx < customHistoryIds.length;
       customHistoryIdsIdx++
     ) {
-      let customHistoryId = customHistoryIds[customHistoryIdsIdx].toString();
-      let historyId = crypto
+      const customHistoryId = customHistoryIds[customHistoryIdsIdx].toString()
+      const historyId = crypto
         .keccak256(ByteArray.fromUTF8(tokenId + customHistoryId))
-        .toHexString();
+        .toHexString()
 
-      let history = new SRRHistory(historyId);
-      history.srr = tokenId;
-      history.customHistory = customHistoryId;
-      history.createdAt = eventUTCMillis(event);
-      history.save();
+      const history = new SRRHistory(historyId)
+      history.srr = tokenId
+      history.customHistory = customHistoryId
+      history.createdAt = eventUTCMillis(event)
+      history.save()
     }
   }
 }
 
 export function handleSRRCommitment(event: SRRCommitmentEvent): void {
-  logInvocation("handleSRRCommitment", event);
-  let params = event.params;
+  logInvocation('handleSRRCommitment', event)
+  const params = event.params
   handleSRRCommitmentInternal(
     eventUTCMillis(event),
     params.commitment,
     params.tokenId,
     null
-  );
+  )
 }
 
 export function handleSRRCommitmentWithCustomHistory(
   event: SRRCommitmentWithCustomHistoryEvent
 ): void {
-  logInvocation("handleSRRCommitmentWithCustomHistory", event);
-  let params = event.params;
+  logInvocation('handleSRRCommitmentWithCustomHistory', event)
+  const params = event.params
   handleSRRCommitmentInternal(
     eventUTCMillis(event),
     params.commitment,
     params.tokenId,
     params.customHistoryId
-  );
+  )
 }
 
 function handleSRRCommitmentInternal(
@@ -526,132 +531,132 @@ function handleSRRCommitmentInternal(
   tokenId: BigInt,
   customHistoryId: BigInt | null
 ): void {
-  let srrId = tokenId.toString();
-  let srr = SRR.load(srrId);
+  const srrId = tokenId.toString()
+  const srr = SRR.load(srrId)
   if (srr == null) {
-    log.error("received event for unknown SRR: {}", [srrId]);
-    return;
+    log.error('received event for unknown SRR: {}', [srrId])
+    return
   }
 
-  log.info("SRRCommitment commitment = {}", [commitment.toHexString()]);
+  log.info('SRRCommitment commitment = {}', [commitment.toHexString()])
 
-  srr.transferCommitment = commitment;
-  srr.updatedAt = eventTimestampMillis;
-  srr.save();
+  srr.transferCommitment = commitment
+  srr.updatedAt = eventTimestampMillis
+  srr.save()
 
-  let srrCommit = SRRTransferCommit.load(srrId);
+  let srrCommit = SRRTransferCommit.load(srrId)
   if (srrCommit == null) {
-    srrCommit = new SRRTransferCommit(srrId);
-    srrCommit.createdAt = eventTimestampMillis;
+    srrCommit = new SRRTransferCommit(srrId)
+    srrCommit.createdAt = eventTimestampMillis
   }
 
-  srrCommit.commitment = srr.transferCommitment;
-  srrCommit.lastAction = "approve";
+  srrCommit.commitment = srr.transferCommitment
+  srrCommit.lastAction = 'approve'
 
   if (customHistoryId != null) {
-    srrCommit.customHistory = customHistoryId.toString();
+    srrCommit.customHistory = customHistoryId.toString()
   }
 
-  srrCommit.updatedAt = eventTimestampMillis;
-  srrCommit.save();
+  srrCommit.updatedAt = eventTimestampMillis
+  srrCommit.save()
 }
 
 export function handleSRRCommitmentFromMigration(
   event: SRRCommitmentFromMigrationEvent
 ): void {
-  logInvocation("handleSRRCommitmentFromMigration", event);
-  let params = event.params;
+  logInvocation('handleSRRCommitmentFromMigration', event)
+  const params = event.params
   handleSRRCommitmentInternal(
     secondsToMillis(event.params.originTimestamp),
     params.commitment,
     params.tokenId,
     null
-  );
+  )
 }
 
 export function handleSRRCommitmentWithCustomHistoryFromMigration(
   event: SRRCommitmentWithCustomHistoryFromMigrationEvent
 ): void {
-  logInvocation("handleSRRCommitmentWithCustomHistoryFromMigration", event);
-  let params = event.params;
+  logInvocation('handleSRRCommitmentWithCustomHistoryFromMigration', event)
+  const params = event.params
   handleSRRCommitmentInternal(
     secondsToMillis(event.params.originTimestamp),
     params.commitment,
     params.tokenId,
     params.customHistoryId
-  );
+  )
 }
 
 export function handleSRRCommitmentCancelled(
   event: SRRCommitmentCancelledEvent
 ): void {
-  logInvocation("handleSRRCommitmentCancelled", event);
+  logInvocation('handleSRRCommitmentCancelled', event)
   handleSRRCommitmentCancelledInternal(
     eventUTCMillis(event),
     event.params.tokenId
-  );
+  )
 }
 
 export function handleSRRCommitmentCancelledFromMigration(
   event: SRRCommitmentCancelledFromMigrationEvent
 ): void {
-  logInvocation("handleSRRCommitmentCancelledFromMigration", event);
+  logInvocation('handleSRRCommitmentCancelledFromMigration', event)
   handleSRRCommitmentCancelledInternal(
     secondsToMillis(event.params.originTimestamp),
     event.params.tokenId
-  );
+  )
 }
 
 function handleSRRCommitmentCancelledInternal(
   eventTimestampMillis: BigInt,
   tokenId: BigInt
 ): void {
-  let srrId = tokenId.toString();
-  let srr = SRR.load(srrId);
+  const srrId = tokenId.toString()
+  const srr = SRR.load(srrId)
   if (srr == null) {
-    log.error("received event for unknown SRR: {}", [srrId]);
-    return;
+    log.error('received event for unknown SRR: {}', [srrId])
+    return
   }
 
-  srr.transferCommitment = null;
-  srr.updatedAt = eventTimestampMillis;
-  srr.save();
+  srr.transferCommitment = null
+  srr.updatedAt = eventTimestampMillis
+  srr.save()
 
-  let srrCommit = SRRTransferCommit.load(srrId);
+  const srrCommit = SRRTransferCommit.load(srrId)
   if (srrCommit == null) {
     log.error(
       `received event but don't have corresponding SRRTransferCommit: {}`,
       [srrId]
-    );
-    return;
+    )
+    return
   }
 
-  srrCommit.lastAction = "cancel";
-  srrCommit.commitment = null;
-  srrCommit.updatedAt = eventTimestampMillis;
-  srrCommit.save();
+  srrCommit.lastAction = 'cancel'
+  srrCommit.commitment = null
+  srrCommit.updatedAt = eventTimestampMillis
+  srrCommit.save()
 }
 
 export function handleUpdateSRR(event: UpdateSRREvent): void {
-  logInvocation("handleUpdateSRR", event);
+  logInvocation('handleUpdateSRR', event)
   handleUpdateSRRInternal(
     eventUTCMillis(event),
     event.params.registryRecord.isPrimaryIssuer,
     event.params.registryRecord.artistAddress,
     event.params.tokenId
-  );
+  )
 }
 
 export function handleUpdateSRRFromMigration(
   event: UpdateSRRFromMigrationEvent
 ): void {
-  logInvocation("handleUpdateSRRFromMigration", event);
+  logInvocation('handleUpdateSRRFromMigration', event)
   handleUpdateSRRInternal(
     secondsToMillis(event.params.originTimestamp),
     event.params.registryRecord.isPrimaryIssuer,
     event.params.registryRecord.artistAddress,
     event.params.tokenId
-  );
+  )
 }
 
 function handleUpdateSRRInternal(
@@ -660,42 +665,42 @@ function handleUpdateSRRInternal(
   artistAddress: Address,
   tokenId: BigInt
 ): void {
-  let srrId = tokenId.toString();
-  let srr = SRR.load(srrId);
+  const srrId = tokenId.toString()
+  const srr = SRR.load(srrId)
   if (srr == null) {
-    log.error("received event for unknown SRR: {}", [srrId]);
-    return;
+    log.error('received event for unknown SRR: {}', [srrId])
+    return
   }
 
-  srr.isPrimaryIssuer = isPrimaryIssuer;
-  srr.artistAddress = artistAddress;
-  srr.updatedAt = eventTimestampMillis;
+  srr.isPrimaryIssuer = isPrimaryIssuer
+  srr.artistAddress = artistAddress
+  srr.updatedAt = eventTimestampMillis
 
-  srr.save();
+  srr.save()
 }
 
 export function handleUpdateSRRMetadataDigest(
   event: UpdateSRRMetadataDigestEvent
 ): void {
-  logInvocation("handleUpdateSRRMetadataDigest", event);
+  logInvocation('handleUpdateSRRMetadataDigest', event)
   handleUpdateSRRMetadataDigestInternal(
     eventUTCMillis(event),
     event.params.tokenId,
     event.params.metadataDigest,
     event
-  );
+  )
 }
 
 export function handleUpdateSRRMetadataDigestFromMigration(
   event: UpdateSRRMetadataDigestFromMigrationEvent
 ): void {
-  logInvocation("handleUpdateSRRMetadataDigestFromMigration", event);
+  logInvocation('handleUpdateSRRMetadataDigestFromMigration', event)
   handleUpdateSRRMetadataDigestInternal(
     secondsToMillis(event.params.originTimestamp),
     event.params.tokenId,
     event.params.metadataDigest,
     event
-  );
+  )
 }
 
 function handleUpdateSRRMetadataDigestInternal(
@@ -704,18 +709,18 @@ function handleUpdateSRRMetadataDigestInternal(
   metadataDigest: Bytes,
   event: ethereum.Event
 ): void {
-  let srrId = tokenId.toString();
-  let srr = SRR.load(srrId);
+  const srrId = tokenId.toString()
+  const srr = SRR.load(srrId)
   if (srr == null) {
-    log.error("received event for unknown SRR: {}", [srrId]);
-    return;
+    log.error('received event for unknown SRR: {}', [srrId])
+    return
   }
 
-  srr.updatedAt = eventTimestampMillis;
-  srr.metadataDigest = metadataDigest;
-  srr.save();
+  srr.updatedAt = eventTimestampMillis
+  srr.metadataDigest = metadataDigest
+  srr.save()
 
-  saveSRRMetadataHistory(srr as SRR, eventTimestampMillis, event);
+  saveSRRMetadataHistory(srr as SRR, eventTimestampMillis, event)
 }
 
 function saveSRRMetadataHistory(
@@ -723,7 +728,7 @@ function saveSRRMetadataHistory(
   eventTimestampMillis: BigInt,
   event: ethereum.Event
 ): void {
-  let metadataHistoryId = crypto
+  const metadataHistoryId = crypto
     .keccak256(
       ByteArray.fromUTF8(
         event.transaction.hash.toHexString() +
@@ -731,54 +736,56 @@ function saveSRRMetadataHistory(
           (srr.metadataDigest as Bytes).toHexString()
       )
     )
-    .toHexString();
+    .toHexString()
 
-  let srrMetadataHistory = new SRRMetadataHistory(metadataHistoryId); // metadataHistoryId)
-  srrMetadataHistory.srr = srr.id;
-  srrMetadataHistory.createdAt = eventTimestampMillis;
+  const srrMetadataHistory = new SRRMetadataHistory(metadataHistoryId) // metadataHistoryId)
+  srrMetadataHistory.srr = srr.id
+  srrMetadataHistory.createdAt = eventTimestampMillis
   srrMetadataHistory.metadataDigest = Bytes.fromHexString(
     (srr.metadataDigest as Bytes).toHexString()
-  ) as Bytes;
-  srrMetadataHistory.save();
+  ) as Bytes
+  srrMetadataHistory.save()
 }
 
 export function handleMigrateSRR(event: MigrateSRREvent): void {
-  logInvocation("handleMigrateSRR", event);
-  let srrId = event.params.tokenId.toString();
-  let srr = SRR.load(srrId);
-  srr.originChain = event.params.originChain;
-  srr.save();
+  logInvocation('handleMigrateSRR', event)
+  const srrId = event.params.tokenId.toString()
+  const srr = SRR.load(srrId)
+  if (srr) {
+    srr.originChain = event.params.originChain
+    srr.save()
+  }
 }
 
 export function handleProvenanceDateMigrationFix(
   event: ProvenanceDateMigrationFixEvent
 ): void {
-  logInvocation("handleProvenanceDateMigrationFix", event);
-  let provenanceId = crypto
-    .keccak256(ByteArray.fromUTF8(event.params.tokenId.toString() + "66000"))
-    .toHexString();
-  let prov = SRRProvenance.load(provenanceId);
+  logInvocation('handleProvenanceDateMigrationFix', event)
+  const provenanceId = crypto
+    .keccak256(ByteArray.fromUTF8(event.params.tokenId.toString() + '66000'))
+    .toHexString()
+  const prov = SRRProvenance.load(provenanceId)
   if (prov == null) {
-    log.error("received fix event but provenance not found: {}", [
-      provenanceId,
-    ]);
-    return;
+    log.error('received fix event but provenance not found: {}', [provenanceId])
+    return
   }
-  prov.createdAt = event.params.originTimestamp;
-  prov.timestamp = event.params.originTimestamp;
-  prov.save();
+  prov.createdAt = event.params.originTimestamp
+  prov.timestamp = event.params.originTimestamp
+  prov.save()
 }
 
-export function handleLockExternalTransfer(event: LockExternalTransferEvent): void {
-  logInvocation("handleLockExternalTransfer", event);
-  let srrId = event.params.tokenId.toString();
-  let srr = SRR.load(srrId);
-  if(srr == null){
-    log.error("received lock external transfer event but srr not found: {}", [
+export function handleLockExternalTransfer(
+  event: LockExternalTransferEvent
+): void {
+  logInvocation('handleLockExternalTransfer', event)
+  const srrId = event.params.tokenId.toString()
+  const srr = SRR.load(srrId)
+  if (srr == null) {
+    log.error('received lock external transfer event but srr not found: {}', [
       srrId,
-    ]);
-    return;
+    ])
+    return
   }
-  srr.lockExternalTransfer = event.params.flag;
-  srr.save();
+  srr.lockExternalTransfer = event.params.flag
+  srr.save()
 }
