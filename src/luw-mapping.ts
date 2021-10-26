@@ -15,184 +15,184 @@ import { eventUTCMillis, logInvocation, secondsToMillis } from './utils'
 function userType(n: i32): string {
   switch (n) {
     case 0:
-      return "handler";
+      return 'handler'
     case 1:
-      return "artist";
+      return 'artist'
     default:
-      log.error(`unhandled userType: {}`, [n.toString()]);
-      return "";
+      log.error(`unhandled userType: {}`, [n.toString()])
+      return ''
   }
 }
 
 export function handleCreateLicensedUserWallet(event: CreateLUWEvent): void {
-  logInvocation("handleCreateLicensedUserWallet", event);
+  logInvocation('handleCreateLicensedUserWallet', event)
 
-  let timestampMillis = eventUTCMillis(event);
-  let luwId = event.params.walletAddress.toHexString();
-  let luw = LicensedUserWallet.load(luwId);
+  const timestampMillis = eventUTCMillis(event)
+  const luwId = event.params.walletAddress.toHexString()
+  let luw = LicensedUserWallet.load(luwId)
 
   // New wallet (not a migration from legacy)
   // If it's a migration we skip setting these values as they are already set
   if (luw == null) {
-    log.info("creating new LUW [{}, {}]", [event.params.originalName, luwId]);
-    luw = new LicensedUserWallet(luwId);
-    luw.walletAddress = event.params.walletAddress;
-    luw.englishName = event.params.englishName;
-    luw.originalName = event.params.originalName;
-    luw.owners = event.params.owners as Array<Bytes>;
-    luw.threshold = event.params.threshold;
-    luw.createdAt = timestampMillis;
+    log.info('creating new LUW [{}, {}]', [event.params.originalName, luwId])
+    luw = new LicensedUserWallet(luwId)
+    luw.walletAddress = event.params.walletAddress
+    luw.englishName = event.params.englishName
+    luw.originalName = event.params.originalName
+    luw.owners = event.params.owners as Array<Bytes>
+    luw.threshold = event.params.threshold
+    luw.createdAt = timestampMillis
   } else {
-    log.info("migrating legacy LUW {}", [luwId]);
+    log.info('migrating legacy LUW {}', [luwId])
   }
 
-  luw.userType = userType(event.params.userType);
-  luw.salt = event.params.salt;
-  luw.updatedAt = timestampMillis;
+  luw.userType = userType(event.params.userType)
+  luw.salt = event.params.salt
+  luw.updatedAt = timestampMillis
 
-  luw.save();
+  luw.save()
 }
 
 export function handleAddedOwner(event: AddedOwnerEvent): void {
-  logInvocation("handleAddedOwner", event);
+  logInvocation('handleAddedOwner', event)
 
-  let luwId = event.params.wallet.toHexString();
-  let luw = LicensedUserWallet.load(luwId);
+  const luwId = event.params.wallet.toHexString()
+  const luw = LicensedUserWallet.load(luwId)
 
   if (luw == null) {
-    log.error("received AddedOwner event for unknown LUW: {}", [luwId]);
-    return;
+    log.error('received AddedOwner event for unknown LUW: {}', [luwId])
+    return
   }
 
-  let owner = event.params.owner;
-  log.info("adding owner [{}] to LUW [{}]", [owner.toHexString(), luwId]);
+  const owner = event.params.owner
+  log.info('adding owner [{}] to LUW [{}]', [owner.toHexString(), luwId])
 
   // this 3 step assign, push, reassign is necessary here:
   // (see https://thegraph.com/docs/assemblyscript-api#api-reference):
-  let owners = luw.owners;
-  owners.push(owner);
-  luw.owners = owners;
+  const owners = luw.owners
+  owners.push(owner)
+  luw.owners = owners
 
-  luw.updatedAt = eventUTCMillis(event);
-  luw.save();
+  luw.updatedAt = eventUTCMillis(event)
+  luw.save()
 }
 
 export function handleRemovedOwner(event: RemovedOwnerEvent): void {
-  logInvocation("handleRemovedOwner", event);
+  logInvocation('handleRemovedOwner', event)
 
-  let luwId = event.params.wallet.toHexString();
-  let luw = LicensedUserWallet.load(luwId);
+  const luwId = event.params.wallet.toHexString()
+  const luw = LicensedUserWallet.load(luwId)
 
   if (luw == null) {
-    log.error("received RemovedOwner event for unknown LUW: {}", [luwId]);
-    return;
+    log.error('received RemovedOwner event for unknown LUW: {}', [luwId])
+    return
   }
 
-  let owner = event.params.owner;
-  let ownerIdx = luw.owners.indexOf(owner);
+  const owner = event.params.owner
+  const ownerIdx = luw.owners.indexOf(owner)
   if (ownerIdx == -1) {
-    log.error("owner in RemovedOwner [{}] is not in the indexed owner list", [
+    log.error('owner in RemovedOwner [{}] is not in the indexed owner list', [
       owner.toHexString(),
-    ]);
-    return;
+    ])
+    return
   }
 
-  log.info("removing owner [{}] to LUW [{}]", [owner.toHexString(), luwId]);
+  log.info('removing owner [{}] to LUW [{}]', [owner.toHexString(), luwId])
 
   // assign to separate variable is required when updating array, see here:
   // (see https://thegraph.com/docs/assemblyscript-api#api-reference):
-  let owners = luw.owners;
-  owners.splice(ownerIdx, 1);
-  luw.owners = owners;
+  const owners = luw.owners
+  owners.splice(ownerIdx, 1)
+  luw.owners = owners
 
-  luw.updatedAt = eventUTCMillis(event);
-  luw.save();
+  luw.updatedAt = eventUTCMillis(event)
+  luw.save()
 }
 
 export function handleChangedThreshold(event: ChangedThresholdEvent): void {
-  logInvocation("handleChangedThreshold", event);
+  logInvocation('handleChangedThreshold', event)
 
-  let luwId = event.params.wallet.toHexString();
-  let luw = LicensedUserWallet.load(luwId);
+  const luwId = event.params.wallet.toHexString()
+  const luw = LicensedUserWallet.load(luwId)
 
   if (luw == null) {
-    log.error("received ChangedThreshold event for unknown LUW: {}", [luwId]);
-    return;
+    log.error('received ChangedThreshold event for unknown LUW: {}', [luwId])
+    return
   }
 
-  log.info("changing threshold to [{}] for LUW [{}]", [
+  log.info('changing threshold to [{}] for LUW [{}]', [
     BigInt.fromI32(event.params.threshold).toString(),
     luwId,
-  ]);
-  luw.threshold = event.params.threshold;
-  luw.updatedAt = eventUTCMillis(event);
-  luw.save();
+  ])
+  luw.threshold = event.params.threshold
+  luw.updatedAt = eventUTCMillis(event)
+  luw.save()
 }
 
 export function handleUpgradeLicensedUserWalletToMulti(
   event: UpgradeLicensedUserWalletToMultiEvent
 ): void {
-  logInvocation("handleUpgradeLicensedUserWalletToMulti", event);
+  logInvocation('handleUpgradeLicensedUserWalletToMulti', event)
 
-  let luwId = event.params.walletAddress.toHexString();
-  let luw = LicensedUserWallet.load(luwId);
+  const luwId = event.params.walletAddress.toHexString()
+  const luw = LicensedUserWallet.load(luwId)
   if (luw == null) {
     log.error(
-      "received UpgradeLicensedUserWalletToMulti event for unknown LUW: {}",
+      'received UpgradeLicensedUserWalletToMulti event for unknown LUW: {}',
       [luwId]
-    );
-    return;
+    )
+    return
   }
 
-  log.info("upgrading LUW {} to multi signer", [luwId]);
-  luw.owners = event.params.owners as Array<Bytes>;
-  luw.threshold = event.params.threshold;
-  luw.updatedAt = eventUTCMillis(event);
-  luw.save();
+  log.info('upgrading LUW {} to multi signer', [luwId])
+  luw.owners = event.params.owners as Array<Bytes>
+  luw.threshold = event.params.threshold
+  luw.updatedAt = eventUTCMillis(event)
+  luw.save()
 }
 
 export function handleUpdateLicensedUserDetail(
   event: UpdateLicensedUserDetailEvent
 ): void {
-  logInvocation("handleUpdateLicensedUserDetail", event);
+  logInvocation('handleUpdateLicensedUserDetail', event)
 
-  let luwId = event.params.walletAddress.toHexString();
-  let luw = LicensedUserWallet.load(luwId);
+  const luwId = event.params.walletAddress.toHexString()
+  const luw = LicensedUserWallet.load(luwId)
   if (luw == null) {
-    log.error("received UpdateLicensedUserDetail event for unknown LUW: {}", [
+    log.error('received UpdateLicensedUserDetail event for unknown LUW: {}', [
       luwId,
-    ]);
-    return;
+    ])
+    return
   }
 
-  log.info("updating LUW {} {} to {}", [
+  log.info('updating LUW {} {} to {}', [
     luwId,
     event.params.key,
     event.params.value,
-  ]);
+  ])
 
-  if (event.params.key == "englishName") {
-    luw.englishName = event.params.value;
-  } else if (event.params.key == "originalName") {
-    luw.originalName = event.params.value;
+  if (event.params.key == 'englishName') {
+    luw.englishName = event.params.value
+  } else if (event.params.key == 'originalName') {
+    luw.originalName = event.params.value
   }
 
-  luw.updatedAt = eventUTCMillis(event);
-  luw.save();
+  luw.updatedAt = eventUTCMillis(event)
+  luw.save()
 }
 
 export function handleMigrateLicensedUser(
   event: MigrateLicensedUserWalletEvent
 ): void {
-  logInvocation("handleMigrateLicensedUser", event);
-  let luwId = event.params.walletAddress.toHexString();
-  let luw = LicensedUserWallet.load(luwId);
+  logInvocation('handleMigrateLicensedUser', event)
+  const luwId = event.params.walletAddress.toHexString()
+  const luw = LicensedUserWallet.load(luwId)
 
-  let createTime = secondsToMillis(event.params.originTimestamp);
-  luw.createdAt = createTime;
-  luw.updatedAt = createTime;
+  const createTime = secondsToMillis(event.params.originTimestamp)
+  luw.createdAt = createTime
+  luw.updatedAt = createTime
 
-  luw.originChain = event.params.originChain;
+  luw.originChain = event.params.originChain
 
-  luw.save();
+  luw.save()
 }

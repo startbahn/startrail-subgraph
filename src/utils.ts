@@ -6,89 +6,89 @@ import {
   log,
 } from '@graphprotocol/graph-ts'
 
-export let currentChainId = (): string => {
-  let network: string = dataSource.network();
+export const currentChainId = (): string => {
+  const network: string = dataSource.network()
 
-  let chainId: string;
+  let chainId: string
 
-  if (network === "matic") {
-    chainId = "eip155:137";
-  } else if (network.indexOf("mumbai") !== -1) {
-    chainId = "eip155:80001";
-  } else if (network === "hardhat" || network.indexOf("local") !== -1) {
-    chainId = "eip155:31337";
+  if (network === 'matic') {
+    chainId = 'eip155:137'
+  } else if (network.indexOf('mumbai') !== -1) {
+    chainId = 'eip155:80001'
+  } else if (network === 'hardhat' || network.indexOf('local') !== -1) {
+    chainId = 'eip155:31337'
   } else {
-    chainId = "eip155:unknown";
+    chainId = 'eip155:unknown'
   }
 
-  return chainId;
-};
+  return chainId
+}
 
-export let ZERO_ADDRESS = Address.fromString(
-  "0x0000000000000000000000000000000000000000"
-);
+export const ZERO_ADDRESS = Address.fromString(
+  '0x0000000000000000000000000000000000000000'
+)
 
 export function secondsToMillis(timestampSeconds: BigInt): BigInt {
-  return timestampSeconds.times(BigInt.fromI32(1000));
+  return timestampSeconds.times(BigInt.fromI32(1000))
 }
 
 export function eventUTCMillis(event: ethereum.Event): BigInt {
-  return secondsToMillis(event.block.timestamp);
+  return secondsToMillis(event.block.timestamp)
 }
 
 export function ethereumValueToString(v: ethereum.Value): string {
-  let valueStr: string;
+  let valueStr: string
   switch (v.kind) {
     case ethereum.ValueKind.STRING:
-      valueStr = v.toString();
-      break;
+      valueStr = v.toString()
+      break
     case ethereum.ValueKind.ADDRESS:
-      valueStr = v.toAddress().toHexString();
-      break;
+      valueStr = v.toAddress().toHexString()
+      break
     case ethereum.ValueKind.INT:
     case ethereum.ValueKind.UINT:
-      valueStr = v.toBigInt().toString();
-      break;
+      valueStr = v.toBigInt().toString()
+      break
     case ethereum.ValueKind.BYTES:
     case ethereum.ValueKind.FIXED_BYTES:
-      valueStr = v.toBytes().toHexString();
-      break;
+      valueStr = v.toBytes().toHexString()
+      break
     case ethereum.ValueKind.ARRAY:
     case ethereum.ValueKind.FIXED_ARRAY:
       valueStr =
-        "(" +
+        '(' +
         v
           .toArray()
           .map<string>((iv: ethereum.Value) => ethereumValueToString(iv))
           .toString() +
-        ")";
-      break;
+        ')'
+      break
     case ethereum.ValueKind.TUPLE:
       valueStr =
-        "(" +
+        '(' +
         v
           .toTuple()
           .map<string>((iv: ethereum.Value) => ethereumValueToString(iv))
           .toString() +
-        ")";
-      break;
+        ')'
+      break
     default:
       // raw u64 type
-      valueStr = v.data.toString();
+      valueStr = v.data.toString()
   }
-  return valueStr;
+  return valueStr
 }
 
 export function logInvocation(
   handlerName: string,
   event: ethereum.Event
 ): void {
-  let paramLog: string[] = event.parameters.map<string>(
-    (p) => p.name + ":" + ethereumValueToString(p.value)
-  );
-  log.info("{} [params: {}] [tx: {}]", [
+  const paramLog: string[] = event.parameters.map<string>(
+    (p) => p.name + ':' + ethereumValueToString(p.value)
+  )
+  log.info('{} [params: {}] [tx: {}]', [
     handlerName,
     paramLog.toString(),
     event.transaction.hash.toHexString(),
-  ]);
+  ])
 }
