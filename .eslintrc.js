@@ -27,6 +27,10 @@ module.exports = {
     ],
     'no-return-await': ['error'],
     'no-console': ['warn'],
+    // switch off because assembly script is writing out a lot of warnings for
+    // const usage at this stage.
+    // and if this is on eslint fix which change all let's to const.
+    'prefer-const': 'off',
     '@typescript-eslint/ban-types': 0,
   },
 }

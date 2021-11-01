@@ -22,16 +22,16 @@ import {
   CreateCustomHistory as CustomHistoryCreatedEvent,
   CreateCustomHistoryFromMigration as CustomHistoryCreatedFromMigrationEvent,
   CreateCustomHistoryType as CustomHistoryTypeCreatedEvent,
-  CreateSRR as CreateSRREvent,
-  CreateSRR1 as CreateSRRWithLockExternalTransferEvent,
+  CreateSRR as CreateSRRWithLockExternalTransferEvent,
+  CreateSRR1 as CreateSRREventLegacy,
   CreateSRRFromMigration as CreateSRRFromMigrationEvent,
   History as SRRHistoryEvent,
   LockExternalTransfer as LockExternalTransferEvent,
   MigrateSRR as MigrateSRREvent,
-  Provenance as SRRProvenanceEvent,
-  Provenance1 as SRRProvenanceWithCustomHistoryEvent,
-  Provenance2 as SRRProvenanceWithIntermediaryEvent,
-  Provenance3 as SRRProvenanceWithCustomHistoryAndIntermediaryEvent,
+  Provenance as SRRProvenanceWithIntermediaryEvent,
+  Provenance1 as SRRProvenanceWithCustomHistoryAndIntermediaryEvent,
+  Provenance2 as SRRProvenanceEventLegacy,
+  Provenance3 as SRRProvenanceWithCustomHistoryEventLegacy,
   ProvenanceDateMigrationFix as ProvenanceDateMigrationFixEvent,
   ProvenanceFromMigration as SRRProvenanceFromMigrationEvent,
   ProvenanceFromMigration1 as SRRProvenanceWithCustomHistoryFromMigrationEvent,
@@ -140,7 +140,7 @@ function checkAndClearCommitOnTransfer(srr: SRR, eventTime: BigInt): void {
   srr.transferCommitment = null
 }
 
-export function handleCreateSRR(event: CreateSRREvent): void {
+export function handleCreateSRR(event: CreateSRREventLegacy): void {
   logInvocation('handleCreateSRR', event)
 
   const timestampMillis = eventUTCMillis(event)
@@ -241,7 +241,7 @@ function getLicensedUserIdFromAddress(address: Address): string | null {
   return luw == null ? null : luw.id
 }
 
-export function handleSRRProvenance(event: SRRProvenanceEvent): void {
+export function handleSRRProvenance(event: SRRProvenanceEventLegacy): void {
   logInvocation('handleSRRProvenance', event)
   const params = event.params
   handleSRRProvenanceInternal(
@@ -257,7 +257,7 @@ export function handleSRRProvenance(event: SRRProvenanceEvent): void {
 }
 
 export function handleSRRProvenanceWithCustomHistory(
-  event: SRRProvenanceWithCustomHistoryEvent
+  event: SRRProvenanceWithCustomHistoryEventLegacy
 ): void {
   logInvocation('handleSRRProvenanceWithCustomHistory', event)
   const params = event.params

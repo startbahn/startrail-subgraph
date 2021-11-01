@@ -25,10 +25,10 @@
     "deploy-gke-staging": "npm run generate-staging && graph deploy --ipfs https://subgraph.startbahn.jp/ipfs/ --node https://subgraph.startbahn.jp/admin/ startbahn/startrail-mumbai-staging subgraph.mumbai-staging.yaml",
     "deploy-gke-polygon": "npm run generate-polygon && graph deploy --ipfs https://subgraph.startrail.io/ipfs/ --node https://subgraph.startrail.io/admin/ startbahn/startrail-polygon subgraph.polygon.yaml",
     "deploy-gke-master": "npm run generate-master && graph deploy --ipfs https://subgraph.startrail.io/ipfs/ --node https://subgraph.startrail.io/admin/ startbahn/startrail subgraph.mainnet.yaml",
-    "deploy-develop": "npm run generate-develop && graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail-mumbai-develop --access-token $TOKEN subgraph.mumbai-develop.yaml",
-    "deploy-release": "npm run generate-release && graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail-mumbai-release --access-token $TOKEN subgraph.mumbai-release.yaml",
-    "deploy-staging": "npm run generate-staging && graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail-mumbai-staging --access-token $TOKEN subgraph.mumbai-staging.yaml",
-    "deploy-polygon": "npm run generate-polygon && graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail-polygon --access-token $TOKEN subgraph.polygon.yaml",
+    "deploy-develop": "npm run generate-develop && graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail-mumbai-develop --access-token \"$TOKEN\" subgraph.mumbai-develop.yaml",
+    "deploy-release": "npm run generate-release && graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail-mumbai-release --access-token \"$TOKEN\" subgraph.mumbai-release.yaml",
+    "deploy-staging": "npm run generate-staging && graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail-mumbai-staging --access-token \"$TOKEN\" subgraph.mumbai-staging.yaml",
+    "deploy-polygon": "npm run generate-polygon && graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ startbahn/startrail-polygon --access-token \"$TOKEN\" subgraph.polygon.yaml",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "generate-local": "node bin/generate-subgraph-yaml local ../startrail/deployments/localhost/deploy.json ../startrail/abi 1",
     "generate-develop": "node bin/generate-subgraph-yaml mumbai-develop",
@@ -60,7 +60,7 @@
     "typescript": "^4.3.5"
   },
   "dependencies": {
-    "@startbahn/startrail": "1.8.0-beta-13",
+    "@startbahn/startrail": "1.9.0-bulk-60k-beta-1",
     "babel-polyfill": "^6.26.0",
     "babel-register": "^6.26.0",
     "lokka": "^1.7.0",
