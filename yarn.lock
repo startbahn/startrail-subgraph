@@ -596,10 +596,10 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@startbahn/startrail@1.8.0-beta-13":
-  version "1.8.0-beta-13"
-  resolved "https://registry.yarnpkg.com/@startbahn/startrail/-/startrail-1.8.0-beta-13.tgz#7b0c834d7289f54881c887fccf8e7896aa573637"
-  integrity sha512-ZaF5D4OPURmPhf3G1p3i8oR7gP9VuknBuAKmRixH6/WKi8l6JrUA5Auo4tU4xgo1TIMwj4B9Pqk99NstUJ3UHg==
+"@startbahn/startrail@1.9.0-bulk-60k-beta-2":
+  version "1.9.0-bulk-60k-beta-2"
+  resolved "https://registry.yarnpkg.com/@startbahn/startrail/-/startrail-1.9.0-bulk-60k-beta-2.tgz#918bf6aca819f212c4279df00fb5147fea4a151e"
+  integrity sha512-IUMESS/lCBG1bjFEGlaZkrFGfIdsGRY+YrmHzoSJz0DgvfgpixC3svzJLLew2zhVwRCax0b+O/gmA/J7ZXIWFA==
 
 "@tootallnate/once@1":
   version "1.1.2"
