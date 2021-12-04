@@ -7,3 +7,4 @@ subgraph.*.yaml
 
 docker/data
 
+package-lock.json
