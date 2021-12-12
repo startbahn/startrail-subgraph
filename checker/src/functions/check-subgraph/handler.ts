@@ -51,6 +51,7 @@ export const checkSubgraph = async (
   }
 
   try {
+    console.log('config', getConfig())
     //
     // Fetch Subgraph Status
     //
