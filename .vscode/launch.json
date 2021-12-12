@@ -1,0 +1,47 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      
+      {
+        "name": "Docker: Attach to NestJS",
+        "type": "node",
+        "request": "attach",
+        "port": 9229,
+        "address": "0.0.0.0",
+        "localRoot": "${workspaceFolder}",
+        "remoteRoot": "/startrail-api",
+        "protocol": "inspector",
+        "restart": true
+      },
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "jest unit test",
+        "program": "${workspaceRoot}/node_modules/jest/node_modules/.bin/jest",
+        "args": ["--runInBand", "request-context"]
+      },
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "jest tx-sender",
+        "program": "${workspaceRoot}/node_modules/jest/node_modules/.bin/jest",
+        "args": ["--runInBand", "tx-sender"]
+      },
+      {
+        "name": "jest e2e test debug",
+        "type": "node",
+        "request": "launch",
+        "runtimeArgs": [
+          "--inspect-brk",
+          "${workspaceRoot}/node_modules/.bin/jest",
+          "--config", 
+          "${workspaceRoot}/jest-e2e.js",
+          "--runInBand",
+          "--forceExit"
+        ],
+        "console": "integratedTerminal",
+        "internalConsoleOptions": "neverOpen",
+        "port": 9229
+      }
+  ]
+}

@@ -8,3 +8,9 @@ subgraph.*.yaml
 docker/data
 
 package-lock.json
+
+.serverless/
+.env
+.env.local
+.env.prod
+.env.qa

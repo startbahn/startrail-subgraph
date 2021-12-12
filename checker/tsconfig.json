@@ -1,0 +1,53 @@
+{
+  "extends": "./tsconfig.paths.json",
+  "compilerOptions": {
+    "target": "ES2019",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowJs": true,
+    "sourceMap": true,
+    // "outDir": "./dist",
+    "strict": true,
+    "noImplicitAny": false,
+    // "baseUrl": "./src/",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "incremental": true,
+    "resolveJsonModule": true,
+  },
+  "include": ["**/*.ts", "serverless.ts"],
+  "exclude": ["node_modules/**/*", ".serverless/**/*", ".webpack/**/*", ".vscode/**/*"],
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
+  }
+}
+
+
+
+// "target": "ES2019",
+// "module": "commonjs",
+// "moduleResolution": "node",
+// "esModuleInterop": true,
+// "allowJs": true,
+// "sourceMap": true,
+// "outDir": "./dist",
+// "strict": true,
+// "noImplicitAny": false,
+// "baseUrl": "./src/",
+// "emitDecoratorMetadata": true,
+// "experimentalDecorators": true,
+// "incremental": true,
+// "resolveJsonModule": true,
+
+
+// "lib": ["ESNext"],
+// "moduleResolution": "node",
+// "noUnusedLocals": true,
+// "noUnusedParameters": true,
+// "removeComments": true,
+// "sourceMap": true,
+// "target": "ES2020",
+// "esModuleInterop": true,        
+// "strict": true,
+// "outDir": "dist"
