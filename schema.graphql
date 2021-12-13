@@ -132,11 +132,18 @@ type SRRTransferCommit @entity {
 type BulkIssue @entity {
   id: ID! # merkleRoot.toHexString()
   merkleRoot: Bytes! # batch merkle root
-  srrs: [Bytes!] # Hashes of SRRs processed
+  srrs: [BulkIssueSRR!]! @derivedFrom(field: "bulkIssue")
   issuer: Bytes! # batchprepared issuer
-  tokenId: String # ERC721 token id for createSRRwithProof event
   createdAt: BigInt! # block.timestamp when entity created
   updatedAt: BigInt! # block.timestamp when entity last updated
+}
+
+type BulkIssueSRR @entity {
+  id: ID! # merkleRoot.toHexString()
+  hash: Bytes! # hash of SRR props isPrimaryIssuer, artistAddress and metadataDigest
+  tokenId: String # ERC721 token id for createSRRwithProof event
+  bulkIssue: BulkIssue! # BulkIssue this entity belongs too
+  createdAt: BigInt! # block.timestamp when entity created
 }
 
 type BulkTransfer @entity {

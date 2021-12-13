@@ -6,8 +6,9 @@
  * Uses deployments.json for contract addresses etc.
  */
 const fs = require('fs')
-const yaml = require('js-yaml')
+const os = require('os')
 const path = require('path')
+const yaml = require('js-yaml')
 
 const rootDir = path.dirname(path.dirname(require.main.filename))
 const rootPath = (rootFile) => path.join(rootDir, rootFile)
@@ -42,8 +43,6 @@ if (['local', 'mainnet'].indexOf(deploymentName) !== -1) {
   network = 'matic'
 } else if (deploymentName.startsWith('mumbai')) {
   network = 'mumbai'
-} else if (deploymentName.startsWith('rinkeby')) {
-  network = 'rinkeby'
 } else {
   throw new Error(`network unknown for deployment [${deploymentName}]`)
 }
@@ -130,12 +129,29 @@ subgraphYamlTemplate.dataSources.forEach((ds) => {
   }
 
   //
+  // ABI file path AND BulkIssue.json 2d array workaround
+  //
+  let abiFilePath = path.join(abisPath, `${contractName}.json`)
+  if (contractName === 'BulkIssue') {
+    // graph-cli does not support Solidity 2d arrays
+    // see https://github.com/graphprotocol/graph-cli/issues/342
+    // so here, strip out the ABI for the function using the 2d array.
+    // it's not required by the subgraph.
+    const bulkIssueABI = JSON.parse(fs.readFileSync(abiFilePath))
+    const bulkissueABIModified = bulkIssueABI.filter(
+      (e) => e.name !== 'createSRRWithProofMulti'
+    )
+    abiFilePath = path.join(os.tmpdir(), `BulkIssue.json`)
+    fs.writeFileSync(abiFilePath, JSON.stringify(bulkissueABIModified, null, 2))
+  }
+
+  //
   // Set dataSource properties
   //
   ds.network = network
   ds.source.address = contractAddress
   ds.source.startBlock = startBlock
-  ds.mapping.abis[0].file = path.join(abisPath, `${contractName}.json`)
+  ds.mapping.abis[0].file = abiFilePath
 })
 
 fs.writeFileSync(
