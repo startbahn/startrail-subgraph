@@ -9,9 +9,9 @@
     "deploy:stag": "NODE_ENV=development serverless deploy --stage stag",
     "remove:stag": "NODE_ENV=development serverless remove --stage stag",
     "deploy:prod": "NODE_ENV=production serverless deploy --stage prod",
-    "remove:prod": "NODE_ENV=development serverless remove --stage prod",
+    "remove:prod": "NODE_ENV=production serverless remove --stage prod",
     "deploy:qa": "NODE_ENV=production serverless deploy --stage qa",
-    "remove:qa": "NODE_ENV=development serverless remove --stage qa",
+    "remove:qa": "NODE_ENV=production serverless remove --stage qa",
     "lint": "eslint . --ext .ts,.js",
     "lint:fix": "yarn run lint --fix",
     "test": "jest --runInBand --forceExit --setupFiles dotenv/config"
