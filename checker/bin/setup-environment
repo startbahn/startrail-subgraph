@@ -1,0 +1,42 @@
+#!/bin/sh
+
+#
+# This script will setup an API environment for development:
+#  - Install npm modules
+#  - Install .env file
+#
+
+PROJECT_ROOT=`dirname $0`/..
+DOT_ENV=$PROJECT_ROOT/.env
+
+echo $DOT_ENV
+
+msg_box() {
+  MSG=$1
+  echo "\n###############################################################################"
+  echo "  $MSG"
+  echo "###############################################################################\n"
+}
+
+msg_done() {
+  echo "\nDone\n"
+}
+
+#
+# Install / Update Dependencies
+#
+msg_box "Installing npm dependencies"
+yarn
+msg_done
+
+#
+# Install local .env
+#
+msg_box "Create .env"
+if [ -f $DOT_ENV ]; then
+  cp $DOT_ENV .env.setup-environment.backup.`date +%s`
+fi
+cp -fv $PROJECT_ROOT/.env.local.example $DOT_ENV
+msg_done
+
+msg_box "Environment setup has completed!"

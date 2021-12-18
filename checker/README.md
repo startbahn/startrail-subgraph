@@ -1,27 +1,33 @@
+### Setup Environment
+
+Run [bin/setup-environment](../bin/setup-environment)
+
+This will:
+
+- install [.env.local.example](../.env.local.example) to .env
+- install npm dependencies
 ### Authenticate
 
 Follow [the authentication doc](https://www.serverless.com/framework/docs/providers/google/guide/credentials/).
 
-**TL;DR**
 
-```shell
+```bash
 gcloud auth application-default login
-```
-
-### Install the dependencies
-
-```shell
-# with npm
-npm i
-# or yarn
-yarn
 ```
 
 ### Deploy
 
 ```shell
-# with npm
-npm run deploy:(dev|prod|qa)
-# or yarn
-yarn deploy:(dev|prod|qa)
+yarn deploy:(stag|prod|qa)
 ```
+### Remove
+
+```bash
+yarn remove:(stag|prod|qa)
+```
+
+## Test
+
+```bash
+# unit tests
+yarn run test

@@ -5,10 +5,16 @@
   "main": "serverless.ts",
   "author": "Startbahn, Inc. <https://startbahn.jp/>",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "format": "prettier --write  \"*.ts\"  \"*.js\" \"src/**/*.ts\" ",
-    "deploy:dev": "NODE_ENV=development serverless deploy --stage dev",
-    "deploy:prod": "NODE_ENV=production serverless deploy --stage prod"
+    "deploy:stag": "NODE_ENV=development serverless deploy --stage stag",
+    "remove:stag": "NODE_ENV=development serverless remove --stage stag",
+    "deploy:prod": "NODE_ENV=production serverless deploy --stage prod",
+    "remove:prod": "NODE_ENV=development serverless remove --stage prod",
+    "deploy:qa": "NODE_ENV=production serverless deploy --stage qa",
+    "remove:qa": "NODE_ENV=development serverless remove --stage qa",
+    "lint": "eslint . --ext .ts,.js",
+    "lint:fix": "yarn run lint --fix",
+    "test": "jest --runInBand --forceExit --setupFiles dotenv/config"
   },
   "engines": {
     "node": ">=14.15.0"
@@ -21,7 +27,13 @@
     "@types/express": "4.17.11",
     "@types/node": "14.14.25",
     "express": "4.17.1",
-    "lint-staged": "12.1.2",
+    "@typescript-eslint/eslint-plugin": "4.29.1",
+    "@typescript-eslint/parser": "4.29.1",
+    "eslint": "7.18.0",
+    "eslint-config-prettier": "7.2.0",
+    "eslint-plugin-prettier": "3.3.1",
+    "eslint-plugin-promise": "4.2.1",
+    "lint-staged": "9.5.0",
     "prettier": "2.2.1",
     "serverless": "2.23.0",
     "serverless-dotenv-plugin": "3.10.0",
@@ -33,7 +45,9 @@
     "tsconfig-paths-webpack-plugin": "3.5.2",
     "typescript": "4.3.5",
     "webpack": "5.20.2",
-    "webpack-node-externals": "2.5.2"
+    "webpack-node-externals": "2.5.2",
+    "jest": "26.6.3",
+    "ts-jest": "26.4.4"
   },
   "dependencies": {
     "axios": "0.24.0",
@@ -41,6 +55,6 @@
     "p-retry": "4.2.0"
   },
   "lint-staged": {
-    "*.{ts,js}": "eslint --ignore-path .gitignore .eslintrc.js"
+    "*.{ts,js}": "eslint --ignore-path webpack.config.js ../.gitignore ../.eslintrc.js"
   }
 }

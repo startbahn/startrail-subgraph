@@ -9,7 +9,7 @@ export type ServerlessConfigurationType = {
   service: string
   frameworkVersion: '2'
   useDotenv?: boolean
-  custom: Record<string, any>
+  custom: Record<string, unknown>
   plugins: string[]
   provider: {
     name: 'google'

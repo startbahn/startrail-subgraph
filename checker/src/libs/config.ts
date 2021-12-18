@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import convict from 'convict'
 import { config as dotenvConfig } from 'dotenv'
 
@@ -67,6 +68,7 @@ export function initConfig(): void {
     return
   }
 
+  dotenvConfig({ path: '.env' })
   switch (process.env.NODE_ENV || 'development') {
     case 'development':
       dotenvConfig({ path: '.env.dev' })

@@ -1,6 +1,9 @@
+/* eslint-disable no-console */
 import type { Request, Response } from 'express'
 import axios from 'axios'
 import pRetry from 'p-retry'
+
+const RETRY_TIME = 3
 
 type ConfigType = {
   CHECKER_RUNTIME_SUBGRAPH_URL: string
@@ -8,14 +11,39 @@ type ConfigType = {
   CHECKER_RUNTIMETHRESHOLD_BLOCKS_LAGGING: string
 }
 
+type SubgraphStatusType = {
+  data: {
+    _meta: {
+      block: {
+        number: number
+      }
+      hasIndexingErrors: boolean
+    }
+  }
+}
+
+type CurrentBlockType = {
+  jsonrpc: string
+  id: number
+  result: string
+}
+
+type CheckSubgraphSuccessResponse = string
+
+type CheckSubgraphErrorResponseType = {
+  msg: string
+  error: boolean
+}
+
 // load from runtime environment variables
-const getConfig = (): ConfigType => {
+export const getConfig = (): ConfigType => {
   return {
-    CHECKER_RUNTIME_SUBGRAPH_URL: process.env.CHECKER_RUNTIME_SUBGRAPH_URL!,
-    CHECKER_RUNTIME_ETHEREUM_PROVIDER_URL: process.env
-      .CHECKER_RUNTIME_ETHEREUM_PROVIDER_URL!,
-    CHECKER_RUNTIMETHRESHOLD_BLOCKS_LAGGING: process.env
-      .CHECKER_RUNTIMETHRESHOLD_BLOCKS_LAGGING!,
+    CHECKER_RUNTIME_SUBGRAPH_URL:
+      process.env.CHECKER_RUNTIME_SUBGRAPH_URL || '',
+    CHECKER_RUNTIME_ETHEREUM_PROVIDER_URL:
+      process.env.CHECKER_RUNTIME_ETHEREUM_PROVIDER_URL || '',
+    CHECKER_RUNTIMETHRESHOLD_BLOCKS_LAGGING:
+      process.env.CHECKER_RUNTIMETHRESHOLD_BLOCKS_LAGGING || '',
   }
 }
 
@@ -23,41 +51,73 @@ const SUBGRAPH_QUERY = `{"query":"{\\n  _meta {\\n    block {\\n      number\\n 
 
 const ETHEREUM_GET_BLOCK_QUERY = `{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}`
 
-const fetchJSONWithRetry = async (url: string, body: string): Promise<any> =>
-  pRetry(
+export const fetchSubgraphStatus = async (): Promise<SubgraphStatusType> => {
+  const url = getConfig().CHECKER_RUNTIME_SUBGRAPH_URL
+  const body = SUBGRAPH_QUERY
+  return pRetry(
     () =>
       axios
         .post(url, body, {
           headers: { 'Content-Type': 'application/json' },
         })
-        .then((response) => response.data),
+        .then((response) => {
+          return response.data as SubgraphStatusType
+        }),
     {
-      retries: 3,
+      retries: RETRY_TIME,
       onFailedAttempt: (error) => {
         console.info(`failure [${error.message}] retry ...`)
       },
     }
   )
+}
+
+export const fetchCurrentBlock = async (): Promise<CurrentBlockType> => {
+  const url = getConfig().CHECKER_RUNTIME_ETHEREUM_PROVIDER_URL
+  const body = ETHEREUM_GET_BLOCK_QUERY
+  return pRetry(
+    () =>
+      axios
+        .post(url, body, {
+          headers: { 'Content-Type': 'application/json' },
+        })
+        .then((response) => {
+          return response.data as CurrentBlockType
+        }),
+    {
+      retries: RETRY_TIME,
+      onFailedAttempt: (error) => {
+        console.info(`failure [${error.message}] retry ...`)
+      },
+    }
+  )
+}
 
 export const checkSubgraph = async (
   req: Request,
   res: Response
-): Promise<any> => {
-  const respond = (responseBody: any) => res.status(200).send(responseBody)
+): Promise<CheckSubgraphSuccessResponse | CheckSubgraphErrorResponseType> => {
+  const succeedRespond = (
+    responseBody: CheckSubgraphSuccessResponse
+  ): CheckSubgraphSuccessResponse =>
+    (res
+      .status(200)
+      .send(responseBody) as unknown) as CheckSubgraphSuccessResponse
 
   const errorResponse = (msg: string) => {
     console.error(`ERROR: ${msg}`)
-    return respond({ msg, error: true })
+    return (res
+      .status(200)
+      .send({ msg, error: true }) as unknown) as CheckSubgraphErrorResponseType
   }
 
   try {
     //
     // Fetch Subgraph Status
     //
-    const subgraphStatus = await fetchJSONWithRetry(
-      getConfig().CHECKER_RUNTIME_SUBGRAPH_URL,
-      SUBGRAPH_QUERY
-    ).then((result) => result.data['_meta'])
+    const subgraphStatus = await fetchSubgraphStatus().then(
+      (result) => result.data._meta
+    )
     console.log(`subgraphStatus: ${JSON.stringify(subgraphStatus)}`)
 
     //
@@ -70,10 +130,9 @@ export const checkSubgraph = async (
     //
     // Compare current block with indexed block
     //
-    const currentBlock = await fetchJSONWithRetry(
-      getConfig().CHECKER_RUNTIME_ETHEREUM_PROVIDER_URL,
-      ETHEREUM_GET_BLOCK_QUERY
-    ).then((getBlockResult) => Number(getBlockResult.result))
+    const currentBlock = await fetchCurrentBlock().then((getBlockResult) =>
+      Number(getBlockResult.result)
+    )
     console.log(`currentBlock: ${currentBlock}`)
 
     const indexedBlockNumber = subgraphStatus.block.number
@@ -83,11 +142,11 @@ export const checkSubgraph = async (
       currentBlock - indexedBlockNumber >
       Number(getConfig().CHECKER_RUNTIMETHRESHOLD_BLOCKS_LAGGING)
     ) {
-      return errorResponse(`Subgraph indexing is lagging or stalled`)
+      return errorResponse('Subgraph indexing is lagging or stalled')
     }
 
-    return respond('OK')
-  } catch (err: any) {
+    return succeedRespond('OK')
+  } catch (err) {
     console.error(err)
     return errorResponse(err.toString())
   }
