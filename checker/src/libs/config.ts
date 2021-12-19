@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import convict from 'convict'
 import { config as dotenvConfig } from 'dotenv'
 
@@ -9,14 +8,18 @@ const fields = {
     env: 'SLS_STAGE',
     default: 'dev',
   },
-
+  GCF_NODE_VERSION: {
+    doc: 'GCF_NODE_VERSION',
+    format: String,
+    env: 'GCF_NODE_VERSION',
+    default: '',
+  },
   GCF_REGION: {
     doc: 'GCF_REGION',
     format: String,
     env: 'GCF_REGION',
     default: '',
   },
-
   GCF_PROJECT_NAME: {
     doc: 'GCF_PROJECT_NAME',
     format: String,
@@ -72,6 +75,8 @@ export function initConfig(): void {
   switch (process.env.NODE_ENV || 'development') {
     case 'development':
       dotenvConfig({ path: '.env.dev' })
+      dotenvConfig({ path: '.env.stag' })
+      dotenvConfig({ path: '.env.qa' })
       break
     case 'production':
       dotenvConfig({ path: '.env.prod' })

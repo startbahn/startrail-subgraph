@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import type { Request, Response } from 'express'
 import axios from 'axios'
 import pRetry from 'p-retry'

@@ -9,11 +9,11 @@ export type ServerlessConfigurationType = {
   service: string
   frameworkVersion: '2'
   useDotenv?: boolean
-  custom: Record<string, unknown>
+  custom: Record<string, any>
   plugins: string[]
   provider: {
     name: 'google'
-    runtime: 'nodejs10' | 'nodejs12' | 'nodejs14' | 'nodejs16'
+    runtime: string
     stage: string
     region: string
     project: string

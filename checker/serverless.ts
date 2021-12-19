@@ -15,6 +15,7 @@ const serverlessConfiguration: ServerlessConfigurationType = {
       exclude: [
         'SLS_DEBUG',
         'SLS_STAGE',
+        'GCF_NODE_VERSION',
         'GCF_REGION',
         'GCF_PROJECT_NAME',
         'GCF_CREDENTAILS',
@@ -30,7 +31,7 @@ const serverlessConfiguration: ServerlessConfigurationType = {
   ],
   provider: {
     name: 'google',
-    runtime: 'nodejs14',
+    runtime: config('GCF_NODE_VERSION'),
     stage: config('SLS_STAGE'),
     region: config('GCF_REGION'),
     project: config('GCF_PROJECT_NAME'),
