@@ -18,12 +18,12 @@ gcloud auth application-default login
 ### Deploy
 
 ```shell
-yarn deploy:(stag|prod|qa)
+yarn deploy:(stg|prod|qa)
 ```
 ### Remove
 
 ```bash
-yarn remove:(stag|prod|qa)
+yarn remove:(stg|prod|qa)
 ```
 
 ## Test

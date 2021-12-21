@@ -6,8 +6,8 @@
   "author": "Startbahn, Inc. <https://startbahn.jp/>",
   "scripts": {
     "format": "prettier  --config ../.prettierrc --write  \"*.ts\"  \"*.js\" \"src/**/*.ts\" ",
-    "deploy:stag": "NODE_ENV=development serverless deploy --stage stag",
-    "remove:stag": "NODE_ENV=development serverless remove --stage stag",
+    "deploy:stg": "NODE_ENV=development serverless deploy --stage stg",
+    "remove:stg": "NODE_ENV=development serverless remove --stage stg",
     "deploy:prod": "NODE_ENV=production serverless deploy --stage prod",
     "remove:prod": "NODE_ENV=production serverless remove --stage prod",
     "deploy:qa": "NODE_ENV=production serverless deploy --stage qa",
