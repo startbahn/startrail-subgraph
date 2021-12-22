@@ -160,7 +160,7 @@ type Bulk @entity {
   id: ID! # merkleRoot.toHexString()
   merkleRoot: Bytes! # batch merkle root
   srrs: [BulkSRR!]! @derivedFrom(field: "bulk")
-  signer: Bytes! # batchprepared sender
+  sender: Bytes! # batchprepared sender
   tokenId: String # ERC721 token id for ApproveSRRCommitmentWithProof event
   createdAt: BigInt! # block.timestamp when entity created
   updatedAt: BigInt! # block.timestamp when entity last updated
