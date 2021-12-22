@@ -187,3 +187,29 @@ dataSources:
           handler: handleBatchPrepared
         - event: ApproveSRRByCommitmentWithProof(indexed bytes32,indexed uint256,bytes32)
           handler: handleApproveSRRByCommitmentWithProof
+  - kind: ethereum/contract
+    name: Bulk
+    network: ##AUTOFILL##
+    source:
+      address: ##AUTOFILL##
+      abi: Bulk
+      startBlock: ##AUTOFILL##
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - SRR
+      abis:
+        - name: Bulk
+          file: ./abis/Bulk.json
+      file: ./src/generalized-bulk-mapping.ts
+      eventHandlers:
+        - event: BatchPrepared(indexed bytes32,indexed address)
+          handler: handleBatchPrepared
+        - event: CreateSRRWithProof(indexed bytes32,indexed uint256,bytes32)
+          handler: handleCreateSRRWithProof
+        - event: ApproveSRRByCommitmentWithProof(indexed bytes32,indexed uint256,bytes32)
+          handler: handleApproveSRRByCommitmentWithProof
+        - event: TransferFromWithProvenanceWithProof(indexed bytes32,indexed uint256,bytes32)
+          handler: handleTransferFromWithProvenanceWithProof
