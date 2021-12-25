@@ -7,7 +7,7 @@ const RETRY_TIME = 3
 type ConfigType = {
   CHECKER_RUNTIME_SUBGRAPH_URL: string
   CHECKER_RUNTIME_ETHEREUM_PROVIDER_URL: string
-  CHECKER_RUNTIMETHRESHOLD_BLOCKS_LAGGING: string
+  CHECKER_RUNTIME_THRESHOLD_BLOCKS_LAGGING: string
 }
 
 type SubgraphStatusType = {
@@ -41,8 +41,8 @@ export const getConfig = (): ConfigType => {
       process.env.CHECKER_RUNTIME_SUBGRAPH_URL || '',
     CHECKER_RUNTIME_ETHEREUM_PROVIDER_URL:
       process.env.CHECKER_RUNTIME_ETHEREUM_PROVIDER_URL || '',
-    CHECKER_RUNTIMETHRESHOLD_BLOCKS_LAGGING:
-      process.env.CHECKER_RUNTIMETHRESHOLD_BLOCKS_LAGGING || '',
+    CHECKER_RUNTIME_THRESHOLD_BLOCKS_LAGGING:
+      process.env.CHECKER_RUNTIME_THRESHOLD_BLOCKS_LAGGING || '',
   }
 }
 
@@ -139,7 +139,7 @@ export const checkSubgraph = async (
 
     if (
       currentBlock - indexedBlockNumber >
-      Number(getConfig().CHECKER_RUNTIMETHRESHOLD_BLOCKS_LAGGING)
+      Number(getConfig().CHECKER_RUNTIME_THRESHOLD_BLOCKS_LAGGING)
     ) {
       return errorResponse('Subgraph indexing is lagging or stalled')
     }

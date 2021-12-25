@@ -11,8 +11,8 @@ describe('env', () => {
     expect(process.env.CHECKER_RUNTIME_ETHEREUM_PROVIDER_URL).toBeDefined()
   })
 
-  it('should have CHECKER_RUNTIMETHRESHOLD_BLOCKS_LAGGING', () => {
-    expect(process.env.CHECKER_RUNTIMETHRESHOLD_BLOCKS_LAGGING).toBeDefined()
+  it('should have CHECKER_RUNTIME_THRESHOLD_BLOCKS_LAGGING', () => {
+    expect(process.env.CHECKER_RUNTIME_THRESHOLD_BLOCKS_LAGGING).toBeDefined()
   })
 
   it('should haveCHECKER_DEPLOY_MEMORY_SIZE', () => {
@@ -27,7 +27,7 @@ describe('env', () => {
 describe('handler', () => {
   it('succeeds with getConfig', () => {
     const config = handler.getConfig()
-    expect(config.CHECKER_RUNTIMETHRESHOLD_BLOCKS_LAGGING).toBeDefined()
+    expect(config.CHECKER_RUNTIME_THRESHOLD_BLOCKS_LAGGING).toBeDefined()
     expect(config.CHECKER_RUNTIME_ETHEREUM_PROVIDER_URL).toBeDefined()
     expect(config.CHECKER_RUNTIME_SUBGRAPH_URL).toBeDefined()
   })
@@ -108,7 +108,7 @@ describe('handler', () => {
         process.env.CHECKER_RUNTIME_SUBGRAPH_URL || '',
       CHECKER_RUNTIME_ETHEREUM_PROVIDER_URL:
         process.env.CHECKER_RUNTIME_ETHEREUM_PROVIDER_URL || '',
-      CHECKER_RUNTIMETHRESHOLD_BLOCKS_LAGGING: '200',
+      CHECKER_RUNTIME_THRESHOLD_BLOCKS_LAGGING: '200',
     })
 
     const fetchSubgraphStatusSpy = jest.spyOn(handler, 'fetchSubgraphStatus')
