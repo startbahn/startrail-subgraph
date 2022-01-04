@@ -129,7 +129,7 @@ subgraphYamlTemplate.dataSources.forEach((ds) => {
   }
 
   //
-  // ABI file path AND BulkIssue.json 2d array workaround
+  // ABI file path AND BulkIssue.json and Bulk.json 2d array workaround
   //
   let abiFilePath = path.join(abisPath, `${contractName}.json`)
   if (contractName === 'BulkIssue') {
@@ -143,6 +143,14 @@ subgraphYamlTemplate.dataSources.forEach((ds) => {
     )
     abiFilePath = path.join(os.tmpdir(), `BulkIssue.json`)
     fs.writeFileSync(abiFilePath, JSON.stringify(bulkissueABIModified, null, 2))
+  }
+  if (contractName === 'Bulk') {
+    const bulkABI = JSON.parse(fs.readFileSync(abiFilePath))
+    const bulkABIModified = bulkABI.filter(
+      (e) => e.name !== 'createSRRWithProofMulti'
+    )
+    abiFilePath = path.join(os.tmpdir(), `Bulk.json`)
+    fs.writeFileSync(abiFilePath, JSON.stringify(bulkABIModified, null, 2))
   }
 
   //

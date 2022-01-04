@@ -156,6 +156,24 @@ type BulkTransfer @entity {
   updatedAt: BigInt! # block.timestamp when entity last updated
 }
 
+type Bulk @entity {
+  id: ID! # merkleRoot.toHexString()
+  merkleRoot: Bytes! # batch merkle root
+  srrs: [BulkSRR!]! @derivedFrom(field: "bulk")
+  sender: Bytes! # batchprepared sender
+  tokenId: String # ERC721 token id for ApproveSRRCommitmentWithProof event
+  createdAt: BigInt! # block.timestamp when entity created
+  updatedAt: BigInt! # block.timestamp when entity last updated
+}
+
+type BulkSRR @entity {
+  id: ID! # merkleRoot.toHexString()
+  hash: Bytes! # hash of function props 
+  tokenId: String # ERC721 token id
+  bulk: Bulk! # Bulk this entity belongs too
+  createdAt: BigInt! # block.timestamp when entity created
+}
+
 type MetaTxRequestType @entity {
   id: ID! # typeHash.toHexString()
   typeHash: Bytes!
