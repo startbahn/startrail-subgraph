@@ -1,3 +1,5 @@
+DEPRECATED: MOVED TO THE STARTRAIL CONTRACTS REPOSITORY
+
 # Startrail Subgraph
 
 This Subgraph indexes events from the Startrail smart contracts.
