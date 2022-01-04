@@ -1,0 +1,60 @@
+{
+  "name": "subgraph-serverless-functions",
+  "version": "1.0.0",
+  "description": "Subgraph serverless functions",
+  "main": "serverless.ts",
+  "author": "Startbahn, Inc. <https://startbahn.jp/>",
+  "scripts": {
+    "format": "prettier  --config ../.prettierrc --write  \"*.ts\"  \"*.js\" \"src/**/*.ts\" ",
+    "deploy:stg": "NODE_ENV=production serverless deploy --stage stg",
+    "remove:stg": "NODE_ENV=production serverless remove --stage stg",
+    "deploy:prod": "NODE_ENV=production serverless deploy --stage prod",
+    "remove:prod": "NODE_ENV=production serverless remove --stage prod",
+    "deploy:qa": "NODE_ENV=production serverless deploy --stage qa",
+    "remove:qa": "NODE_ENV=production serverless remove --stage qa",
+    "lint": "eslint . --ext .ts,.js",
+    "lint:fix": "yarn run lint --fix",
+    "test": "jest --runInBand --forceExit --setupFiles dotenv/config"
+  },
+  "engines": {
+    "node": ">=14.15.0"
+  },
+  "devDependencies": {
+    "@serverless/typescript": "2.23.0",
+    "@types/config": "0.0.40",
+    "@types/convict": "5.2.2",
+    "@types/dotenv": "8.2.0",
+    "@types/express": "4.17.11",
+    "@types/node": "14.14.25",
+    "express": "4.17.1",
+    "@typescript-eslint/eslint-plugin": "4.29.1",
+    "@typescript-eslint/parser": "4.29.1",
+    "eslint": "7.18.0",
+    "eslint-config-prettier": "7.2.0",
+    "eslint-plugin-prettier": "3.3.1",
+    "eslint-plugin-promise": "4.2.1",
+    "lint-staged": "9.5.0",
+    "prettier": "2.2.1",
+    "serverless": "2.23.0",
+    "serverless-dotenv-plugin": "3.10.0",
+    "serverless-google-cloudfunctions": "4.5.0",
+    "serverless-webpack": "5.3.5",
+    "ts-loader": "8.0.15",
+    "ts-node": "10.4.0",
+    "tsconfig-paths": "3.9.0",
+    "tsconfig-paths-webpack-plugin": "3.5.2",
+    "typescript": "4.3.5",
+    "webpack": "5.20.2",
+    "webpack-node-externals": "2.5.2",
+    "jest": "26.6.3",
+    "ts-jest": "26.4.4"
+  },
+  "dependencies": {
+    "axios": "0.24.0",
+    "convict": "6.0.0",
+    "p-retry": "4.2.0"
+  },
+  "lint-staged": {
+    "*.{ts,js}": "eslint --ignore-path webpack.config.js ../.gitignore ../.eslintrc.js"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.paths.json",
+  "include": ["**/*.ts", "serverless.ts"],
+  "exclude": ["node_modules/**/*", ".serverless/**/*", ".webpack/**/*", ".vscode/**/*"],
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
+  }
+}

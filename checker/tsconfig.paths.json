@@ -1,0 +1,11 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@functions/*": ["src/functions/*"],
+      "@serverlesss-types/*": ["src/types/*"],
+      "@libs/*": ["src/libs/*"]
+    }
+  }
+}
